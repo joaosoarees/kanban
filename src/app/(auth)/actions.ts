@@ -24,15 +24,8 @@ async function startSession(userId: string): Promise<void> {
   await writeSessionCookie(await createSessionToken(userId));
 }
 
-export async function signUpAction(
-  _previous: ActionResult | null,
-  formData: FormData,
-): Promise<ActionResult> {
-  const parsed = signUpSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
+export async function signUpAction(input: unknown): Promise<ActionResult> {
+  const parsed = signUpSchema.safeParse(input);
   if (!parsed.success) {
     return {
       status: "error",
@@ -66,14 +59,8 @@ export async function signUpAction(
   redirect(AFTER_SIGN_IN);
 }
 
-export async function signInAction(
-  _previous: ActionResult | null,
-  formData: FormData,
-): Promise<ActionResult> {
-  const parsed = signInSchema.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
+export async function signInAction(input: unknown): Promise<ActionResult> {
+  const parsed = signInSchema.safeParse(input);
   if (!parsed.success) {
     return {
       status: "error",
