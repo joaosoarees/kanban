@@ -19,7 +19,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      # postinstall runs `prisma generate`; no database is needed for any step.
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check

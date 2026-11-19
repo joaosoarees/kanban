@@ -7,7 +7,6 @@ function createClient() {
   return new PrismaClient({ adapter });
 }
 
-// `next dev` re-evaluates this module on edit; reuse the client (and its pool).
 const globalForDb = globalThis as unknown as { db?: PrismaClient };
 
 export const db = globalForDb.db ?? createClient();
