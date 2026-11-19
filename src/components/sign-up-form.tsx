@@ -35,30 +35,46 @@ export function SignUpForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
-      <TextField
-        id="name"
-        label="Nome"
-        autoComplete="name"
-        error={errors.name?.message}
-        {...register("name")}
-      />
-      <TextField
-        id="email"
-        label="E-mail"
-        type="email"
-        autoComplete="email"
-        error={errors.email?.message}
-        {...register("email")}
-      />
-      <TextField
-        id="password"
-        label="Senha"
-        type="password"
-        autoComplete="new-password"
-        error={errors.password?.message}
-        {...register("password")}
-      />
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      aria-busy={isPending}
+      className="flex flex-col gap-5"
+    >
+      <fieldset
+        disabled={isPending}
+        className="m-0 flex min-w-0 flex-col gap-5 border-0 p-0"
+      >
+        <TextField
+          id="name"
+          required
+          label="Nome"
+          autoComplete="name"
+          error={errors.name?.message}
+          {...register("name")}
+        />
+        <TextField
+          id="email"
+          required
+          autoCapitalize="none"
+          spellCheck={false}
+          label="E-mail"
+          type="email"
+          autoComplete="email"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+        <TextField
+          id="password"
+          required
+          label="Senha"
+          type="password"
+          autoComplete="new-password"
+          hint="Use pelo menos 8 caracteres."
+          error={errors.password?.message}
+          {...register("password")}
+        />
+      </fieldset>
       <FormFooter
         error={errors.root?.message}
         isPending={isPending}
