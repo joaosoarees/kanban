@@ -31,6 +31,10 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - Membership e papel checados no layout e em toda Server Action.
 - Zustand só para preferências de UI; dados do servidor nunca vão para o store.
 
+## Código
+
+- **Sem comentários no código.** Nomes de variáveis e funções devem bastar. Componentes gerados pelo shadcn em `src/components/ui/` ficam como vieram.
+
 ## Comandos
 
 - `pnpm db:up`: sobe o Postgres (Docker Compose)
