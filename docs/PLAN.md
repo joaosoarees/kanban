@@ -63,7 +63,7 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 ## Fatias
 
 1. [x] Setup: Next, Tailwind/shadcn, Docker/Postgres, Prisma, lint, Husky, CI
-2. [ ] Auth: cadastro, login/logout, páginas protegidas
+2. [x] Auth: cadastro, login/logout, páginas protegidas
 3. [ ] Workspaces: criar, listar, slug, layout com membership, error/not-found
 4. [ ] Membros e papéis
 5. [ ] Boards e colunas: reorder optimistic, store Zustand de colunas recolhidas
