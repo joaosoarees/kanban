@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import type * as z from "zod";
 import { signInAction } from "@/app/(auth)/actions";
 import { FormFooter } from "@/components/form-footer";
-import { RuledField } from "@/components/ruled-field";
+import { TextField } from "@/components/text-field";
 import { signInSchema } from "@/lib/auth-schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 
@@ -35,8 +35,8 @@ export function SignInForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="mt-6 flex flex-col">
-      <RuledField
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+      <TextField
         id="email"
         label="E-mail"
         type="email"
@@ -44,7 +44,7 @@ export function SignInForm() {
         error={errors.email?.message}
         {...register("email")}
       />
-      <RuledField
+      <TextField
         id="password"
         label="Senha"
         type="password"
