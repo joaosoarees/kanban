@@ -1,6 +1,6 @@
 # Kanban — plano
 
-Projeto de estudo para treinar as skills. Só local: sem deploy, sem publicação.
+Projeto de estudo para treinar as skills. Roda só local, sem deploy. O código é público no GitHub (o plano gratuito só tem branch protection em repositório público).
 
 ## Stack
 
@@ -57,6 +57,7 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 ## Processo
 
 - Commits pequenos, um assunto por commit.
+- Toda mudança entra por branch e PR; merge só com o CI verde, por rebase, para manter os commits pequenos no histórico.
 - Antes de criar qualquer página, o `impeccable` propõe ideias de layout e o João aprova; só então a página é implementada.
 
 ## Fatias
