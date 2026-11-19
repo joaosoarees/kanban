@@ -43,7 +43,7 @@ export function SignInForm() {
     >
       <fieldset
         disabled={isPending}
-        className="m-0 flex min-w-0 flex-col gap-5 border-0 p-0"
+        className="m-0 flex min-w-0 flex-col gap-4 border-0 p-0"
       >
         <TextField
           id="email"
