@@ -10,11 +10,9 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  --color-ink: var(--ink);
-  --color-ink-strong: var(--ink-strong);
-  --color-ink-muted: var(--ink-muted);
-  --color-rule: var(--rule);
-  --color-margin: var(--margin);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-deep: var(--brand-deep);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -54,35 +52,33 @@
 }
 
 :root {
-  --ink: #1d3bb3;
-  --ink-strong: #172f8f;
-  --ink-muted: #5566a8;
-  --rule: #a9d3ef;
-  --margin: #e0483e;
+  --brand: #4f46e5;
+  --brand-strong: #4338ca;
+  --brand-deep: #3730a3;
   --background: #ffffff;
-  --foreground: #1f2328;
+  --foreground: #18181b;
   --card: #ffffff;
-  --card-foreground: #1f2328;
+  --card-foreground: #18181b;
   --popover: #ffffff;
-  --popover-foreground: #1f2328;
-  --primary: var(--ink);
+  --popover-foreground: #18181b;
+  --primary: var(--brand);
   --primary-foreground: #ffffff;
-  --secondary: #eef4fb;
-  --secondary-foreground: #1f2328;
-  --muted: #eef4fb;
-  --muted-foreground: #4f5a66;
-  --accent: #e3ecfa;
-  --accent-foreground: var(--ink);
-  --destructive: #b8322a;
-  --border: #c9d6e3;
-  --input: #8a97a6;
-  --ring: var(--ink);
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #eef2ff;
+  --accent-foreground: var(--brand-deep);
+  --destructive: #dc2626;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.25rem;
+  --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -136,20 +132,10 @@
   }
   html {
     @apply font-sans;
-    caret-color: var(--ink);
+    caret-color: var(--brand);
   }
   ::selection {
-    background-color: #cfdcf7;
-    color: var(--ink);
+    background-color: #e0e7ff;
+    color: var(--brand-deep);
   }
-}
-
-@utility ruled {
-  background-color: var(--background);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 23px,
-    var(--rule) 23px 24px
-  );
-  background-position-y: -5px;
 }
