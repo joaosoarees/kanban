@@ -44,7 +44,6 @@ export async function signUpAction(
   const { name, email, password } = parsed.data;
   const passwordHash = await hashPassword(password);
 
-  // The unique index decides whether the e-mail is free (no check-then-insert race).
   let userId: string;
   try {
     const user = await db.user.create({
@@ -64,7 +63,6 @@ export async function signUpAction(
   }
 
   await startSession(userId);
-  // After the try: redirect() works by throwing.
   redirect(AFTER_SIGN_IN);
 }
 
@@ -89,7 +87,6 @@ export async function signInAction(
     select: { id: true, passwordHash: true },
   });
 
-  // Runs against a decoy hash for an unknown e-mail: same answer, same time.
   const matches = await verifyPassword(
     parsed.data.password,
     user?.passwordHash,

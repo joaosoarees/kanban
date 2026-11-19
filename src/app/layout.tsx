@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-// `shadcn init` rewrote globals.css to read the sans font from --font-sans.
 const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],

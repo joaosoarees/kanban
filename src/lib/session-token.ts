@@ -1,10 +1,8 @@
 import { jwtVerify, SignJWT } from "jose";
 
 const ALGORITHM = "HS256";
-export const SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 7; // 7 days
+export const SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 7;
 
-// users.id is a uuid: a `sub` of any other shape names no user (and would make
-// the query throw instead of finding nobody).
 const USER_ID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -17,18 +15,14 @@ function getKey(): Uint8Array {
 }
 
 export async function createSessionToken(userId: string): Promise<string> {
-  return (
-    new SignJWT()
-      .setProtectedHeader({ alg: ALGORITHM })
-      .setSubject(userId)
-      .setIssuedAt()
-      // A number here would be a Unix timestamp, not a duration: keep the "s".
-      .setExpirationTime(`${SESSION_LIFETIME_SECONDS}s`)
-      .sign(getKey())
-  );
+  return new SignJWT()
+    .setProtectedHeader({ alg: ALGORITHM })
+    .setSubject(userId)
+    .setIssuedAt()
+    .setExpirationTime(`${SESSION_LIFETIME_SECONDS}s`)
+    .sign(getKey());
 }
 
-// Never throws: missing, malformed, tampered, expired or foreign tokens are null.
 export async function verifySessionToken(
   token: string | undefined,
 ): Promise<{ userId: string } | null> {

@@ -1,6 +1,5 @@
 import * as z from "zod";
 
-// bcrypt reads the first 72 bytes of a password and ignores the rest.
 const PASSWORD_MAX_BYTES = 72;
 
 const byteLength = (text: string) => new TextEncoder().encode(text).length;
@@ -24,8 +23,6 @@ export const signUpSchema = z.object({
     }),
 });
 
-// Sign-in only needs both fields: a password that breaks today's rules is just
-// a wrong password.
 export const signInSchema = z.object({
   email: z.string().trim().toLowerCase().min(1, "Informe seu e-mail"),
   password: z.string().min(1, "Informe sua senha"),
