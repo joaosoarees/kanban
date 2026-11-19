@@ -1,21 +1,26 @@
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
+import { BoardPreview } from "@/components/board-preview";
+import { Logo } from "@/components/logo";
 import { getCurrentUser } from "@/lib/auth";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
-    <main className="relative min-h-svh ruled [--column-start:max(2.5rem,calc(50%_-_16rem))]">
-      <div
-        aria-hidden
-        className="absolute inset-y-0 left-[calc(var(--column-start)_-_1.5rem)] w-px bg-margin"
-      />
-      <div className="ml-(--column-start) w-[min(22.5rem,calc(100%_-_var(--column-start)_-_1rem))] pt-12 pb-24 sm:pt-24">
-        <p className="pt-[14px] text-[2rem] leading-[34px] font-semibold tracking-tight text-ink">
-          Kanbanary
-        </p>
-        <Suspense fallback={null}>
-          <SignedOutOnly>{children}</SignedOutOnly>
-        </Suspense>
+    <main className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col px-6 py-8 sm:px-12">
+        <Logo />
+        <div className="flex flex-1 justify-center py-12 lg:items-center">
+          <div className="w-full max-w-sm">
+            <Suspense fallback={null}>
+              <SignedOutOnly>{children}</SignedOutOnly>
+            </Suspense>
+          </div>
+        </div>
+      </div>
+      <div className="relative hidden overflow-hidden bg-brand lg:block">
+        <div className="absolute top-1/2 left-16 -translate-y-1/2">
+          <BoardPreview />
+        </div>
       </div>
     </main>
   );

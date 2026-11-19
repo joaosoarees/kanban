@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AuthHeading } from "@/components/auth-heading";
 import { SignUpForm } from "@/components/sign-up-form";
 
 export const metadata: Metadata = { title: "Criar conta" };
@@ -6,9 +7,10 @@ export const metadata: Metadata = { title: "Criar conta" };
 export default function SignUpPage() {
   return (
     <>
-      <h1 className="mt-6 pt-[18px] text-2xl leading-[30px] font-semibold tracking-tight">
-        Crie sua conta
-      </h1>
+      <AuthHeading
+        title="Crie sua conta"
+        description="Organize o trabalho do seu time em quadros."
+      />
       <SignUpForm />
     </>
   );
