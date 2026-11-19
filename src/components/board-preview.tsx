@@ -15,7 +15,7 @@ const columns: PreviewColumn[] = [
       {
         title: "Revisar onboarding",
         label: { text: "UX", className: "bg-pink-100 text-pink-800" },
-        assignee: { initials: "MA", className: "bg-sky-500" },
+        assignee: { initials: "MA", className: "bg-sky-700" },
       },
       {
         title: "Exportar quadro em CSV",
@@ -31,11 +31,11 @@ const columns: PreviewColumn[] = [
       {
         title: "Tela de membros",
         label: { text: "Front", className: "bg-indigo-100 text-indigo-800" },
-        assignee: { initials: "JS", className: "bg-amber-500" },
+        assignee: { initials: "JS", className: "bg-amber-700" },
       },
       {
         title: "Migrar etiquetas",
-        assignee: { initials: "RL", className: "bg-rose-500" },
+        assignee: { initials: "RL", className: "bg-rose-700" },
       },
     ],
   },
@@ -52,16 +52,18 @@ const columns: PreviewColumn[] = [
 export function BoardPreview() {
   return (
     <div aria-hidden className="flex flex-col gap-4">
-      <p className="text-sm text-indigo-200">Sprint 14 · Time de produto</p>
+      <p className="text-sm font-medium text-white">
+        Sprint 14 · Time de produto
+      </p>
       <div className="flex gap-4">
         {columns.map((column) => (
           <div
             key={column.title}
             className="flex w-60 shrink-0 flex-col gap-2 rounded-xl bg-brand-strong p-3"
           >
-            <p className="px-1 text-sm font-medium text-indigo-100">
+            <p className="px-1 text-sm font-medium text-white">
               {column.title}{" "}
-              <span className="text-indigo-300">{column.count}</span>
+              <span className="text-indigo-100">{column.count}</span>
             </p>
             {column.cards.map((card) => (
               <div
@@ -71,7 +73,7 @@ export function BoardPreview() {
                 <span
                   className={
                     card.done
-                      ? "text-zinc-400 line-through"
+                      ? "text-zinc-500 line-through"
                       : "font-medium text-zinc-900"
                   }
                 >
