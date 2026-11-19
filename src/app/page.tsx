@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { signOutAction } from "@/app/(auth)/actions";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/sign-out-button";
 import { requireUser } from "@/lib/auth";
 
 export default function HomePage() {
@@ -18,11 +18,11 @@ async function Greeting() {
 
   return (
     <>
-      <p>Olá, {user.name}.</p>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        Olá, {user.name}.
+      </h1>
       <form action={signOutAction}>
-        <Button type="submit" variant="outline">
-          Sair
-        </Button>
+        <SignOutButton />
       </form>
     </>
   );
