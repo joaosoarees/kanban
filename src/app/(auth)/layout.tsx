@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
         className="absolute inset-y-0 left-[calc(var(--column-start)_-_1.5rem)] w-px bg-margin"
       />
       <div className="ml-(--column-start) w-[min(22.5rem,calc(100%_-_var(--column-start)_-_1rem))] pt-12 pb-24 sm:pt-24">
-        <p className="text-[2rem] leading-12 font-semibold tracking-tight text-ink">
+        <p className="pt-[14px] text-[2rem] leading-[34px] font-semibold tracking-tight text-ink">
           Kanbanary
         </p>
         <Suspense fallback={null}>
