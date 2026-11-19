@@ -23,10 +23,7 @@ export function TextField({
 }: TextFieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = type === "password";
-  const hintId = `${id}-hint`;
-  const errorId = `${id}-error`;
-  const describedBy =
-    [error && errorId, hint && hintId].filter(Boolean).join(" ") || undefined;
+  const messageId = error || hint ? `${id}-message` : undefined;
 
   return (
     <div className="flex flex-col gap-2">
@@ -36,7 +33,7 @@ export function TextField({
           id={id}
           type={isPassword && isPasswordVisible ? "text" : type}
           aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy}
+          aria-describedby={messageId}
           className={cn(
             "h-10 enabled:hover:border-zinc-300 aria-invalid:enabled:hover:border-destructive",
             isPassword && "pr-11",
@@ -60,16 +57,15 @@ export function TextField({
           </button>
         )}
       </div>
-      {error && (
-        <p id={errorId} className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-      {hint && !error && (
-        <p id={hintId} className="text-sm text-muted-foreground">
-          {hint}
-        </p>
-      )}
+      <p
+        id={messageId}
+        className={cn(
+          "min-h-5 text-sm",
+          error ? "text-destructive" : "text-muted-foreground",
+        )}
+      >
+        {error ?? hint}
+      </p>
     </div>
   );
 }
