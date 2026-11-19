@@ -50,9 +50,14 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 ## Qualidade
 
 - ESLint, Prettier e formatação ao salvar.
-- Husky: lint-staged no pre-commit, commitlint (Conventional Commits em inglês) no commit-msg.
+- Husky: lint-staged e typecheck (`next typegen && tsc`) no pre-commit, commitlint (Conventional Commits em inglês) no commit-msg.
 - CI no GitHub Actions: lint, format, typecheck, test, build. Branch protection na `main`.
 - Testes: só o teste unitário da lógica de posição. Sem mocks e sem testes de componente.
+
+## Processo
+
+- Commits pequenos, um assunto por commit.
+- Antes de criar qualquer página, o `impeccable` propõe ideias de layout e o João aprova; só então a página é implementada.
 
 ## Fatias
 
