@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
     <main className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col px-6 py-8 sm:px-12">
         <Logo />
-        <div className="flex flex-1 justify-center py-12 lg:items-center">
+        <div className="flex flex-1 justify-center py-12 lg:pt-[18vh]">
           <div className="w-full max-w-sm">
             <Suspense fallback={null}>
               <SignedOutOnly>{children}</SignedOutOnly>
