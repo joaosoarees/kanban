@@ -6,7 +6,7 @@ Projeto de estudo para treinar as skills. Roda só local, sem deploy. O código 
 
 - Next.js (App Router), TypeScript, Tailwind v4, shadcn/ui (Base UI, preset nova)
 - Postgres 18 via Docker Compose, Prisma 7, IDs UUID v7
-- Auth.js com credentials (e-mail + senha), sessão JWT
+- Auth própria: e-mail + senha (bcrypt), sessão em JWT HS256 (`jose`) num cookie HttpOnly, `getCurrentUser()` como única checagem. Sem Auth.js: a v5 nunca saiu do beta.
 - React Hook Form + Zod nos formulários
 - `useOptimistic` + Server Actions em toda interação do board (rollback + toast no erro)
 - Zustand + persist só para preferências de UI (colunas recolhidas, densidade, sidebar)
