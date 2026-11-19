@@ -22,21 +22,26 @@ export function FormFooter({
 }: FormFooterProps) {
   return (
     <>
-      <p role="alert" className="min-h-6 text-sm leading-6 text-destructive">
-        {error}
-      </p>
+      {error && (
+        <p
+          role="alert"
+          className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          {error}
+        </p>
+      )}
       <Button
         type="submit"
         disabled={isPending}
-        className="mt-[18px] h-12 w-full text-base hover:bg-ink-strong disabled:bg-ink-muted disabled:opacity-100"
+        className="h-10 w-full hover:bg-brand-strong"
       >
         {isPending ? pendingLabel : submitLabel}
       </Button>
-      <p className="mt-[30px] text-sm leading-6 text-muted-foreground">
+      <p className="text-center text-sm text-muted-foreground">
         {switchText}{" "}
         <Link
           href={switchHref}
-          className="font-medium text-ink underline decoration-ink decoration-1 underline-offset-[1px] hover:text-ink-strong"
+          className="font-medium text-brand underline-offset-4 hover:underline"
         >
           {switchLabel}
         </Link>
