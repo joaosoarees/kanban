@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kanban",
-  description: "Boards, colunas e cards por workspace",
+  title: { default: "Kanbanary", template: "%s · Kanbanary" },
+  description: "Quadros, colunas e cards para times pequenos",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

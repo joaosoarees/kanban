@@ -147,4 +147,5 @@
     transparent 0 23px,
     var(--rule) 23px 24px
   );
+  background-position-y: -5px;
 }
