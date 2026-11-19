@@ -11,6 +11,8 @@
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-muted: var(--ink-muted);
   --color-rule: var(--rule);
   --color-margin: var(--margin);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -53,6 +55,8 @@
 
 :root {
   --ink: #1d3bb3;
+  --ink-strong: #172f8f;
+  --ink-muted: #5566a8;
   --rule: #a9d3ef;
   --margin: #e0483e;
   --background: #ffffff;
