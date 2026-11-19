@@ -7,18 +7,18 @@ related_targets: []
 
 # Auth surface (/sign-in, /sign-up)
 
-Mode: Operate. Audience: members of small teams opening Kanbanary to get to their boards. Task: sign in or create an account in seconds and land in the app. No marketing, no invented claims.
+Mode: Operate. Audience: members of small teams opening Kanbanary to get to their boards. Task: sign in or create an account in seconds and land in the app. No marketing claims.
 
 ## Direction contract
 
-THESIS: The app is an open school notebook; the auth screens are its first page. Refuses the category default of a centred white card floating on grey with a logo above it.
+THESIS: Show the product at the door. A split screen pairs a plain form with a live-looking board preview, instead of a lone card on grey. Replaces the rejected "Caderno pautado" notebook world (user: dated, not modern).
 
-OWN-WORLD: White sheet, pale-blue ruling every 24px across the whole viewport (#a9d3ef), one 1px red margin rule (#e0483e) left of the writing column, Bic-blue ink (#1d3bb3) for the wordmark, primary action and focus, graphite (#1f2328) for body text. Fields are writing lines: an underline on the ruling, no boxes. Red appears only for errors and destructive actions.
+OWN-WORLD: Modern SaaS. White form side and an indigo brand panel (#4f46e5, columns #4338ca). Zinc neutrals (#18181b text, #71717a muted, #e4e4e7 borders). Standard shadcn inputs and buttons with an 8px radius, Geist, and a logo mark made of three bars like board columns.
 
-STORY: The visitor recognises a page to write on, reads one heading, fills two or three lines and presses one blue button. Errors are written on the next ruled line in red.
+STORY: The visitor sees their tool on the right, the form on the left, fills two or three fields, and lands in the app.
 
-FIRST VIEWPORT: A ~360px writing column set left of centre, the red margin rule running the full height just before it. Top to bottom on the ruling: Kanbanary wordmark in ink, the heading, the fields, the primary button, the switch link. Every baseline sits on a 24px rule. Mobile keeps the margin rule with 16px gutters.
+FIRST VIEWPORT: Desktop has two equal columns. On the left: the logo top-left, then a ~384px form centred vertically (h1, one-line description, fields, full-width indigo button, switch link). On the right: the indigo panel with "Sprint 14 · Time de produto" and three board columns of white cards that bleed off the right edge. On mobile the panel is hidden and the form is top-aligned under the logo.
 
-FORM: Caderno pautado, candidate 6 of 7 on my grounded list, seed a833cb04. Raises: the ruling is the real grid (Crouwel); one text size for card content (timetable); red has a single job (airport wayfinding).
+FORM: Proposal A of three rendered mockups chosen by the user (split with board preview), replacing seed a833cb04.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
