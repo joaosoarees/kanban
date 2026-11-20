@@ -1,4 +1,4 @@
 {
-  "*.{ts,tsx,js,mjs}": ["bun lint --fix", "prettier --write"],
-  "*.{json,css,md,yaml,yml}": "prettier --write"
+  "*.{ts,tsx,js,mjs}": ["bun lint --fix", "bun fmt"],
+  "*.{json,css,md,yaml,yml}": "bun fmt"
 }
