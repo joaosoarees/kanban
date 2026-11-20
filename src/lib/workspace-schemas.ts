@@ -22,7 +22,7 @@ export const addMemberSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .pipe(z.email("Informe um e-mail válido.")),
+    .pipe(z.email("Digite um e-mail como nome@empresa.com.")),
   role: assignableRoleSchema,
 });
 
