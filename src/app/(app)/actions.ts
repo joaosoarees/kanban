@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
 import type { ActionResult } from "@/lib/action-result";
@@ -42,6 +43,7 @@ export async function createWorkspaceAction(
       if (isUniqueViolation(error)) continue;
       throw error;
     }
+    revalidatePath("/", "layout");
     redirect(`/w/${slug}`);
   }
 
