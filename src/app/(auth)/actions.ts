@@ -3,7 +3,11 @@
 import { redirect } from "next/navigation";
 import * as z from "zod";
 import type { ActionResult } from "@/lib/action-result";
-import { signInSchema, signUpSchema } from "@/lib/auth-schemas";
+import {
+  EMAIL_TAKEN_MESSAGE,
+  signInSchema,
+  signUpSchema,
+} from "@/lib/auth-schemas";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { isUniqueViolation } from "@/lib/prisma-errors";
@@ -40,8 +44,8 @@ export async function signUpAction(input: unknown): Promise<ActionResult> {
     if (isUniqueViolation(error)) {
       return {
         status: "error",
-        message: "Este e-mail já está em uso.",
-        fieldErrors: { email: ["Entre na sua conta ou use outro e-mail."] },
+        message: EMAIL_TAKEN_MESSAGE,
+        fieldErrors: { email: [EMAIL_TAKEN_MESSAGE] },
       };
     }
     throw error;
@@ -71,7 +75,10 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
     user?.passwordHash,
   );
   if (!user || !matches) {
-    return { status: "error", message: "E-mail ou senha incorretos." };
+    return {
+      status: "error",
+      message: "E-mail ou senha incorretos. Confira e tente de novo.",
+    };
   }
 
   await startSession(user.id);
