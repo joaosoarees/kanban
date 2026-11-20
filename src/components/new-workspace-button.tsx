@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { primaryButton } from "@/components/button-styles";
 import { CreateWorkspaceDialog } from "@/components/create-workspace-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,7 @@ export function NewWorkspaceButton({
     <>
       <Button
         onClick={() => setOpen(true)}
-        className={cn("h-10 px-4 enabled:hover:bg-brand-strong", className)}
+        className={cn("h-10 px-4", primaryButton, className)}
       >
         <Plus aria-hidden />
         {label}

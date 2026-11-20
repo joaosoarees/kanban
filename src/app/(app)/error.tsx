@@ -2,8 +2,10 @@
 
 import { TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
+import { primaryButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function AppError({
   error,
@@ -23,10 +25,7 @@ export default function AppError({
       title="Algo deu errado"
       description="Algo falhou do nosso lado. Tente de novo em instantes."
       actions={
-        <Button
-          onClick={retry}
-          className="h-10 px-4 enabled:hover:bg-brand-strong"
-        >
+        <Button onClick={retry} className={cn("h-10 px-4", primaryButton)}>
           Tentar de novo
         </Button>
       }
