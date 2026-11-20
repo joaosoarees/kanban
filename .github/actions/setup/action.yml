@@ -1,5 +1,5 @@
 name: Setup
-description: Bun, node_modules and the Prisma client from cache, within the setup budget
+description: Bun and its package cache restored, dependencies installed, within the setup budget
 inputs:
   budget:
     description: Seconds the setup may take
@@ -22,15 +22,12 @@ runs:
       run: npm install --prefix ~/.bun-bin --no-fund --no-audit --no-save "bun@${{ steps.version.outputs.bun }}"
     - shell: bash
       run: echo "$HOME/.bun-bin/node_modules/.bin" >> "$GITHUB_PATH"
-    - id: modules
-      uses: actions/cache@v4
+    - uses: actions/cache@v4
       with:
-        path: |
-          node_modules
-          src/generated
-        key: modules-${{ runner.os }}-${{ hashFiles('bun.lock', 'prisma/schema.prisma') }}
-    - if: steps.modules.outputs.cache-hit != 'true'
-      shell: bash
+        path: ~/.bun/install/cache
+        key: bun-cache-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        restore-keys: bun-cache-${{ runner.os }}-
+    - shell: bash
       run: bun install --frozen-lockfile
     - shell: bash
       run: |
