@@ -87,14 +87,12 @@ export async function addMemberAction(
 
   const user = await db.user.findUnique({
     where: { email: parsed.data.email },
-    select: { id: true },
+    select: { id: true, name: true },
   });
   if (!user) {
-    return {
-      status: "error",
-      message: "Nenhuma conta com esse e-mail.",
-      fieldErrors: { email: ["Nenhuma conta com esse e-mail."] },
-    };
+    const message =
+      "Nenhuma conta com esse e-mail. Peça para a pessoa se cadastrar primeiro.";
+    return { status: "error", message, fieldErrors: { email: [message] } };
   }
 
   try {
@@ -107,11 +105,8 @@ export async function addMemberAction(
     });
   } catch (error) {
     if (isUniqueViolation(error)) {
-      return {
-        status: "error",
-        message: "Essa pessoa já faz parte do workspace.",
-        fieldErrors: { email: ["Essa pessoa já faz parte do workspace."] },
-      };
+      const message = `${user.name} já faz parte do workspace.`;
+      return { status: "error", message, fieldErrors: { email: [message] } };
     }
     throw error;
   }
