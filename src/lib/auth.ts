@@ -13,7 +13,9 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const session = await verifySessionToken(
     cookieStore.get(SESSION_COOKIE)?.value,
   );
-  if (!session) return null;
+  if (!session) {
+    return null;
+  }
 
   return db.user.findUnique({
     where: { id: session.userId },
@@ -23,6 +25,8 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 
 export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
+  if (!user) {
+    redirect("/sign-in");
+  }
   return user;
 }

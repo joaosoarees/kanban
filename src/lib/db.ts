@@ -7,10 +7,12 @@ function createClient() {
   return new PrismaClient({ adapter });
 }
 
-const globalForDb = globalThis as unknown as { db?: PrismaClient };
+declare global {
+  var prismaClient: PrismaClient | undefined;
+}
 
-export const db = globalForDb.db ?? createClient();
+export const db = globalThis.prismaClient ?? createClient();
 
 if (process.env.NODE_ENV !== "production") {
-  globalForDb.db = db;
+  globalThis.prismaClient = db;
 }

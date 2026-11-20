@@ -41,7 +41,11 @@ export function UserMenu({ name, email }: UserMenuProps) {
         <DropdownMenuItem
           closeOnClick={false}
           disabled={isPending}
-          onClick={() => startTransition(() => signOutAction())}
+          onClick={() => {
+            startTransition(async () => {
+              await signOutAction();
+            });
+          }}
           className="h-10 cursor-pointer gap-2.5 px-2 data-disabled:cursor-wait"
         >
           {isPending ? (

@@ -34,7 +34,9 @@ export function LeaveWorkspace({
       </div>
       <Button
         variant="outline"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+        }}
         className={cn("h-10 px-4", dangerOutlineButton)}
       >
         <LogOut aria-hidden />
@@ -45,11 +47,11 @@ export function LeaveWorkspace({
         onOpenChange={setOpen}
         title={`Sair de ${workspaceName}?`}
         description={
-          "Você perde o acesso aos quadros deste workspace. Para voltar, um admin precisa adicionar você de\u00a0novo."
+          "Você perde o acesso aos quadros deste workspace. Para voltar, um admin precisa adicionar você de\u00A0novo."
         }
         confirmLabel="Sair do workspace"
         pendingLabel="Saindo…"
-        onConfirm={() => leaveWorkspaceAction(workspaceId)}
+        onConfirm={async () => leaveWorkspaceAction(workspaceId)}
       />
     </section>
   );

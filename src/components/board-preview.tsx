@@ -72,14 +72,14 @@ export function BoardPreview() {
               >
                 <span
                   className={
-                    card.done
+                    card.done === true
                       ? "text-zinc-500 line-through"
                       : "font-medium text-zinc-900"
                   }
                 >
                   {card.title}
                 </span>
-                {(card.label || card.assignee) && (
+                {(card.label !== undefined || card.assignee !== undefined) && (
                   <div className="flex items-center justify-between">
                     {card.label ? (
                       <span

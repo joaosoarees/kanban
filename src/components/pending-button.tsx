@@ -19,7 +19,7 @@ export function PendingButton({
   return (
     <Button
       {...props}
-      disabled={disabled || isPending}
+      disabled={disabled === true || isPending}
       aria-busy={isPending || undefined}
       data-pending={isPending || undefined}
       className={cn(

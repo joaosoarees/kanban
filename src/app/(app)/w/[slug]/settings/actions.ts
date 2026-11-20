@@ -36,13 +36,17 @@ function invalidFields(error: z.ZodError): ActionResult {
 async function loadActor(workspaceId: unknown) {
   const user = await requireUser();
   const id = z.uuid().safeParse(workspaceId);
-  if (!id.success) return null;
+  if (!id.success) {
+    return null;
+  }
 
   const membership = await db.membership.findUnique({
     where: { userId_workspaceId: { userId: user.id, workspaceId: id.data } },
     select: { role: true, workspace: { select: { slug: true, name: true } } },
   });
-  if (!membership) return null;
+  if (!membership) {
+    return null;
+  }
 
   return {
     userId: user.id,
@@ -69,7 +73,9 @@ async function loadActorAllowedTo(
   action: WorkspaceAction,
 ) {
   const actor = await loadActor(workspaceId);
-  if (!actor || !can(actor.role, action)) return null;
+  if (!actor || !can(actor.role, action)) {
+    return null;
+  }
   return actor;
 }
 
@@ -78,7 +84,9 @@ export async function addMemberAction(
   input: unknown,
 ): Promise<ActionResult> {
   const actor = await loadActorAllowedTo(workspaceId, "addMember");
-  if (!actor) return FORBIDDEN;
+  if (!actor) {
+    return FORBIDDEN;
+  }
 
   const parsed = addMemberSchema.safeParse(input);
   if (!parsed.success) {
@@ -121,8 +129,12 @@ export async function changeRoleAction(
 ): Promise<ActionResult> {
   const actor = await loadActor(workspaceId);
   const parsed = changeRoleSchema.safeParse(input);
-  if (!actor) return FORBIDDEN;
-  if (!parsed.success) return INVALID;
+  if (!actor) {
+    return FORBIDDEN;
+  }
+  if (!parsed.success) {
+    return INVALID;
+  }
 
   const target = await loadTarget(actor.workspaceId, parsed.data.userId);
   if (!target) {
@@ -158,8 +170,12 @@ export async function removeMemberAction(
 ): Promise<ActionResult> {
   const actor = await loadActor(workspaceId);
   const parsed = removeMemberSchema.safeParse(input);
-  if (!actor) return FORBIDDEN;
-  if (!parsed.success) return INVALID;
+  if (!actor) {
+    return FORBIDDEN;
+  }
+  if (!parsed.success) {
+    return INVALID;
+  }
 
   const target = await loadTarget(actor.workspaceId, parsed.data.userId);
   if (!target) {
@@ -192,7 +208,9 @@ export async function leaveWorkspaceAction(
   workspaceId: unknown,
 ): Promise<ActionResult> {
   const actor = await loadActorAllowedTo(workspaceId, "leaveWorkspace");
-  if (!actor) return FORBIDDEN;
+  if (!actor) {
+    return FORBIDDEN;
+  }
 
   await db.membership.delete({
     where: {
@@ -204,7 +222,7 @@ export async function leaveWorkspaceAction(
   });
 
   revalidatePath("/", "layout");
-  redirect("/");
+  return redirect("/");
 }
 
 export async function renameWorkspaceAction(
@@ -212,7 +230,9 @@ export async function renameWorkspaceAction(
   input: unknown,
 ): Promise<ActionResult> {
   const actor = await loadActorAllowedTo(workspaceId, "renameWorkspace");
-  if (!actor) return FORBIDDEN;
+  if (!actor) {
+    return FORBIDDEN;
+  }
 
   const parsed = renameWorkspaceSchema.safeParse(input);
   if (!parsed.success) {
@@ -233,7 +253,9 @@ export async function deleteWorkspaceAction(
   confirmation: unknown,
 ): Promise<ActionResult> {
   const actor = await loadActorAllowedTo(workspaceId, "deleteWorkspace");
-  if (!actor) return FORBIDDEN;
+  if (!actor) {
+    return FORBIDDEN;
+  }
   if (confirmation !== actor.name) {
     return {
       status: "error",
@@ -244,5 +266,5 @@ export async function deleteWorkspaceAction(
   await db.workspace.delete({ where: { id: actor.workspaceId } });
 
   revalidatePath("/", "layout");
-  redirect("/");
+  return redirect("/");
 }

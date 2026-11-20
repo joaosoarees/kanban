@@ -27,7 +27,7 @@ export function DeleteWorkspace({
   const members =
     memberCount === 1
       ? "de 1 membro"
-      : `de todos os ${memberCount}\u00a0membros`;
+      : `de todos os ${memberCount}\u00A0membros`;
 
   return (
     <section
@@ -45,7 +45,9 @@ export function DeleteWorkspace({
       </div>
       <Button
         variant="outline"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+        }}
         className={cn("h-10 px-4", dangerOutlineButton)}
       >
         <Trash2 aria-hidden />
@@ -55,14 +57,16 @@ export function DeleteWorkspace({
         open={open}
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen);
-          if (!nextOpen) setConfirmation("");
+          if (!nextOpen) {
+            setConfirmation("");
+          }
         }}
         title={`Excluir ${workspaceName}?`}
-        description={`Apaga o workspace, os quadros e os cards ${members}. Não dá para\u00a0desfazer.`}
+        description={`Apaga o workspace, os quadros e os cards ${members}. Não dá para\u00A0desfazer.`}
         confirmLabel="Excluir workspace"
         pendingLabel="Excluindo…"
         confirmDisabled={confirmation !== workspaceName}
-        onConfirm={() => deleteWorkspaceAction(workspaceId, confirmation)}
+        onConfirm={async () => deleteWorkspaceAction(workspaceId, confirmation)}
       >
         <div className="mt-4 flex flex-col gap-2">
           <Label htmlFor="delete-confirmation" className="block font-normal">
@@ -72,7 +76,9 @@ export function DeleteWorkspace({
           <Input
             id="delete-confirmation"
             value={confirmation}
-            onChange={(event) => setConfirmation(event.target.value)}
+            onChange={(event) => {
+              setConfirmation(event.target.value);
+            }}
             autoComplete="off"
             spellCheck={false}
             className="h-10"

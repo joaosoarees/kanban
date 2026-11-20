@@ -68,7 +68,7 @@ export async function getMembers(
       email: user.email,
       role,
     }))
-    .sort(
+    .toSorted(
       (a, b) =>
         ROLE_ORDER[a.role] - ROLE_ORDER[b.role] ||
         a.name.localeCompare(b.name, "pt-BR"),
@@ -92,7 +92,9 @@ export const requireMembership = cache(async (slug: string) => {
       },
     },
   });
-  if (!membership) notFound();
+  if (!membership) {
+    notFound();
+  }
 
   const { workspace, role } = membership;
   return {

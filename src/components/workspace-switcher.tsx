@@ -39,7 +39,9 @@ export function WorkspaceSwitcher({
   const [dialogPath, setDialogPath] = useState<string | null>(null);
 
   const current = workspaces.find(({ slug }) => slug === params.slug);
-  if (!current) return null;
+  if (!current) {
+    return null;
+  }
 
   return (
     <>
@@ -116,7 +118,9 @@ export function WorkspaceSwitcher({
           </Menu.LinkItem>
           <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
           <DropdownMenuItem
-            onClick={() => setDialogPath(pathname)}
+            onClick={() => {
+              setDialogPath(pathname);
+            }}
             className={ITEM_CLASS}
           >
             <span className="flex size-[22px] items-center justify-center rounded-[5px] border border-dashed border-zinc-400">
@@ -135,7 +139,9 @@ export function WorkspaceSwitcher({
       <CreateWorkspaceDialog
         key={pathname}
         open={dialogPath === pathname}
-        onOpenChange={(open) => setDialogPath(open ? pathname : null)}
+        onOpenChange={(open) => {
+          setDialogPath(open ? pathname : null);
+        }}
       />
     </>
   );

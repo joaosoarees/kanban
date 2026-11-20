@@ -104,7 +104,7 @@ function WorkspaceCard({ workspace }: { workspace: WorkspaceSummary }) {
 
 function WorkspacesSkeleton() {
   return (
-    <div role="status">
+    <output className="block">
       <span className="sr-only">Carregando seus workspaces…</span>
       <div aria-hidden>
         <div className="flex items-end justify-between gap-4">
@@ -135,6 +135,6 @@ function WorkspacesSkeleton() {
           ))}
         </div>
       </div>
-    </div>
+    </output>
   );
 }

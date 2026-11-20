@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MembersLoading() {
   return (
-    <div role="status">
+    <output className="block">
       <span className="sr-only">Carregando os membros…</span>
       <div aria-hidden className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 rounded-xl border bg-white p-5">
@@ -33,6 +33,6 @@ export default function MembersLoading() {
           </div>
         </div>
       </div>
-    </div>
+    </output>
   );
 }

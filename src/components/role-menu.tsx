@@ -14,6 +14,10 @@ import { cn } from "@/lib/utils";
 
 export type AssignableRole = Exclude<Role, "OWNER">;
 
+export function isAssignableRole(role: unknown): role is AssignableRole {
+  return role === "ADMIN" || role === "MEMBER";
+}
+
 const ROLE_OPTIONS: { role: AssignableRole; description: string }[] = [
   {
     role: "ADMIN",
@@ -53,7 +57,11 @@ export function RoleMenu({
       <DropdownMenuContent align="end" className="w-64 p-1.5">
         <DropdownMenuRadioGroup
           value={value}
-          onValueChange={(next) => onChange(next as AssignableRole)}
+          onValueChange={(next) => {
+            if (isAssignableRole(next)) {
+              onChange(next);
+            }
+          }}
         >
           {ROLE_OPTIONS.map(({ role, description }) => (
             <DropdownMenuRadioItem

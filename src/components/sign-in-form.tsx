@@ -36,7 +36,9 @@ export function SignInForm() {
 
   return (
     <form
-      onSubmit={onSubmit}
+      onSubmit={(event) => {
+        void onSubmit(event);
+      }}
       noValidate
       aria-busy={isPending}
       className="flex flex-col gap-5"

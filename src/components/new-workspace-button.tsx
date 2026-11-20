@@ -21,7 +21,9 @@ export function NewWorkspaceButton({
   return (
     <>
       <Button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+        }}
         className={cn("h-10 px-4", primaryButton, className)}
       >
         <Plus aria-hidden />

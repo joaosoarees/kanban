@@ -35,7 +35,7 @@ export function StatusView({
           )}
         />
       </span>
-      {eyebrow && (
+      {eyebrow !== undefined && (
         <p className="font-mono text-[13px] text-muted-foreground">{eyebrow}</p>
       )}
       <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>

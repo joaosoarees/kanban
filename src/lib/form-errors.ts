@@ -8,8 +8,9 @@ export function applyActionErrors<T extends FieldValues>(
   const fieldErrors = Object.entries(result.fieldErrors ?? {});
 
   for (const [field, messages] of fieldErrors) {
-    if (messages?.[0]) {
-      setError(field as Path<T>, { message: messages[0] });
+    const message = messages?.at(0);
+    if (message !== undefined) {
+      setError(field as Path<T>, { message });
     }
   }
 

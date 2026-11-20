@@ -14,7 +14,7 @@ const TILE_COLORS = [
 function colorFor(slug: string): string {
   let hash = 0;
   for (const char of slug) {
-    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    hash = (hash * 31 + (char.codePointAt(0) ?? 0)) % 2 ** 32;
   }
   return TILE_COLORS[hash % TILE_COLORS.length];
 }

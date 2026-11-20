@@ -9,7 +9,11 @@ import {
 import { rowButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { RoleBadge } from "@/components/role-badge";
-import { type AssignableRole, RoleMenu } from "@/components/role-menu";
+import {
+  type AssignableRole,
+  isAssignableRole,
+  RoleMenu,
+} from "@/components/role-menu";
 import { Button } from "@/components/ui/button";
 import type { Role } from "@/generated/prisma/enums";
 import { initialsOf } from "@/lib/initials";
@@ -48,7 +52,9 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
   const [isRemoveOpen, setIsRemoveOpen] = useState(false);
 
   const changeRole = (member: WorkspaceMember, role: AssignableRole) => {
-    if (role === member.role) return;
+    if (role === member.role) {
+      return;
+    }
     startTransition(async () => {
       applyOptimistic({ type: "role", userId: member.userId, role });
       const result = await changeRoleAction(workspaceId, {
@@ -76,6 +82,12 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
         });
       }
     });
+  };
+
+  const confirmRemove = (): undefined => {
+    if (removeTarget) {
+      remove(removeTarget);
+    }
   };
 
   return (
@@ -124,11 +136,13 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
                   showsControls && "justify-between sm:justify-end",
                 )}
               >
-                {canChangeRole ? (
+                {canChangeRole && isAssignableRole(member.role) ? (
                   <RoleMenu
                     label={`Papel de ${member.name}`}
-                    value={member.role as AssignableRole}
-                    onChange={(role) => changeRole(member, role)}
+                    value={member.role}
+                    onChange={(role) => {
+                      changeRole(member, role);
+                    }}
                   />
                 ) : (
                   <span className="inline-flex w-28">
@@ -161,12 +175,10 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
         open={isRemoveOpen}
         onOpenChange={setIsRemoveOpen}
         title={`Remover ${removeTarget?.name ?? ""}?`}
-        description={`${removeTarget?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de\u00a0novo\u00a0depois.`}
+        description={`${removeTarget?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de\u00A0novo\u00A0depois.`}
         confirmLabel="Remover"
         pendingLabel="Removendo…"
-        onConfirm={() => {
-          if (removeTarget) remove(removeTarget);
-        }}
+        onConfirm={confirmRemove}
       />
     </section>
   );

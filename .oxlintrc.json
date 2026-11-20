@@ -1,0 +1,108 @@
+{
+  "options": {
+    "typeAware": true
+  },
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "react",
+    "react-perf",
+    "nextjs",
+    "import",
+    "jsx-a11y",
+    "promise",
+    "node",
+    "oxc",
+    "vitest"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error",
+    "pedantic": "error",
+    "nursery": "error"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
+    "react-perf/jsx-no-new-object-as-prop": "off",
+    "react-perf/jsx-no-new-array-as-prop": "off",
+    "react-perf/jsx-no-jsx-as-prop": "off",
+    "eslint/max-lines-per-function": "off",
+    "import/max-dependencies": "off",
+    "eslint/no-undef": "off",
+    "eslint/curly": "error",
+    "eslint/eqeqeq": "error",
+    "eslint/default-case": "off",
+    "eslint/no-console": [
+      "error",
+      {
+        "allow": ["error"]
+      }
+    ],
+    "eslint/no-plusplus": "error",
+    "eslint/no-bitwise": "error",
+    "eslint/no-var": "error",
+    "eslint/prefer-const": "error",
+    "eslint/no-else-return": "error",
+    "eslint/no-useless-concat": "error",
+    "unicorn/switch-case-braces": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/array-type": "error",
+    "typescript/no-invalid-void-type": "error",
+    "typescript/promise-function-async": "error",
+    "react/only-export-components": "off",
+    "vitest/prefer-to-be-truthy": "off",
+    "vitest/prefer-to-be-falsy": "off",
+    "vitest/no-importing-vitest-globals": "off",
+    "node/no-process-env": "off",
+    "typescript/switch-exhaustiveness-check": "error",
+    "import/no-unassigned-import": [
+      "error",
+      {
+        "allow": ["server-only", "dotenv/config", "**/*.css"]
+      }
+    ],
+    "eslint/no-underscore-dangle": [
+      "error",
+      {
+        "allow": ["_count"]
+      }
+    ],
+    "eslint/require-await": "off"
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "src/generated/**"
+  ],
+  "overrides": [
+    {
+      "files": ["src/lib/form-errors.ts"],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "off"
+      }
+    },
+    {
+      "files": ["src/components/ui/**"],
+      "rules": {
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "typescript/array-type": "off",
+        "eslint/eqeqeq": "off",
+        "react/no-array-index-key": "off",
+        "typescript/strict-boolean-expressions": "off",
+        "typescript/promise-function-async": "off",
+        "typescript/no-unnecessary-condition": "off",
+        "typescript/no-unsafe-type-assertion": "off"
+      }
+    }
+  ]
+}

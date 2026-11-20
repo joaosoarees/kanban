@@ -23,7 +23,7 @@ type ConfirmDialogProps = {
   confirmLabel: string;
   pendingLabel: string;
   confirmDisabled?: boolean;
-  onConfirm: () => Promise<ActionResult | void> | void;
+  onConfirm: () => Promise<ActionResult> | undefined;
   children?: ReactNode;
 };
 
@@ -42,7 +42,9 @@ export function ConfirmDialog({
   const [error, setError] = useState<string>();
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (isPending) return;
+    if (isPending) {
+      return;
+    }
     setError(undefined);
     onOpenChange(nextOpen);
   };
@@ -70,7 +72,7 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         {children}
         <div role="alert" className="empty:hidden">
-          {error && (
+          {error !== undefined && (
             <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {error}
             </p>
