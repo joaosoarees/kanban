@@ -20,4 +20,4 @@ bun dev
 | `bun db:migrate`                                  | cria e aplica migrations (`prisma migrate dev`)          |
 | `bun db:studio`                                   | abre o Prisma Studio                                     |
 | `bun lint` / `bun run typecheck` / `bun run test` | checagens que o CI também roda                           |
-| `bun format`                                      | formata tudo com Prettier                                |
+| `bun fmt`                                         | formata tudo                                             |
