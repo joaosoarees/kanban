@@ -9,7 +9,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - Commits pequenos, um assunto por commit. Dentro de uma fatia, commite a cada passo coerente (schema e migration, depois a action, depois a UI), nunca tudo no final.
 - Conventional Commits em inglês (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `ci:`). O commitlint valida no hook `commit-msg`.
 - **Sem atribuição ao Claude**: nada de `Co-Authored-By: Claude`, nem "Generated with Claude Code" em commits ou PRs. O autor é o João (git config local). O hook `commit-msg` rejeita esses trailers.
-- O `pre-commit` roda lint-staged e o typecheck completo (`next typegen && tsc`). Não use `--no-verify`.
+- O `pre-commit` roda lint-staged e o typecheck completo (`bun check`). Não use `--no-verify`.
 
 ## Branches e PRs
 
@@ -41,6 +41,6 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - `bun db:up`: sobe o Postgres (Docker Compose)
 - `bun db:migrate --name <nome>`: cria e aplica uma migration
 - `bun dev`
-- `bun lint` / `bun run typecheck` / `bun run test` / `bun run build`: o mesmo que o CI roda
+- `bun lint` / `bun check` / `bun run test` / `bun run build`: o mesmo que o CI roda
 
 Variáveis em `.env` (modelo em `.env.example`): `DATABASE_URL` e `SESSION_SECRET` (`openssl rand -base64 32`).
