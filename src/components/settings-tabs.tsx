@@ -16,10 +16,20 @@ export function SettingsTabs({
   showGeneral,
 }: SettingsTabsProps) {
   const pathname = usePathname();
+
+  if (!showGeneral) {
+    return (
+      <h2 className="mt-7 flex items-baseline gap-2 text-lg font-semibold">
+        Membros
+        <span className="text-sm font-normal text-muted-foreground">
+          {memberCount}
+        </span>
+      </h2>
+    );
+  }
+
   const tabs = [
-    ...(showGeneral
-      ? [{ href: `/w/${slug}/settings`, label: "Geral", count: null }]
-      : []),
+    { href: `/w/${slug}/settings`, label: "Geral", count: null },
     {
       href: `/w/${slug}/settings/members`,
       label: "Membros",

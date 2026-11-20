@@ -96,17 +96,7 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
   };
 
   return (
-    <section aria-labelledby="members-title">
-      <div className="mb-3 flex items-baseline justify-between">
-        <h2 id="members-title" className="text-[15px] font-semibold">
-          Membros
-        </h2>
-        <span className="text-[13px] text-muted-foreground">
-          {optimisticMembers.length === 1
-            ? "1 pessoa"
-            : `${optimisticMembers.length} pessoas`}
-        </span>
-      </div>
+    <section aria-label="Membros">
       <ul className="divide-y rounded-xl border bg-white">
         {optimisticMembers.map((member) => {
           const target = {
