@@ -140,8 +140,51 @@
   }
 }
 
+:is([data-slot="dialog-content"], [data-slot="alert-dialog-content"]) {
+  &[data-open] {
+    --tw-duration: 160ms;
+    --tw-ease: ease-out;
+    --tw-enter-scale: 0.96;
+  }
+  &[data-closed] {
+    --tw-duration: 100ms;
+    --tw-exit-scale: 1;
+  }
+}
+
+:is([data-slot="dialog-overlay"], [data-slot="alert-dialog-overlay"]) {
+  &[data-open] {
+    --tw-duration: 160ms;
+  }
+  &[data-closed] {
+    --tw-duration: 100ms;
+  }
+}
+
+:is(
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"]
+) {
+  &[data-open] {
+    --tw-duration: 140ms;
+    --tw-ease: ease-out;
+  }
+  &[data-closed] {
+    --tw-duration: 90ms;
+    --tw-exit-scale: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  [data-slot="skeleton"] {
+  :is(
+    [data-slot="skeleton"],
+    [data-slot="dialog-content"],
+    [data-slot="dialog-overlay"],
+    [data-slot="alert-dialog-content"],
+    [data-slot="alert-dialog-overlay"],
+    [data-slot="dropdown-menu-content"],
+    [data-slot="dropdown-menu-sub-content"]
+  ) {
     animation: none;
   }
 }
