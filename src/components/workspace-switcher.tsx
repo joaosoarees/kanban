@@ -74,20 +74,28 @@ export function WorkspaceSwitcher({
                   key={workspace.id}
                   render={<Link href={`/w/${workspace.slug}`} />}
                   aria-current={isCurrent ? "page" : undefined}
-                  className={cn(ITEM_CLASS, "h-12", isCurrent && "bg-zinc-100")}
+                  className={cn(
+                    ITEM_CLASS,
+                    "h-12",
+                    isCurrent
+                      ? "bg-indigo-50 focus:bg-indigo-50 data-highlighted:bg-indigo-50"
+                      : "focus:bg-zinc-100 data-highlighted:bg-zinc-100",
+                  )}
                 >
                   <WorkspaceTile
                     name={workspace.name}
                     slug={workspace.slug}
                     className="size-[22px] rounded-[5px] text-[11px]"
                   />
-                  <span
-                    className={cn(
-                      "flex-1 truncate",
-                      isCurrent && "font-medium",
-                    )}
-                  >
-                    {workspace.name}
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span
+                      className={cn("truncate", isCurrent && "font-medium")}
+                    >
+                      {workspace.name}
+                    </span>
+                    <span className="truncate font-mono text-xs text-muted-foreground">
+                      /w/{workspace.slug}
+                    </span>
                   </span>
                   {isCurrent && (
                     <Check aria-hidden className="size-4 text-brand" />
