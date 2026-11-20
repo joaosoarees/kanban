@@ -218,6 +218,7 @@ function RoleMenu({
             <DropdownMenuRadioItem
               key={role}
               value={role}
+              closeOnClick
               className="cursor-pointer items-start rounded-md py-2 pr-8 pl-2"
             >
               <span className="flex flex-col gap-0.5">
