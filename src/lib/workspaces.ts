@@ -41,6 +41,40 @@ export const getMyWorkspaces = cache(async (): Promise<WorkspaceSummary[]> => {
   }));
 });
 
+export type WorkspaceMember = {
+  userId: string;
+  name: string;
+  email: string;
+  role: Role;
+};
+
+const ROLE_ORDER: Record<Role, number> = { OWNER: 0, ADMIN: 1, MEMBER: 2 };
+
+export async function getMembers(
+  workspaceId: string,
+): Promise<WorkspaceMember[]> {
+  const memberships = await db.membership.findMany({
+    where: { workspaceId },
+    select: {
+      role: true,
+      user: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+  return memberships
+    .map(({ role, user }) => ({
+      userId: user.id,
+      name: user.name,
+      email: user.email,
+      role,
+    }))
+    .sort(
+      (a, b) =>
+        ROLE_ORDER[a.role] - ROLE_ORDER[b.role] ||
+        a.name.localeCompare(b.name, "pt-BR"),
+    );
+}
+
 export const requireMembership = cache(async (slug: string) => {
   const user = await requireUser();
 
