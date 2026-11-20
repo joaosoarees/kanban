@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { firstCharacter } from "@/components/workspace-tile";
 
 type UserMenuProps = {
   name: string;
@@ -18,9 +19,9 @@ type UserMenuProps = {
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/);
-  const first = parts[0]?.charAt(0) ?? "";
-  const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
-  return (first + last).toUpperCase();
+  const first = firstCharacter(parts[0] ?? "");
+  const last = parts.length > 1 ? firstCharacter(parts[parts.length - 1]) : "";
+  return first + last;
 }
 
 export function UserMenu({ name, email }: UserMenuProps) {

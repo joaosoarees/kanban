@@ -18,6 +18,10 @@ function colorFor(slug: string): string {
   return TILE_COLORS[hash % TILE_COLORS.length];
 }
 
+export function firstCharacter(text: string): string {
+  return (Array.from(text.trim())[0] ?? "").toUpperCase();
+}
+
 type WorkspaceTileProps = {
   name: string;
   slug: string;
@@ -34,7 +38,7 @@ export function WorkspaceTile({ name, slug, className }: WorkspaceTileProps) {
         className,
       )}
     >
-      {name.trim().charAt(0).toUpperCase()}
+      {firstCharacter(name)}
     </span>
   );
 }
