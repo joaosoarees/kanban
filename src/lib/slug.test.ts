@@ -28,6 +28,11 @@ describe("slugify", () => {
     expect(slugify("x".repeat(60))).toBe("x".repeat(48));
   });
 
+  it("cuts at 48 characters when the last whole word would be too short", () => {
+    const name = `A ${"b".repeat(60)}`;
+    expect(slugify(name)).toBe(`a-${"b".repeat(46)}`);
+  });
+
   it("falls back to workspace when nothing is left", () => {
     expect(slugify("!!!")).toBe("workspace");
   });

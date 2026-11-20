@@ -18,7 +18,9 @@ function cutAtLastWord(slug: string): string {
   const head = slug.slice(0, SLUG_MAX_LENGTH + 1);
   const lastHyphen = head.lastIndexOf("-");
   const cut =
-    lastHyphen > 0 ? head.slice(0, lastHyphen) : head.slice(0, SLUG_MAX_LENGTH);
+    lastHyphen >= SLUG_MAX_LENGTH / 2
+      ? head.slice(0, lastHyphen)
+      : head.slice(0, SLUG_MAX_LENGTH);
 
   return cut.replace(/-+$/, "");
 }
