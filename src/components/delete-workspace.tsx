@@ -38,9 +38,9 @@ export function DeleteWorkspace({
         <h2 id="delete-title" className="text-[15px] font-semibold">
           Excluir workspace
         </h2>
-        <p className="text-sm/relaxed text-muted-foreground">
+        <p className="text-sm/relaxed text-pretty text-muted-foreground">
           Apaga o workspace, os quadros e os cards de todos os membros. Não dá
-          para desfazer.
+          para&nbsp;desfazer.
         </p>
       </div>
       <Button
