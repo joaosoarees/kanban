@@ -68,7 +68,7 @@ export function WorkspaceSwitcher({
                   key={workspace.id}
                   render={<Link href={`/w/${workspace.slug}`} />}
                   aria-current={isCurrent ? "page" : undefined}
-                  className={cn(ITEM_CLASS, isCurrent && "bg-zinc-100")}
+                  className={cn(ITEM_CLASS, "h-12", isCurrent && "bg-zinc-100")}
                 >
                   <WorkspaceTile
                     name={workspace.name}
@@ -109,6 +109,7 @@ export function WorkspaceSwitcher({
         </DropdownMenuContent>
       </DropdownMenu>
       <CreateWorkspaceDialog
+        key={pathname}
         open={dialogPath === pathname}
         onOpenChange={(open) => setDialogPath(open ? pathname : null)}
       />
