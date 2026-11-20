@@ -22,18 +22,20 @@ export default function WorkspacesPage() {
   );
 }
 
-function PageHeading({ withAction }: { withAction: boolean }) {
+function PageHeading({ hasWorkspaces }: { hasWorkspaces: boolean }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-col gap-1">
         <h1 className="text-[22px] font-semibold tracking-tight sm:text-[26px]">
           Seus workspaces
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Escolha onde trabalhar ou crie um novo.
-        </p>
+        {hasWorkspaces && (
+          <p className="text-sm text-muted-foreground">
+            Escolha onde trabalhar ou crie um novo.
+          </p>
+        )}
       </div>
-      {withAction && <NewWorkspaceButton className="w-full sm:w-auto" />}
+      {hasWorkspaces && <NewWorkspaceButton className="w-full sm:w-auto" />}
     </div>
   );
 }
@@ -44,7 +46,7 @@ async function WorkspaceList() {
   if (workspaces.length === 0) {
     return (
       <>
-        <PageHeading withAction={false} />
+        <PageHeading hasWorkspaces={false} />
         <div className="mt-8">
           <EmptyState
             icon={LayoutGrid}
@@ -59,10 +61,10 @@ async function WorkspaceList() {
 
   return (
     <>
-      <PageHeading withAction />
-      <ul className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] sm:gap-4">
+      <PageHeading hasWorkspaces />
+      <ul className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-3 sm:mt-8 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] sm:gap-4">
         {workspaces.map((workspace) => (
-          <li key={workspace.id}>
+          <li key={workspace.id} className="min-w-0">
             <WorkspaceCard workspace={workspace} />
           </li>
         ))}
