@@ -1,15 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type * as z from "zod";
 import { renameWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
+import { primaryButton } from "@/components/button-styles";
+import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
-import { Button } from "@/components/ui/button";
 import { applyActionErrors } from "@/lib/form-errors";
+import { cn } from "@/lib/utils";
 import {
   renameWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
@@ -82,20 +83,15 @@ export function RenameWorkspaceForm({
             {...register("name")}
           />
           <div>
-            <Button
+            <PendingButton
               type="submit"
-              disabled={!isDirty || isPending}
-              className="h-10 px-4 enabled:hover:bg-brand-strong data-pending:cursor-wait data-pending:opacity-100"
-              data-pending={isPending || undefined}
+              disabled={!isDirty}
+              isPending={isPending}
+              pendingLabel="Salvando…"
+              className={cn("h-10 px-4", primaryButton)}
             >
-              {isPending && (
-                <Loader2
-                  aria-hidden
-                  className="animate-spin motion-reduce:animate-none"
-                />
-              )}
-              {isPending ? "Salvando…" : "Salvar"}
-            </Button>
+              Salvar
+            </PendingButton>
           </div>
         </fieldset>
       </form>
