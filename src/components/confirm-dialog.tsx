@@ -47,6 +47,7 @@ export function ConfirmDialog({
   };
 
   const confirm = () => {
+    setError(undefined);
     startTransition(async () => {
       const result = await onConfirm();
       if (result?.status === "error") {
