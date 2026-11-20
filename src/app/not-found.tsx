@@ -1,10 +1,9 @@
 import { SearchX } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { linkButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
-import { buttonVariants } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
-import { cn } from "@/lib/utils";
 
 const DESCRIPTION = "O endereço pode estar errado ou a página foi removida.";
 
@@ -32,23 +31,11 @@ async function NotFoundView() {
       }
       actions={
         user ? (
-          <Link
-            href="/"
-            className={buttonVariants({
-              variant: "outline",
-              className: "h-10 px-4",
-            })}
-          >
+          <Link href="/" className={linkButton("outline", "h-10 px-4")}>
             Ver meus workspaces
           </Link>
         ) : (
-          <Link
-            href="/sign-in"
-            className={cn(
-              buttonVariants({ className: "h-10 px-4" }),
-              "hover:bg-brand-strong active:bg-brand-deep",
-            )}
-          >
+          <Link href="/sign-in" className={linkButton("default", "h-10 px-4")}>
             Entrar
           </Link>
         )
