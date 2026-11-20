@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
@@ -63,7 +63,10 @@ export function CreateWorkspaceDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="gap-0 p-6 sm:max-w-[440px]">
+      <DialogContent
+        showCloseButton={false}
+        className="gap-0 p-6 sm:max-w-[440px]"
+      >
         <DialogHeader className="gap-1.5 pr-8">
           <DialogTitle className="text-lg font-semibold tracking-tight">
             Novo workspace
@@ -113,6 +116,19 @@ export function CreateWorkspaceDialog({
             </div>
           </fieldset>
         </form>
+        <DialogClose
+          aria-label="Fechar"
+          disabled={isPending}
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="absolute top-3 right-3"
+            />
+          }
+        >
+          <X aria-hidden />
+        </DialogClose>
       </DialogContent>
     </Dialog>
   );

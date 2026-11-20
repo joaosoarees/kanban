@@ -139,3 +139,9 @@
     color: var(--brand-deep);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="skeleton"] {
+    animation: none;
+  }
+}
