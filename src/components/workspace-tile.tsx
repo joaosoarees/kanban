@@ -1,3 +1,4 @@
+import { firstCharacter } from "@/lib/initials";
 import { cn } from "@/lib/utils";
 
 const TILE_COLORS = [
@@ -16,10 +17,6 @@ function colorFor(slug: string): string {
     hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   }
   return TILE_COLORS[hash % TILE_COLORS.length];
-}
-
-export function firstCharacter(text: string): string {
-  return (Array.from(text.trim())[0] ?? "").toUpperCase();
 }
 
 type WorkspaceTileProps = {
