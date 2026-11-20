@@ -1,0 +1,33 @@
+{
+  "source": "src/app/globals.css",
+  "tool": "claude.ai Design canvas: https://claude.ai/artifact/QQ4ykQjWJGbJjWLeDCeWu4, linha \"Guia\"",
+  "naming": "Nomes das CSS custom properties como estão no globals.css; classes Tailwind (zinc-300, red-700…) onde o código usa a classe direto",
+  "synced": "2026-11-20",
+  "tokens": {
+    "--brand": "#4f46e5",
+    "--brand-strong": "#4338ca",
+    "--brand-deep": "#3730a3",
+    "--accent": "#eef2ff",
+    "--foreground": "#18181b",
+    "--muted-foreground": "#71717a",
+    "--secondary": "#f4f4f5",
+    "--border": "#e4e4e7",
+    "--destructive": "#dc2626",
+    "--radius": "0.5rem"
+  },
+  "components": {
+    "Button": "drawn",
+    "TextField": "drawn",
+    "RoleMenu": "drawn",
+    "RoleBadge": "drawn",
+    "WorkspaceTile": "drawn",
+    "Toaster": "drawn",
+    "ConfirmDialog": "drawn",
+    "Dialog": "in code only",
+    "DropdownMenu": "in code only",
+    "Card": "in code only",
+    "Skeleton": "in code only",
+    "EmptyState": "in code only",
+    "StatusView": "in code only"
+  }
+}
