@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
     <main className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col px-6 py-8 sm:px-12">
         <Logo />
-        <div className="flex flex-1 justify-center py-12 lg:pt-[18vh]">
+        <div className="flex flex-1 justify-center py-12 lg:pt-34">
           <div className="w-full max-w-sm">
             <Suspense fallback={null}>
               <SignedOutOnly>{children}</SignedOutOnly>
@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
         </div>
       </div>
       <div className="relative hidden overflow-hidden bg-brand lg:block">
-        <div className="absolute top-1/2 left-16 -translate-y-1/2">
+        <div className="absolute top-49 left-16">
           <BoardPreview />
         </div>
       </div>
