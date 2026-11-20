@@ -1,6 +1,7 @@
 import { SettingsTabs } from "@/components/settings-tabs";
 import { WorkspaceTile } from "@/components/workspace-tile";
 import { can } from "@/lib/permissions";
+import { cn } from "@/lib/utils";
 import { requireMembership } from "@/lib/workspaces";
 
 export default async function SettingsLayout({
@@ -9,6 +10,7 @@ export default async function SettingsLayout({
 }: LayoutProps<"/w/[slug]/settings">) {
   const { slug } = await params;
   const workspace = await requireMembership(slug);
+  const showGeneral = can(workspace.role, "renameWorkspace");
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
@@ -30,9 +32,11 @@ export default async function SettingsLayout({
       <SettingsTabs
         slug={workspace.slug}
         memberCount={workspace.memberCount}
-        showGeneral={can(workspace.role, "renameWorkspace")}
+        showGeneral={showGeneral}
       />
-      <div className="mt-6 flex flex-col gap-6">{children}</div>
+      <div className={cn("flex flex-col gap-6", showGeneral ? "mt-6" : "mt-3")}>
+        {children}
+      </div>
     </main>
   );
 }
