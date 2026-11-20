@@ -65,7 +65,7 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 1. [x] Setup: Next, Tailwind/shadcn, Docker/Postgres, Prisma, lint, Husky, CI
 2. [x] Auth: cadastro, login/logout, páginas protegidas
 3. [x] Workspaces: criar, listar, slug, layout com membership, error/not-found
-4. [ ] Membros e papéis
+4. [x] Membros e papéis
 5. [ ] Boards e colunas: reorder optimistic, store Zustand de colunas recolhidas
 6. [ ] Cards: CRUD, drag optimistic, teste de posição
 7. [ ] Etiquetas e responsável, optimistic
