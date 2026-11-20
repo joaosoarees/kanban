@@ -19,7 +19,8 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 
 ## Páginas e UI
 
-- **Antes de criar qualquer página**, use o skill `impeccable` para propor ideias de layout, apresente as opções e **espere o João aprovar**. Só então implemente.
+- O fluxo de design é o do plugin `craft` (`/craft:craft`). O `DESIGN.md` na raiz é o brief que todas as skills leem; se ele não existir, comece por `/craft:craft-setup`.
+- **Antes de criar qualquer página**, o `craft` confirma o escopo, lista os estados e apresenta as telas desenhadas. **Espere o João aprovar**; só então implemente.
 - O trabalho sem UI de uma fatia (schema, migration, actions) pode andar antes da aprovação.
 
 ## Arquitetura
