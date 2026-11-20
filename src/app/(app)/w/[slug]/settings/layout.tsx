@@ -11,7 +11,7 @@ export default async function SettingsLayout({
   const workspace = await requireMembership(slug);
 
   return (
-    <main className="mx-auto w-full max-w-[880px] px-4 py-6 sm:px-6 sm:py-10">
+    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
       <div className="flex items-center gap-3">
         <WorkspaceTile
           name={workspace.name}
