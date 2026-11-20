@@ -1,4 +1,4 @@
-pnpm exec commitlint --edit "$1"
+bunx commitlint --edit "$1"
 
 if grep -qiE '^co-authored-by:.*(claude|anthropic)|generated with \[?claude code' "$1"; then
   echo "commit-msg: remove Claude attribution from the message" >&2

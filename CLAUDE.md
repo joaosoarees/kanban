@@ -38,9 +38,9 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 
 ## Comandos
 
-- `pnpm db:up`: sobe o Postgres (Docker Compose)
-- `pnpm db:migrate --name <nome>`: cria e aplica uma migration
-- `pnpm dev`
-- `pnpm lint` / `pnpm typecheck` / `pnpm test` / `pnpm build`: o mesmo que o CI roda
+- `bun db:up`: sobe o Postgres (Docker Compose)
+- `bun db:migrate --name <nome>`: cria e aplica uma migration
+- `bun dev`
+- `bun lint` / `bun typecheck` / `bun test` / `bun build`: o mesmo que o CI roda
 
 Variáveis em `.env` (modelo em `.env.example`): `DATABASE_URL` e `SESSION_SECRET` (`openssl rand -base64 32`).
