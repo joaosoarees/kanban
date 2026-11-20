@@ -1,0 +1,107 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, UserPlus } from "lucide-react";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import type * as z from "zod";
+import { addMemberAction } from "@/app/(app)/w/[slug]/settings/actions";
+import { TextField } from "@/components/text-field";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { applyActionErrors } from "@/lib/form-errors";
+import { addMemberSchema } from "@/lib/workspace-schemas";
+
+type AddMemberInput = z.input<typeof addMemberSchema>;
+type AddMemberOutput = z.output<typeof addMemberSchema>;
+
+export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
+  const [isPending, startTransition] = useTransition();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    reset,
+    formState: { errors },
+  } = useForm<AddMemberInput, unknown, AddMemberOutput>({
+    resolver: zodResolver(addMemberSchema),
+    defaultValues: { email: "", role: "MEMBER" },
+  });
+
+  const onSubmit = handleSubmit((values) => {
+    startTransition(async () => {
+      const result = await addMemberAction(workspaceId, values);
+      if (result.status === "error") {
+        applyActionErrors(result, setError);
+        return;
+      }
+      reset();
+      toast.success(`${values.email} agora faz parte do workspace.`);
+    });
+  });
+
+  return (
+    <section
+      aria-labelledby="add-member-title"
+      className="rounded-xl border bg-white p-5"
+    >
+      <h2 id="add-member-title" className="text-[15px] font-semibold">
+        Adicionar membro
+      </h2>
+      <form
+        onSubmit={onSubmit}
+        noValidate
+        aria-busy={isPending}
+        className="mt-4"
+      >
+        <fieldset
+          disabled={isPending}
+          className="m-0 flex min-w-0 flex-col gap-3 border-0 p-0 sm:grid sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-start"
+        >
+          <TextField
+            id="member-email"
+            type="email"
+            required
+            label="E-mail"
+            placeholder="nome@empresa.com"
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            hint="A pessoa precisa ter uma conta no Kanbanary."
+            error={errors.email?.message ?? errors.root?.message}
+            {...register("email")}
+          />
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="member-role">Papel</Label>
+            <select
+              id="member-role"
+              className="h-10 cursor-pointer rounded-lg border border-input bg-white px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 enabled:hover:border-zinc-300 disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("role")}
+            >
+              <option value="MEMBER">Membro</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span aria-hidden className="hidden h-3.5 sm:block" />
+            <Button
+              type="submit"
+              className="h-10 px-4 enabled:hover:bg-brand-strong disabled:cursor-wait disabled:opacity-100"
+            >
+              {isPending ? (
+                <Loader2
+                  aria-hidden
+                  className="animate-spin motion-reduce:animate-none"
+                />
+              ) : (
+                <UserPlus aria-hidden />
+              )}
+              {isPending ? "Adicionando…" : "Adicionar"}
+            </Button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  );
+}
