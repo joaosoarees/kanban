@@ -3,7 +3,7 @@ import { compare, hash, truncates } from "bcryptjs";
 
 const COST = 12;
 
-export function hashPassword(password: string): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
   return hash(password, COST);
 }
 

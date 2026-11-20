@@ -25,7 +25,9 @@ export function TextField({
 }: TextFieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = type === "password";
-  const messageId = error || hint ? `${id}-message` : undefined;
+  const hasError = error !== undefined;
+  const messageId =
+    hasError || hint !== undefined ? `${id}-message` : undefined;
 
   return (
     <div className="flex flex-col gap-2">
@@ -36,7 +38,7 @@ export function TextField({
         <Input
           id={id}
           type={isPassword && isPasswordVisible ? "text" : type}
-          aria-invalid={error ? true : undefined}
+          aria-invalid={hasError ? true : undefined}
           aria-describedby={messageId}
           className={cn(
             "h-10 enabled:hover:border-zinc-300 aria-invalid:enabled:hover:border-destructive",
@@ -47,7 +49,9 @@ export function TextField({
         {isPassword && (
           <button
             type="button"
-            onClick={() => setIsPasswordVisible((visible) => !visible)}
+            onClick={() => {
+              setIsPasswordVisible((visible) => !visible);
+            }}
             aria-label="Mostrar senha"
             aria-pressed={isPasswordVisible}
             aria-controls={id}
@@ -66,7 +70,7 @@ export function TextField({
         aria-live="polite"
         className={cn(
           "min-h-5 text-[13px]/5 text-pretty",
-          error ? "text-red-700" : "text-muted-foreground",
+          hasError ? "text-red-700" : "text-muted-foreground",
         )}
       >
         {error ?? hint}

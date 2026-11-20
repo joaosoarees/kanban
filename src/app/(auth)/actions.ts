@@ -52,7 +52,7 @@ export async function signUpAction(input: unknown): Promise<ActionResult> {
   }
 
   await startSession(userId);
-  redirect(AFTER_SIGN_IN);
+  return redirect(AFTER_SIGN_IN);
 }
 
 export async function signInAction(input: unknown): Promise<ActionResult> {
@@ -82,10 +82,10 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
   }
 
   await startSession(user.id);
-  redirect(AFTER_SIGN_IN);
+  return redirect(AFTER_SIGN_IN);
 }
 
 export async function signOutAction(): Promise<void> {
   await deleteSessionCookie();
-  redirect("/sign-in");
+  return redirect("/sign-in");
 }

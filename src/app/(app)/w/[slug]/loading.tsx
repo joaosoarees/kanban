@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function WorkspaceLoading() {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-12">
-      <div role="status">
+      <output className="block">
         <span className="sr-only">Carregando o workspace…</span>
         <div aria-hidden>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -19,7 +19,7 @@ export default function WorkspaceLoading() {
           <Skeleton className="mt-10 h-4 w-16 bg-zinc-200" />
           <Skeleton className="mt-3 h-[230px] rounded-xl bg-zinc-200" />
         </div>
-      </div>
+      </output>
     </main>
   );
 }

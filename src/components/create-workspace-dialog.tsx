@@ -50,8 +50,12 @@ export function CreateWorkspaceDialog({
   });
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (isPending) return;
-    if (!nextOpen) reset();
+    if (isPending) {
+      return;
+    }
+    if (!nextOpen) {
+      reset();
+    }
     onOpenChange(nextOpen);
   };
 
@@ -79,7 +83,9 @@ export function CreateWorkspaceDialog({
           </DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={onSubmit}
+          onSubmit={(event) => {
+            void onSubmit(event);
+          }}
           noValidate
           aria-busy={isPending}
           className="mt-5"

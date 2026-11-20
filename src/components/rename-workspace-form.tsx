@@ -57,7 +57,9 @@ export function RenameWorkspaceForm({
   return (
     <div className="rounded-xl border bg-white p-5">
       <form
-        onSubmit={onSubmit}
+        onSubmit={(event) => {
+          void onSubmit(event);
+        }}
         noValidate
         aria-busy={isPending}
         className="max-w-[480px]"

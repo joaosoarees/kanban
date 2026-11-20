@@ -25,7 +25,7 @@ export function EmptyState({
       <p className="max-w-sm text-sm/relaxed text-muted-foreground">
         {description}
       </p>
-      {action && <div className="mt-4">{action}</div>}
+      {action !== undefined && <div className="mt-4">{action}</div>}
     </div>
   );
 }

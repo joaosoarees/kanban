@@ -54,7 +54,9 @@ export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
         Adicionar membro
       </h2>
       <form
-        onSubmit={onSubmit}
+        onSubmit={(event) => {
+          void onSubmit(event);
+        }}
         noValidate
         aria-busy={isPending}
         className="mt-4"

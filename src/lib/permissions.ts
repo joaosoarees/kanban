@@ -10,23 +10,33 @@ export type WorkspaceAction =
 
 export type MemberTarget = { role: Role; isSelf: boolean };
 
+type Rule = (actor: Role, target?: MemberTarget) => boolean;
+
+const canManage: Rule = (actor) => actor === "OWNER" || actor === "ADMIN";
+
+const canManageMember: Rule = (actor, target) => {
+  if (!target || target.isSelf || target.role === "OWNER") {
+    return false;
+  }
+  if (actor === "OWNER") {
+    return true;
+  }
+  return actor === "ADMIN" && target.role === "MEMBER";
+};
+
+const RULES: Record<WorkspaceAction, Rule> = {
+  addMember: canManage,
+  renameWorkspace: canManage,
+  deleteWorkspace: (actor) => actor === "OWNER",
+  leaveWorkspace: (actor) => actor !== "OWNER",
+  changeRole: canManageMember,
+  removeMember: canManageMember,
+};
+
 export function can(
   actor: Role,
   action: WorkspaceAction,
   target?: MemberTarget,
 ): boolean {
-  switch (action) {
-    case "addMember":
-    case "renameWorkspace":
-      return actor === "OWNER" || actor === "ADMIN";
-    case "deleteWorkspace":
-      return actor === "OWNER";
-    case "leaveWorkspace":
-      return actor !== "OWNER";
-    case "changeRole":
-    case "removeMember":
-      if (!target || target.isSelf || target.role === "OWNER") return false;
-      if (actor === "OWNER") return true;
-      return actor === "ADMIN" && target.role === "MEMBER";
-  }
+  return RULES[action](actor, target);
 }

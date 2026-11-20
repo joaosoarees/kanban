@@ -4,11 +4,11 @@ const ALGORITHM = "HS256";
 export const SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 7;
 
 const USER_ID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
 function getKey(): Uint8Array {
   const secret = process.env.SESSION_SECRET;
-  if (!secret || secret.length < 32) {
+  if (secret === undefined || secret.length < 32) {
     throw new Error("SESSION_SECRET must be set to at least 32 characters.");
   }
   return new TextEncoder().encode(secret);
@@ -26,7 +26,9 @@ export async function createSessionToken(userId: string): Promise<string> {
 export async function verifySessionToken(
   token: string | undefined,
 ): Promise<{ userId: string } | null> {
-  if (!token) return null;
+  if (token === undefined || token === "") {
+    return null;
+  }
 
   try {
     const { payload } = await jwtVerify(token, getKey(), {

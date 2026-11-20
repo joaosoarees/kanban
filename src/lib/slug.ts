@@ -4,16 +4,18 @@ const SUFFIX_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 export function slugify(text: string): string {
   const slug = text
     .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
+    .replaceAll(/\p{Diacritic}/gu, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replaceAll(/[^a-z0-9]+/gu, "-")
+    .replaceAll(/^-+|-+$/gu, "");
 
   return cutAtLastWord(slug) || "workspace";
 }
 
 function cutAtLastWord(slug: string): string {
-  if (slug.length <= SLUG_MAX_LENGTH) return slug;
+  if (slug.length <= SLUG_MAX_LENGTH) {
+    return slug;
+  }
 
   const head = slug.slice(0, SLUG_MAX_LENGTH + 1);
   const lastHyphen = head.lastIndexOf("-");
@@ -22,7 +24,7 @@ function cutAtLastWord(slug: string): string {
       ? head.slice(0, lastHyphen)
       : head.slice(0, SLUG_MAX_LENGTH);
 
-  return cut.replace(/-+$/, "");
+  return cut.replace(/-+$/u, "");
 }
 
 export function withRandomSuffix(slug: string): string {

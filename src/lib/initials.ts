@@ -3,8 +3,8 @@ export function firstCharacter(text: string): string {
 }
 
 export function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/);
+  const parts = name.trim().split(/\s+/u);
   const first = firstCharacter(parts[0] ?? "");
-  const last = parts.length > 1 ? firstCharacter(parts[parts.length - 1]) : "";
+  const last = parts.length > 1 ? firstCharacter(parts.at(-1) ?? "") : "";
   return first + last;
 }
