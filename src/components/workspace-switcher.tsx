@@ -1,7 +1,13 @@
 "use client";
 
 import { Menu } from "@base-ui/react/menu";
-import { Check, ChevronsUpDown, LayoutGrid, Plus } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  LayoutGrid,
+  Plus,
+  Settings,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -90,6 +96,16 @@ export function WorkspaceSwitcher({
               );
             })}
           </DropdownMenuGroup>
+          <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
+          <Menu.LinkItem
+            render={<Link href={`/w/${current.slug}/settings`} />}
+            className={ITEM_CLASS}
+          >
+            <span className="flex w-[22px] justify-center">
+              <Settings aria-hidden className="size-4 text-zinc-600" />
+            </span>
+            Configurações
+          </Menu.LinkItem>
           <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
           <DropdownMenuItem
             onClick={() => setDialogPath(pathname)}
