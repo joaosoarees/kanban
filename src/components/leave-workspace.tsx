@@ -44,7 +44,9 @@ export function LeaveWorkspace({
         open={open}
         onOpenChange={setOpen}
         title={`Sair de ${workspaceName}?`}
-        description="Você perde o acesso aos quadros deste workspace. Para voltar, um admin precisa adicionar você de novo."
+        description={
+          "Você perde o acesso aos quadros deste workspace. Para voltar, um admin precisa adicionar você de\u00a0novo."
+        }
         confirmLabel="Sair do workspace"
         pendingLabel="Saindo…"
         onConfirm={() => leaveWorkspaceAction(workspaceId)}

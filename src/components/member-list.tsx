@@ -161,7 +161,7 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
         open={isRemoveOpen}
         onOpenChange={setIsRemoveOpen}
         title={`Remover ${removeTarget?.name ?? ""}?`}
-        description={`${removeTarget?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de novo depois.`}
+        description={`${removeTarget?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de\u00a0novo\u00a0depois.`}
         confirmLabel="Remover"
         pendingLabel="Removendo…"
         onConfirm={() => {

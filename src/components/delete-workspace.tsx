@@ -25,7 +25,9 @@ export function DeleteWorkspace({
   const [confirmation, setConfirmation] = useState("");
 
   const members =
-    memberCount === 1 ? "de 1 membro" : `de todos os ${memberCount} membros`;
+    memberCount === 1
+      ? "de 1 membro"
+      : `de todos os ${memberCount}\u00a0membros`;
 
   return (
     <section
@@ -56,7 +58,7 @@ export function DeleteWorkspace({
           if (!nextOpen) setConfirmation("");
         }}
         title={`Excluir ${workspaceName}?`}
-        description={`Apaga o workspace, os quadros e os cards ${members}. Não dá para desfazer.`}
+        description={`Apaga o workspace, os quadros e os cards ${members}. Não dá para\u00a0desfazer.`}
         confirmLabel="Excluir workspace"
         pendingLabel="Excluindo…"
         confirmDisabled={confirmation !== workspaceName}
