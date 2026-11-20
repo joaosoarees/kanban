@@ -4,7 +4,6 @@ import { PendingButton } from "@/components/pending-button";
 import { cn } from "@/lib/utils";
 
 type FormFooterProps = {
-  error?: string;
   isPending: boolean;
   submitLabel: string;
   pendingLabel: string;
@@ -14,7 +13,6 @@ type FormFooterProps = {
 };
 
 export function FormFooter({
-  error,
   isPending,
   submitLabel,
   pendingLabel,
@@ -24,13 +22,6 @@ export function FormFooter({
 }: FormFooterProps) {
   return (
     <>
-      <div role="alert">
-        {error && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </p>
-        )}
-      </div>
       <PendingButton
         type="submit"
         isPending={isPending}
