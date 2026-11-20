@@ -130,8 +130,10 @@ export async function changeRoleAction(
   if (!parsed.success) return INVALID;
 
   const target = await loadTarget(actor.workspaceId, parsed.data.userId);
-  if (!target)
+  if (!target) {
+    revalidateWorkspace(actor.slug);
     return { status: "error", message: "Essa pessoa já saiu do workspace." };
+  }
   if (
     !can(actor.role, "changeRole", {
       role: target.role,
