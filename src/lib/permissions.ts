@@ -24,8 +24,6 @@ export function can(
     case "leaveWorkspace":
       return actor !== "OWNER";
     case "changeRole":
-      if (!target || target.isSelf || target.role === "OWNER") return false;
-      return actor === "OWNER" || actor === "ADMIN";
     case "removeMember":
       if (!target || target.isSelf || target.role === "OWNER") return false;
       if (actor === "OWNER") return true;

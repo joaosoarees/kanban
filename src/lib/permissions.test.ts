@@ -26,11 +26,11 @@ describe("can", () => {
     expect(can("MEMBER", "leaveWorkspace")).toBe(true);
   });
 
-  it("lets owners and admins change other non-owner roles", () => {
+  it("lets the owner change any other role and admins only members' roles", () => {
     expect(can("OWNER", "changeRole", admin)).toBe(true);
     expect(can("OWNER", "changeRole", member)).toBe(true);
-    expect(can("ADMIN", "changeRole", admin)).toBe(true);
     expect(can("ADMIN", "changeRole", member)).toBe(true);
+    expect(can("ADMIN", "changeRole", admin)).toBe(false);
     expect(can("MEMBER", "changeRole", member)).toBe(false);
   });
 
