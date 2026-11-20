@@ -7,6 +7,7 @@ import {
   changeRoleAction,
   removeMemberAction,
 } from "@/app/(app)/w/[slug]/settings/actions";
+import { rowButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ROLE_LABELS, RoleBadge } from "@/components/role-badge";
 import { Button } from "@/components/ui/button";
@@ -162,13 +163,13 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
                 )}
                 {canRemove ? (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => {
                       setRemoveTarget(member);
                       setIsRemoveOpen(true);
                     }}
                     aria-label={`Remover ${member.name}`}
-                    className="h-9 px-2.5 text-[13px] text-red-700 enabled:hover:bg-red-50 enabled:hover:text-red-800"
+                    className={rowButton}
                   >
                     Remover
                   </Button>

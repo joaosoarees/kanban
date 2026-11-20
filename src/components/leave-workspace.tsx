@@ -3,8 +3,10 @@
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { leaveWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
+import { dangerOutlineButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type LeaveWorkspaceProps = {
   workspaceId: string;
@@ -33,7 +35,7 @@ export function LeaveWorkspace({
       <Button
         variant="outline"
         onClick={() => setOpen(true)}
-        className="h-10 border-red-200 px-4 text-red-700 enabled:hover:bg-red-50 enabled:hover:text-red-800"
+        className={cn("h-10 px-4", dangerOutlineButton)}
       >
         <LogOut aria-hidden />
         Sair do workspace

@@ -3,10 +3,12 @@
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { deleteWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
+import { dangerOutlineButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 type DeleteWorkspaceProps = {
   workspaceId: string;
@@ -28,13 +30,10 @@ export function DeleteWorkspace({
   return (
     <section
       aria-labelledby="delete-title"
-      className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-red-200 bg-white p-5"
+      className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-5"
     >
       <div className="flex max-w-[520px] flex-col gap-1">
-        <h2
-          id="delete-title"
-          className="text-[15px] font-semibold text-red-700"
-        >
+        <h2 id="delete-title" className="text-[15px] font-semibold">
           Excluir workspace
         </h2>
         <p className="text-sm/relaxed text-muted-foreground">
@@ -43,8 +42,9 @@ export function DeleteWorkspace({
         </p>
       </div>
       <Button
+        variant="outline"
         onClick={() => setOpen(true)}
-        className="h-10 bg-red-600 px-4 text-white enabled:hover:bg-red-700"
+        className={cn("h-10 px-4", dangerOutlineButton)}
       >
         <Trash2 aria-hidden />
         Excluir workspace
