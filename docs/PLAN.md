@@ -58,7 +58,7 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 
 - Commits pequenos, um assunto por commit.
 - Toda mudança entra por branch e PR; merge só com o CI verde, por rebase, para manter os commits pequenos no histórico.
-- Antes de criar qualquer página, o `impeccable` propõe ideias de layout e o João aprova; só então a página é implementada.
+- Antes de criar qualquer página, o `craft` lista os estados e desenha as telas, e o João aprova; só então a página é implementada.
 
 ## Fatias
 
@@ -69,4 +69,4 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 5. [ ] Boards e colunas: reorder optimistic, store Zustand de colunas recolhidas
 6. [ ] Cards: CRUD, drag optimistic, teste de posição
 7. [ ] Etiquetas e responsável, optimistic
-8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, `impeccable`
+8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
