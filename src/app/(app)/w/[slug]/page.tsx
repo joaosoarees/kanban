@@ -1,10 +1,10 @@
 import { Settings, SquareKanban } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { linkButton } from "@/components/button-styles";
 import { EmptyState } from "@/components/empty-state";
 import { MemberCount } from "@/components/member-count";
 import { RoleBadge } from "@/components/role-badge";
-import { buttonVariants } from "@/components/ui/button";
 import { WorkspaceTile } from "@/components/workspace-tile";
 import { requireMembership } from "@/lib/workspaces";
 
@@ -51,10 +51,7 @@ export default async function WorkspacePage({
         </div>
         <Link
           href={`/w/${workspace.slug}/settings`}
-          className={buttonVariants({
-            variant: "outline",
-            className: "h-9 w-full px-3 sm:w-auto",
-          })}
+          className={linkButton("outline", "h-9 w-full px-3 sm:w-auto")}
         >
           <Settings aria-hidden />
           Configurações

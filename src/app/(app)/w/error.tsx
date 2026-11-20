@@ -3,9 +3,9 @@
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
-import { primaryButton } from "@/components/button-styles";
+import { linkButton, primaryButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function WorkspaceError({
@@ -30,13 +30,7 @@ export default function WorkspaceError({
           <Button onClick={retry} className={cn("h-10 px-4", primaryButton)}>
             Tentar de novo
           </Button>
-          <Link
-            href="/"
-            className={buttonVariants({
-              variant: "outline",
-              className: "h-10 px-4",
-            })}
-          >
+          <Link href="/" className={linkButton("outline", "h-10 px-4")}>
             Ver meus workspaces
           </Link>
         </>
