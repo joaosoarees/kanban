@@ -6,18 +6,18 @@ Projeto de estudo: Next.js + Postgres, só local. O plano e as decisões estão 
 
 ```bash
 cp .env.example .env
-pnpm install
-pnpm db:up
-pnpm db:migrate
-pnpm dev
+bun install
+bun db:up
+bun db:migrate
+bun dev
 ```
 
 ## Scripts
 
-| Script                                       | O que faz                                                |
-| -------------------------------------------- | -------------------------------------------------------- |
-| `pnpm db:up`                                 | sobe o Postgres (Docker Compose) e espera ficar saudável |
-| `pnpm db:migrate`                            | cria e aplica migrations (`prisma migrate dev`)          |
-| `pnpm db:studio`                             | abre o Prisma Studio                                     |
-| `pnpm lint` / `pnpm typecheck` / `pnpm test` | checagens que o CI também roda                           |
-| `pnpm format`                                | formata tudo com Prettier                                |
+| Script                                    | O que faz                                                |
+| ----------------------------------------- | -------------------------------------------------------- |
+| `bun db:up`                               | sobe o Postgres (Docker Compose) e espera ficar saudável |
+| `bun db:migrate`                          | cria e aplica migrations (`prisma migrate dev`)          |
+| `bun db:studio`                           | abre o Prisma Studio                                     |
+| `bun lint` / `bun typecheck` / `bun test` | checagens que o CI também roda                           |
+| `bun format`                              | formata tudo com Prettier                                |

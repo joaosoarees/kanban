@@ -58,5 +58,9 @@
     "typescript": "^5",
     "vitest": "^5.1.1"
   },
-  "packageManager": "pnpm@12.11.2"
+  "packageManager": "bun@1.4.5-canary.20261120.1",
+  "trustedDependencies": [
+    "@prisma/engines",
+    "prisma"
+  ]
 }
