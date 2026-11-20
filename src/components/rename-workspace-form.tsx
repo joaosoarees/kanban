@@ -56,17 +56,14 @@ export function RenameWorkspaceForm({
 
   return (
     <section
-      aria-labelledby="rename-title"
+      aria-label="Nome do workspace"
       className="rounded-xl border bg-white p-5"
     >
-      <h2 id="rename-title" className="text-[15px] font-semibold">
-        Nome do workspace
-      </h2>
       <form
         onSubmit={onSubmit}
         noValidate
         aria-busy={isPending}
-        className="mt-4 max-w-[480px]"
+        className="max-w-[480px]"
       >
         <fieldset
           disabled={isPending}
@@ -75,10 +72,16 @@ export function RenameWorkspaceForm({
           <TextField
             id="workspace-rename"
             required
-            label="Nome"
+            label="Nome do workspace"
+            labelClassName="text-[15px] font-semibold"
             autoComplete="off"
             maxLength={WORKSPACE_NAME_MAX_LENGTH}
-            hint={`O endereço /w/${slug} não muda.`}
+            hint={
+              <>
+                O endereço <span className="font-mono">/w/{slug}</span> não
+                muda.
+              </>
+            }
             error={errors.name?.message ?? errors.root?.message}
             {...register("name")}
           />

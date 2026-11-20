@@ -9,13 +9,15 @@ import { cn } from "@/lib/utils";
 type TextFieldProps = ComponentProps<"input"> & {
   id: string;
   label: string;
-  hint?: string;
+  labelClassName?: string;
+  hint?: ReactNode;
   error?: ReactNode;
 };
 
 export function TextField({
   id,
   label,
+  labelClassName,
   hint,
   error,
   type,
@@ -27,7 +29,9 @@ export function TextField({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id} className={labelClassName}>
+        {label}
+      </Label>
       <div className="relative">
         <Input
           id={id}
