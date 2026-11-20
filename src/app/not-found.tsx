@@ -5,41 +5,39 @@ import { linkButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
 import { getCurrentUser } from "@/lib/auth";
 
-const DESCRIPTION = "O endereço pode estar errado ou a página foi removida.";
-
 export default function NotFound() {
   return (
     <>
       <title>Página não encontrada · Kanbanary</title>
-      <Suspense>
-        <NotFoundView />
-      </Suspense>
+      <StatusView
+        icon={SearchX}
+        eyebrow="404"
+        title="Página não encontrada"
+        description="O endereço pode estar errado ou a página foi removida."
+        actions={
+          <Suspense fallback={<span aria-hidden className="h-10" />}>
+            <NotFoundAction />
+          </Suspense>
+        }
+      />
     </>
   );
 }
 
-async function NotFoundView() {
+async function NotFoundAction() {
   const user = await getCurrentUser();
 
+  if (user) {
+    return (
+      <Link href="/" className={linkButton("outline", "h-10 px-4")}>
+        Ver meus workspaces
+      </Link>
+    );
+  }
+
   return (
-    <StatusView
-      icon={SearchX}
-      eyebrow="404"
-      title="Página não encontrada"
-      description={
-        user ? DESCRIPTION : `${DESCRIPTION} Entre para ver seus workspaces.`
-      }
-      actions={
-        user ? (
-          <Link href="/" className={linkButton("outline", "h-10 px-4")}>
-            Ver meus workspaces
-          </Link>
-        ) : (
-          <Link href="/sign-in" className={linkButton("default", "h-10 px-4")}>
-            Entrar
-          </Link>
-        )
-      }
-    />
+    <Link href="/sign-in" className={linkButton("default", "h-10 px-4")}>
+      Entrar para ver seus workspaces
+    </Link>
   );
 }
