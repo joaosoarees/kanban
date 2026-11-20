@@ -14,5 +14,38 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
 
+  memberships Membership[]
+
   @@map("users")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Workspace {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  memberships Membership[]
+
+  @@map("workspaces")
+}
+
+model Membership {
+  userId      String   @db.Uuid
+  workspaceId String   @db.Uuid
+  role        Role
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workspaceId])
+  @@index([workspaceId])
+  @@map("memberships")
 }
