@@ -1,4 +1,0 @@
-bun.lock
-src/generated
-prisma/migrations
-.next

@@ -1,0 +1,3 @@
+[fmt]
+sortTailwindcss = { stylesheet = "./src/app/globals.css", functions = [] }
+ignorePatterns = ["bun.lock", "src/generated", "prisma/migrations", ".next"]
