@@ -6,19 +6,11 @@ import type { ActionResult } from "@/lib/action-result";
 import { signInSchema, signUpSchema } from "@/lib/auth-schemas";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
+import { isUniqueViolation } from "@/lib/prisma-errors";
 import { deleteSessionCookie, writeSessionCookie } from "@/lib/session-cookie";
 import { createSessionToken } from "@/lib/session-token";
 
 const AFTER_SIGN_IN = "/";
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
-  );
-}
 
 async function startSession(userId: string): Promise<void> {
   await writeSessionCookie(await createSessionToken(userId));
