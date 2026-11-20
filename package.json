@@ -6,13 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "db:up": "docker compose up -d --wait",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check": "next typegen && bun check --no-script"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -47,7 +47,7 @@
     "lint-staged": "^17.6.1",
     "prisma": "^7.10.1",
     "tailwindcss": "4.3.3",
-    "typescript": "^5",
+    "typescript": "7.0.2",
     "vitest": "^5.1.1"
   },
   "packageManager": "bun@1.4.5-canary.20261120.1",
