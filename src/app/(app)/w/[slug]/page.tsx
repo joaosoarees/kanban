@@ -1,5 +1,6 @@
 import { SquareKanban } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { MemberCount } from "@/components/member-count";
 import { RoleBadge } from "@/components/role-badge";
@@ -35,7 +36,12 @@ export default async function WorkspacePage({
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-muted-foreground">
             <span className="font-mono">/w/{workspace.slug}</span>
             <span aria-hidden>·</span>
-            <MemberCount count={workspace.memberCount} />
+            <Link
+              href={`/w/${workspace.slug}/settings/members`}
+              className="rounded-sm outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 [&_span]:text-inherit"
+            >
+              <MemberCount count={workspace.memberCount} />
+            </Link>
             <span aria-hidden>·</span>
             <RoleBadge role={workspace.role} />
           </p>
