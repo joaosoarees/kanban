@@ -7,10 +7,20 @@ export function slugify(text: string): string {
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .slice(0, SLUG_MAX_LENGTH)
     .replace(/^-+|-+$/g, "");
 
-  return slug || "workspace";
+  return cutAtLastWord(slug) || "workspace";
+}
+
+function cutAtLastWord(slug: string): string {
+  if (slug.length <= SLUG_MAX_LENGTH) return slug;
+
+  const head = slug.slice(0, SLUG_MAX_LENGTH + 1);
+  const lastHyphen = head.lastIndexOf("-");
+  const cut =
+    lastHyphen > 0 ? head.slice(0, lastHyphen) : head.slice(0, SLUG_MAX_LENGTH);
+
+  return cut.replace(/-+$/, "");
 }
 
 export function withRandomSuffix(slug: string): string {
