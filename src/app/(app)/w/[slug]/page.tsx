@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/empty-state";
 import { MemberCount } from "@/components/member-count";
 import { RoleBadge } from "@/components/role-badge";
 import { WorkspaceTile } from "@/components/workspace-tile";
+import { can } from "@/lib/permissions";
 import { requireMembership } from "@/lib/workspaces";
 
 export async function generateMetadata({
@@ -50,7 +51,11 @@ export default async function WorkspacePage({
           </div>
         </div>
         <Link
-          href={`/w/${workspace.slug}/settings`}
+          href={
+            can(workspace.role, "renameWorkspace")
+              ? `/w/${workspace.slug}/settings`
+              : `/w/${workspace.slug}/settings/members`
+          }
           className={linkButton("outline", "h-9 w-full px-3 sm:w-auto")}
         >
           <Settings aria-hidden />
