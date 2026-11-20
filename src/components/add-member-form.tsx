@@ -3,12 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
 import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type * as z from "zod";
 import { addMemberAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
+import { RoleMenu } from "@/components/role-menu";
 import { TextField } from "@/components/text-field";
 import { Label } from "@/components/ui/label";
 import { applyActionErrors } from "@/lib/form-errors";
@@ -22,6 +23,7 @@ export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
   const [isPending, startTransition] = useTransition();
   const {
     register,
+    control,
     handleSubmit,
     setError,
     reset,
@@ -76,14 +78,19 @@ export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
           />
           <div className="flex flex-col gap-2">
             <Label htmlFor="member-role">Papel</Label>
-            <select
-              id="member-role"
-              className="h-10 cursor-pointer rounded-lg border border-input bg-white px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 enabled:hover:border-zinc-300 disabled:cursor-not-allowed disabled:opacity-50"
-              {...register("role")}
-            >
-              <option value="MEMBER">Membro</option>
-              <option value="ADMIN">Admin</option>
-            </select>
+            <Controller
+              control={control}
+              name="role"
+              render={({ field }) => (
+                <RoleMenu
+                  id="member-role"
+                  label="Papel"
+                  value={field.value}
+                  onChange={field.onChange}
+                  className="h-10 w-full text-sm"
+                />
+              )}
+            />
           </div>
           <div className="flex flex-col gap-2">
             <span aria-hidden className="hidden h-3.5 sm:block" />

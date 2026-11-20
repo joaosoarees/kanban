@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
@@ -9,34 +8,18 @@ import {
 } from "@/app/(app)/w/[slug]/settings/actions";
 import { rowButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { ROLE_LABELS, RoleBadge } from "@/components/role-badge";
+import { RoleBadge } from "@/components/role-badge";
+import { type AssignableRole, RoleMenu } from "@/components/role-menu";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { Role } from "@/generated/prisma/enums";
 import { initialsOf } from "@/lib/initials";
 import { can } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import type { WorkspaceMember } from "@/lib/workspaces";
 
-type AssignableRole = Exclude<Role, "OWNER">;
-
 type OptimisticChange =
   | { type: "role"; userId: string; role: AssignableRole }
   | { type: "remove"; userId: string };
-
-const ROLE_OPTIONS: { role: AssignableRole; description: string }[] = [
-  {
-    role: "ADMIN",
-    description: "Adiciona e remove membros e renomeia o workspace.",
-  },
-  { role: "MEMBER", description: "Usa os quadros do workspace." },
-];
 
 function applyChange(members: WorkspaceMember[], change: OptimisticChange) {
   if (change.type === "remove") {
@@ -143,7 +126,8 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
               >
                 {canChangeRole ? (
                   <RoleMenu
-                    member={member}
+                    label={`Papel de ${member.name}`}
+                    value={member.role as AssignableRole}
                     onChange={(role) => changeRole(member, role)}
                   />
                 ) : (
@@ -185,47 +169,5 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
         }}
       />
     </section>
-  );
-}
-
-function RoleMenu({
-  member,
-  onChange,
-}: {
-  member: WorkspaceMember;
-  onChange: (role: AssignableRole) => void;
-}) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={`Papel de ${member.name}: ${ROLE_LABELS[member.role]}`}
-        className="inline-flex h-9 w-28 cursor-pointer items-center justify-between gap-2 rounded-lg border bg-white pr-2.5 pl-3 text-[13px] font-medium outline-none hover:bg-zinc-50 focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-zinc-100"
-      >
-        {ROLE_LABELS[member.role]}
-        <ChevronDown aria-hidden className="size-3.5 text-muted-foreground" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 p-1.5">
-        <DropdownMenuRadioGroup
-          value={member.role}
-          onValueChange={(value) => onChange(value as AssignableRole)}
-        >
-          {ROLE_OPTIONS.map(({ role, description }) => (
-            <DropdownMenuRadioItem
-              key={role}
-              value={role}
-              closeOnClick
-              className="cursor-pointer items-start rounded-md py-2 pr-8 pl-2"
-            >
-              <span className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">{ROLE_LABELS[role]}</span>
-                <span className="text-xs/snug text-muted-foreground">
-                  {description}
-                </span>
-              </span>
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }
