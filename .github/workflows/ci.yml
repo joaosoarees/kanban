@@ -17,7 +17,8 @@ jobs:
         with:
           filter: blob:none
       - uses: ./.github/actions/setup
-      - run: bunx next typegen
+      - if: ${{ !cancelled() }}
+        run: bunx next typegen
       - if: ${{ !cancelled() }}
         run: timeout 1 bun lint
       - if: ${{ !cancelled() }}
