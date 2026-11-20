@@ -58,7 +58,10 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
     applyChange,
   );
   const [, startTransition] = useTransition();
-  const [removing, setRemoving] = useState<WorkspaceMember | null>(null);
+  const [removeTarget, setRemoveTarget] = useState<WorkspaceMember | null>(
+    null,
+  );
+  const [isRemoveOpen, setIsRemoveOpen] = useState(false);
 
   const changeRole = (member: WorkspaceMember, role: AssignableRole) => {
     if (role === member.role) return;
@@ -77,7 +80,7 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
   };
 
   const remove = (member: WorkspaceMember) => {
-    setRemoving(null);
+    setIsRemoveOpen(false);
     startTransition(async () => {
       applyOptimistic({ type: "remove", userId: member.userId });
       const result = await removeMemberAction(workspaceId, {
@@ -160,7 +163,10 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
                 {canRemove ? (
                   <Button
                     variant="ghost"
-                    onClick={() => setRemoving(member)}
+                    onClick={() => {
+                      setRemoveTarget(member);
+                      setIsRemoveOpen(true);
+                    }}
                     aria-label={`Remover ${member.name}`}
                     className="h-9 px-2.5 text-[13px] text-red-700 enabled:hover:bg-red-50 enabled:hover:text-red-800"
                   >
@@ -177,16 +183,14 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
         })}
       </ul>
       <ConfirmDialog
-        open={removing !== null}
-        onOpenChange={(open) => {
-          if (!open) setRemoving(null);
-        }}
-        title={`Remover ${removing?.name ?? ""}?`}
-        description={`${removing?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de novo depois.`}
+        open={isRemoveOpen}
+        onOpenChange={setIsRemoveOpen}
+        title={`Remover ${removeTarget?.name ?? ""}?`}
+        description={`${removeTarget?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de novo depois.`}
         confirmLabel="Remover"
         pendingLabel="Removendo…"
         onConfirm={() => {
-          if (removing) remove(removing);
+          if (removeTarget) remove(removeTarget);
         }}
       />
     </section>
