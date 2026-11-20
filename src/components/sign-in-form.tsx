@@ -62,12 +62,11 @@ export function SignInForm() {
           label="Senha"
           type="password"
           autoComplete="current-password"
-          error={errors.password?.message}
+          error={errors.password?.message ?? errors.root?.message}
           {...register("password")}
         />
       </fieldset>
       <FormFooter
-        error={errors.root?.message}
         isPending={isPending}
         submitLabel="Entrar"
         pendingLabel="Entrando…"

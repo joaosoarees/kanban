@@ -1,13 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
 import { signUpAction } from "@/app/(auth)/actions";
 import { FormFooter } from "@/components/form-footer";
 import { TextField } from "@/components/text-field";
-import { signUpSchema } from "@/lib/auth-schemas";
+import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/lib/auth-schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 
 type SignUpInput = z.input<typeof signUpSchema>;
@@ -61,7 +62,21 @@ export function SignUpForm() {
           label="E-mail"
           type="email"
           autoComplete="email"
-          error={errors.email?.message}
+          error={
+            errors.email?.message === EMAIL_TAKEN_MESSAGE ? (
+              <>
+                {EMAIL_TAKEN_MESSAGE}{" "}
+                <Link
+                  href="/sign-in"
+                  className="rounded-sm font-medium text-brand underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  Entre
+                </Link>
+              </>
+            ) : (
+              errors.email?.message
+            )
+          }
           {...register("email")}
         />
         <TextField
@@ -71,12 +86,11 @@ export function SignUpForm() {
           type="password"
           autoComplete="new-password"
           hint="Use pelo menos 8 caracteres."
-          error={errors.password?.message}
+          error={errors.password?.message ?? errors.root?.message}
           {...register("password")}
         />
       </fieldset>
       <FormFooter
-        error={errors.root?.message}
         isPending={isPending}
         submitLabel="Criar conta"
         pendingLabel="Criando conta…"

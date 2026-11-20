@@ -1,7 +1,7 @@
 "use client";
 
 import { Eye, EyeOff } from "lucide-react";
-import { useState, type ComponentProps } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ type TextFieldProps = ComponentProps<"input"> & {
   id: string;
   label: string;
   hint?: string;
-  error?: string;
+  error?: ReactNode;
 };
 
 export function TextField({
@@ -59,9 +59,10 @@ export function TextField({
       </div>
       <p
         id={messageId}
+        aria-live="polite"
         className={cn(
-          "min-h-5 text-sm",
-          error ? "text-destructive" : "text-muted-foreground",
+          "min-h-5 text-[13px]/5 text-pretty",
+          error ? "text-red-700" : "text-muted-foreground",
         )}
       >
         {error ?? hint}
