@@ -1,0 +1,82 @@
+"use client";
+
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { deleteWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+type DeleteWorkspaceProps = {
+  workspaceId: string;
+  workspaceName: string;
+  memberCount: number;
+};
+
+export function DeleteWorkspace({
+  workspaceId,
+  workspaceName,
+  memberCount,
+}: DeleteWorkspaceProps) {
+  const [open, setOpen] = useState(false);
+  const [confirmation, setConfirmation] = useState("");
+
+  const members =
+    memberCount === 1 ? "de 1 membro" : `de todos os ${memberCount} membros`;
+
+  return (
+    <section
+      aria-labelledby="delete-title"
+      className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-red-200 bg-white p-5"
+    >
+      <div className="flex max-w-[520px] flex-col gap-1">
+        <h2
+          id="delete-title"
+          className="text-[15px] font-semibold text-red-700"
+        >
+          Excluir workspace
+        </h2>
+        <p className="text-sm/relaxed text-muted-foreground">
+          Apaga o workspace, os quadros e os cards de todos os membros. Não dá
+          para desfazer.
+        </p>
+      </div>
+      <Button
+        onClick={() => setOpen(true)}
+        className="h-10 bg-red-600 px-4 text-white enabled:hover:bg-red-700"
+      >
+        <Trash2 aria-hidden />
+        Excluir workspace
+      </Button>
+      <ConfirmDialog
+        open={open}
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen);
+          if (!nextOpen) setConfirmation("");
+        }}
+        title={`Excluir ${workspaceName}?`}
+        description={`Apaga o workspace, os quadros e os cards ${members}. Não dá para desfazer.`}
+        confirmLabel="Excluir workspace"
+        pendingLabel="Excluindo…"
+        confirmDisabled={confirmation !== workspaceName}
+        onConfirm={() => deleteWorkspaceAction(workspaceId, confirmation)}
+      >
+        <div className="mt-4 flex flex-col gap-2">
+          <Label htmlFor="delete-confirmation" className="block font-normal">
+            Digite <strong className="font-semibold">{workspaceName}</strong>{" "}
+            para confirmar
+          </Label>
+          <Input
+            id="delete-confirmation"
+            value={confirmation}
+            onChange={(event) => setConfirmation(event.target.value)}
+            autoComplete="off"
+            spellCheck={false}
+            className="h-10"
+          />
+        </div>
+      </ConfirmDialog>
+    </section>
+  );
+}
