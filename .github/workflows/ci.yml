@@ -7,23 +7,60 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  check:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: npm install --global --no-fund --no-audit bun@1.4.5-canary.20261120.1
+        with:
+          filter: blob:none
+      - uses: ./.github/actions/setup
+      - run: bunx next typegen
+      - if: ${{ !cancelled() }}
+        run: timeout 1 bun lint
+      - if: ${{ !cancelled() }}
+        run: timeout 1 bun fmt --check
+      - if: ${{ !cancelled() }}
+        run: timeout 5 bun check --no-script
+      - if: ${{ !cancelled() }}
+        uses: ./.github/actions/budget
+        with:
+          seconds: 35
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          filter: blob:none
+      - uses: ./.github/actions/setup
+      - run: timeout 30 bun test --isolate=modules
+      - uses: ./.github/actions/budget
+        with:
+          seconds: 35
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          filter: blob:none
+      - uses: ./.github/actions/setup
       - uses: actions/cache@v4
         with:
-          path: ~/.bun/install/cache
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          restore-keys: bun-${{ runner.os }}-
-      - run: bun install --frozen-lockfile
-      - run: bunx next typegen
-      - run: bun lint
-      - run: bun fmt --check
-      - run: bun check
-      - run: bun test --isolate=modules
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ hashFiles('src/**', 'next.config.*', 'tsconfig.json') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
       - run: bun run build
+      - uses: ./.github/actions/budget
+        with:
+          seconds: 35
+
+  check:
+    if: ${{ always() }}
+    needs: [checks, test, build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo '${{ toJSON(needs) }}' | jq -e 'all(.[]; .result == "success")'

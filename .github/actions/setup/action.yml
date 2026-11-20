@@ -1,0 +1,39 @@
+name: Setup
+description: Bun, node_modules and the Prisma client from cache, within the setup budget
+inputs:
+  budget:
+    description: Seconds the setup may take
+    default: "15"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+    - id: version
+      shell: bash
+      run: echo "bun=$(jq -r '.packageManager | sub("^bun@"; "")' package.json)" >> "$GITHUB_OUTPUT"
+    - id: bun
+      uses: actions/cache@v4
+      with:
+        path: ~/.bun-bin
+        key: bun-bin-${{ runner.os }}-${{ steps.version.outputs.bun }}
+    - if: steps.bun.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm install --prefix ~/.bun-bin --no-fund --no-audit --no-save "bun@${{ steps.version.outputs.bun }}"
+    - shell: bash
+      run: echo "$HOME/.bun-bin/node_modules/.bin" >> "$GITHUB_PATH"
+    - id: modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          src/generated
+        key: modules-${{ runner.os }}-${{ hashFiles('bun.lock', 'prisma/schema.prisma') }}
+    - if: steps.modules.outputs.cache-hit != 'true'
+      shell: bash
+      run: bun install --frozen-lockfile
+    - shell: bash
+      run: |
+        elapsed=$(( $(date +%s) - JOB_START ))
+        echo "setup took ${elapsed}s (budget ${{ inputs.budget }}s)"
+        [ "$elapsed" -le "${{ inputs.budget }}" ]

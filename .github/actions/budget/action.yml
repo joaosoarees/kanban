@@ -1,0 +1,14 @@
+name: Budget
+description: Fails the job when it ran longer than its budget
+inputs:
+  seconds:
+    description: Seconds the job may take
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        elapsed=$(( $(date +%s) - JOB_START ))
+        echo "job took ${elapsed}s (budget ${{ inputs.seconds }}s)"
+        [ "$elapsed" -le "${{ inputs.seconds }}" ]
