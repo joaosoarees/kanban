@@ -14,10 +14,10 @@ bun dev
 
 ## Scripts
 
-| Script                                    | O que faz                                                |
-| ----------------------------------------- | -------------------------------------------------------- |
-| `bun db:up`                               | sobe o Postgres (Docker Compose) e espera ficar saudável |
-| `bun db:migrate`                          | cria e aplica migrations (`prisma migrate dev`)          |
-| `bun db:studio`                           | abre o Prisma Studio                                     |
-| `bun lint` / `bun check` / `bun run test` | checagens que o CI também roda                           |
-| `bun fmt`                                 | formata tudo                                             |
+| Script                                                  | O que faz                                                |
+| ------------------------------------------------------- | -------------------------------------------------------- |
+| `bun db:up`                                             | sobe o Postgres (Docker Compose) e espera ficar saudável |
+| `bun db:migrate`                                        | cria e aplica migrations (`prisma migrate dev`)          |
+| `bun db:studio`                                         | abre o Prisma Studio                                     |
+| `bun lint` / `bun check` / `bun test --isolate=modules` | checagens que o CI também roda                           |
+| `bun fmt`                                               | formata tudo                                             |
