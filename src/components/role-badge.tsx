@@ -1,7 +1,7 @@
 import type { Role } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 
-const ROLE_LABELS: Record<Role, string> = {
+export const ROLE_LABELS: Record<Role, string> = {
   OWNER: "Dono",
   ADMIN: "Admin",
   MEMBER: "Membro",
