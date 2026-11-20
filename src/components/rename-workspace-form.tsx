@@ -55,10 +55,7 @@ export function RenameWorkspaceForm({
   });
 
   return (
-    <section
-      aria-label="Nome do workspace"
-      className="rounded-xl border bg-white p-5"
-    >
+    <div className="rounded-xl border bg-white p-5">
       <form
         onSubmit={onSubmit}
         noValidate
@@ -98,6 +95,6 @@ export function RenameWorkspaceForm({
           </div>
         </fieldset>
       </form>
-    </section>
+    </div>
   );
 }
