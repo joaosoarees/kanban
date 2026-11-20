@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useState, useTransition, type ReactNode } from "react";
 import {
   AlertDialog,
@@ -11,8 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { dangerButton } from "@/components/button-styles";
+import { PendingButton } from "@/components/pending-button";
 import type { ActionResult } from "@/lib/action-result";
+import { cn } from "@/lib/utils";
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -79,20 +80,15 @@ export function ConfirmDialog({
           <AlertDialogCancel disabled={isPending} className="h-10 px-4">
             Cancelar
           </AlertDialogCancel>
-          <Button
+          <PendingButton
             onClick={confirm}
-            disabled={isPending || confirmDisabled}
-            className="h-10 bg-red-600 px-4 text-white enabled:hover:bg-red-700 disabled:data-pending:cursor-wait"
-            data-pending={isPending || undefined}
+            disabled={confirmDisabled}
+            isPending={isPending}
+            pendingLabel={pendingLabel}
+            className={cn("h-10 px-4", dangerButton)}
           >
-            {isPending && (
-              <Loader2
-                aria-hidden
-                className="animate-spin motion-reduce:animate-none"
-              />
-            )}
-            {isPending ? pendingLabel : confirmLabel}
-          </Button>
+            {confirmLabel}
+          </PendingButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

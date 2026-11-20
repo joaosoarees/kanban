@@ -1,11 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
 import { createWorkspaceAction } from "@/app/(app)/actions";
+import { primaryButton } from "@/components/button-styles";
+import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,7 @@ import {
   createWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
 } from "@/lib/workspace-schemas";
+import { cn } from "@/lib/utils";
 
 type CreateWorkspaceInput = z.input<typeof createWorkspaceSchema>;
 type CreateWorkspaceOutput = z.output<typeof createWorkspaceSchema>;
@@ -101,18 +104,14 @@ export function CreateWorkspaceDialog({
               >
                 Cancelar
               </DialogClose>
-              <Button
+              <PendingButton
                 type="submit"
-                className="h-10 px-4 enabled:hover:bg-brand-strong disabled:cursor-wait disabled:opacity-100"
+                isPending={isPending}
+                pendingLabel="Criando workspace…"
+                className={cn("h-10 px-4", primaryButton)}
               >
-                {isPending && (
-                  <Loader2
-                    aria-hidden
-                    className="animate-spin motion-reduce:animate-none"
-                  />
-                )}
-                {isPending ? "Criando…" : "Criar workspace"}
-              </Button>
+                Criar workspace
+              </PendingButton>
             </div>
           </fieldset>
         </form>

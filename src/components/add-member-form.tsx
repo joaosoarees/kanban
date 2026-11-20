@@ -1,16 +1,18 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type * as z from "zod";
 import { addMemberAction } from "@/app/(app)/w/[slug]/settings/actions";
+import { primaryButton } from "@/components/button-styles";
+import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { applyActionErrors } from "@/lib/form-errors";
+import { cn } from "@/lib/utils";
 import { addMemberSchema } from "@/lib/workspace-schemas";
 
 type AddMemberInput = z.input<typeof addMemberSchema>;
@@ -85,20 +87,15 @@ export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
           </div>
           <div className="flex flex-col gap-2">
             <span aria-hidden className="hidden h-3.5 sm:block" />
-            <Button
+            <PendingButton
               type="submit"
-              className="h-10 px-4 enabled:hover:bg-brand-strong disabled:cursor-wait disabled:opacity-100"
+              isPending={isPending}
+              pendingLabel="Adicionando membro…"
+              className={cn("h-10 px-4", primaryButton)}
             >
-              {isPending ? (
-                <Loader2
-                  aria-hidden
-                  className="animate-spin motion-reduce:animate-none"
-                />
-              ) : (
-                <UserPlus aria-hidden />
-              )}
-              {isPending ? "Adicionando…" : "Adicionar"}
-            </Button>
+              <UserPlus aria-hidden />
+              Adicionar
+            </PendingButton>
           </div>
         </fieldset>
       </form>

@@ -1,6 +1,7 @@
-import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { primaryButton } from "@/components/button-styles";
+import { PendingButton } from "@/components/pending-button";
+import { cn } from "@/lib/utils";
 
 type FormFooterProps = {
   error?: string;
@@ -30,19 +31,14 @@ export function FormFooter({
           </p>
         )}
       </div>
-      <Button
+      <PendingButton
         type="submit"
-        disabled={isPending}
-        className="h-10 w-full enabled:hover:bg-brand-strong disabled:cursor-wait disabled:opacity-100"
+        isPending={isPending}
+        pendingLabel={pendingLabel}
+        className={cn("h-10 w-full", primaryButton)}
       >
-        {isPending && (
-          <Loader2
-            aria-hidden
-            className="animate-spin motion-reduce:animate-none"
-          />
-        )}
-        {isPending ? pendingLabel : submitLabel}
-      </Button>
+        {submitLabel}
+      </PendingButton>
       <p className="text-center text-sm text-muted-foreground">
         {switchText}{" "}
         <Link
