@@ -1,12 +1,13 @@
 import { Suspense, type ReactNode } from "react";
 import { requireMembership } from "@/lib/workspaces";
+import WorkspaceLoading from "./loading";
 
 export default function WorkspaceLayout({
   children,
   params,
 }: LayoutProps<"/w/[slug]">) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<WorkspaceLoading />}>
       <MembersOnly params={params}>{children}</MembersOnly>
     </Suspense>
   );
