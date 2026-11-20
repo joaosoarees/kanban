@@ -71,11 +71,11 @@ export function CreateWorkspaceDialog({
         className="gap-0 p-6 sm:max-w-[440px]"
       >
         <DialogHeader className="gap-1.5 pr-8">
-          <DialogTitle className="text-lg font-semibold tracking-tight">
+          <DialogTitle className="text-lg font-semibold tracking-tight text-balance">
             Novo workspace
           </DialogTitle>
-          <DialogDescription>
-            Dê um nome ao espaço onde seu time vai organizar os quadros.
+          <DialogDescription className="text-pretty">
+            Dê um nome ao espaço onde seu time vai organizar os&nbsp;quadros.
           </DialogDescription>
         </DialogHeader>
         <form
