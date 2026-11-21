@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 .husky/in-app bunx commitlint --edit "$1"
 
 if grep -qiE '^co-authored-by:.*(claude|anthropic)|generated with \[?claude code' "$1"; then
