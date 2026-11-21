@@ -45,6 +45,8 @@ O bun roda só no container `app`; não instale bun, hk ou pkl na máquina.
 - `docker compose exec app bun lint` / `bun check` / `bun test --isolate=modules` / `bun run build`: o mesmo que o CI roda
 - `npx prisma studio`: abre o Prisma Studio fora do container
 
-Os hooks do git rodam no container: ele precisa estar ligado para commitar, e commits a partir de git worktrees são recusados.
+- `docker compose restart app`: reaplica dependências e migrations depois de `git pull` ou troca de branch
+
+Os hooks nativos do git ficam em `.husky` e rodam no container: ele precisa estar ligado para commitar, e commits a partir de git worktrees são recusados.
 
 Variáveis em `.env` (modelo em `.env.example`): `DATABASE_URL` e `SESSION_SECRET` (`openssl rand -base64 32`).

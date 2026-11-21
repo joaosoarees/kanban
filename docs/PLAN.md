@@ -51,7 +51,7 @@ Deletes em cascata de Workspace até Card. O responsável precisa ser membro do 
 
 - `bun lint` e `bun fmt`, com a formatação aplicada no pre-commit.
 - Ambiente local em Docker Compose: Postgres e app, com o bun só dentro do container.
-- Husky no container: lint-staged e typecheck (`bun check`) no pre-commit, commitlint (Conventional Commits em inglês) no commit-msg.
+- Hooks nativos do git em `.husky`, executados no container: lint-staged e typecheck (`bun check`) no pre-commit, commitlint (Conventional Commits em inglês) no commit-msg.
 - CI no GitHub Actions: lint, format, typecheck, test, build. Branch protection na `main`.
 - Testes: só o teste unitário da lógica de posição. Sem mocks e sem testes de componente.
 
