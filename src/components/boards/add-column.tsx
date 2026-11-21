@@ -122,7 +122,7 @@ function AddColumnForm({
           parsed.data,
         );
         if (result.status === "success") {
-          onCreated();
+          startTransition(onCreated);
           return;
         }
         const fieldError = result.fieldErrors?.name?.at(0);

@@ -80,7 +80,7 @@ export function ColumnNameEditor({
         console.error(caught);
         toast.error(RENAME_FAILED);
       }
-      close();
+      startTransition(close);
     });
   };
 
