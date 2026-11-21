@@ -74,7 +74,7 @@ export function AddColumn({
           onClick={() => {
             onOpenChange(true);
           }}
-          className="flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-dashed border-zinc-400 text-sm font-medium text-zinc-700 outline-none hover:border-zinc-500 hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-10"
+          className="flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-dashed border-zinc-400 text-sm font-medium text-zinc-700 outline-hidden hover:border-zinc-500 hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-10"
         >
           <Plus aria-hidden className="size-4" />
           Adicionar coluna

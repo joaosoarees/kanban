@@ -120,7 +120,7 @@ export function ColumnCard({
             ref={setActivatorNodeRef}
             type="button"
             aria-label={`Arrastar a coluna ${column.name}`}
-            className="hidden h-8 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-zinc-500 outline-none hover:text-zinc-800 focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing sm:flex"
+            className="hidden h-8 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-zinc-500 outline-hidden hover:text-zinc-800 focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing sm:flex"
             {...attributes}
             {...listeners}
           >
@@ -146,7 +146,7 @@ export function ColumnCard({
               onClick={() => {
                 setIsRenaming(true);
               }}
-              className="h-11 min-w-0 flex-1 cursor-text truncate rounded-md px-2 text-left text-[15px] font-semibold outline-none hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-8 sm:text-sm"
+              className="h-11 min-w-0 flex-1 cursor-text truncate rounded-md px-2 text-left text-[15px] font-semibold outline-hidden hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-8 sm:text-sm"
             >
               {column.name}
             </button>
