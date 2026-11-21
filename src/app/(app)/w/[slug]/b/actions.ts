@@ -94,8 +94,12 @@ export async function renameBoardAction(
     data: { name: parsed.data.name },
   });
 
+  if (count === 0) {
+    return BOARD_GONE;
+  }
+
   revalidateWorkspace(actor.slug);
-  return count === 0 ? BOARD_GONE : { status: "success", data: undefined };
+  return { status: "success", data: undefined };
 }
 
 export async function deleteBoardAction(
