@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 export const BOARD_GONE: ActionError = {
   status: "error",
   message: "Esse quadro não existe mais.",
+  gone: true,
 };
 
 export const COLUMN_ORDER = [{ position: "asc" }, { id: "asc" }] as const;
