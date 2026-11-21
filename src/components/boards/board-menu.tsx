@@ -36,10 +36,12 @@ export function BoardMenu({
 }: BoardMenuProps) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const columnsText =
-    columnCount === 1
-      ? "sua coluna serão apagados"
-      : `suas ${columnCount} colunas serão apagados`;
+  const deletedText =
+    columnCount === 0
+      ? "O quadro será apagado"
+      : columnCount === 1
+        ? "O quadro e sua coluna serão apagados"
+        : `O quadro e suas ${columnCount} colunas serão apagados`;
 
   return (
     <>
@@ -96,7 +98,7 @@ export function BoardMenu({
         open={isDeleting}
         onOpenChange={setIsDeleting}
         title={`Excluir o quadro ${name}?`}
-        description={`O quadro e ${columnsText} para todo o workspace. Isso não pode ser desfeito.`}
+        description={`${deletedText} para todo o workspace. Isso não pode ser desfeito.`}
         confirmLabel="Excluir quadro"
         pendingLabel="Excluindo quadro…"
         onConfirm={async () => deleteBoardAction(workspaceId, boardId)}
