@@ -8,7 +8,7 @@ type BoardCrumbProps = {
 };
 
 export function BoardCrumb({ href, name }: BoardCrumbProps) {
-  if (usePathname() !== href) {
+  if (usePathname().toLowerCase() !== href.toLowerCase()) {
     return null;
   }
 
