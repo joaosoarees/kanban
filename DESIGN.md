@@ -63,10 +63,13 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-20 — Conteúdo das páginas logadas com largura máxima de 1024px — a borda esquerda não pode pular entre páginas.
 - 2026-11-20 — Endereços (`/w/slug`) sempre em Geist Mono, cortados com reticências — mesma peça em todo lugar.
 - 2026-11-20 — Movimento: abrir 140–160ms com ease-out, fechar 90–100ms só com fade, nada com "reduzir movimento" — referência do Linear e regra do brief.
+- 2026-11-21 — A página do quadro usa a largura total, com rolagem horizontal só na área das colunas — exceção aos 1024px, porque as colunas precisam do espaço e o cabeçalho não pode se mover.
+- 2026-11-21 — A lista de quadros é uma grade de tiles com nome e data de criação — repete o padrão da tela inicial.
+- 2026-11-21 — Mover coluna para a esquerda e a direita fica no mesmo menu no desktop e no celular — dá uma alternativa ao arraste para toque e teclado.
+- 2026-11-21 — Sem cor por quadro por enquanto — a cor continua sendo do workspace.
 
 ## Perguntas abertas
 
 - Avatares coloridos por pessoa (referência Height/Plane): hoje todos os avatares são indigo claro. Mudar? (não decidido)
 - Texto secundário em 12–13px aparece em vários lugares, e a referência pede evitar texto pequeno. Subir o mínimo para 13px? (assumido: 13px mínimo)
 - Paleta das etiquetas de cards (fatia 7): tons claros com texto escuro, sem saturação forte. (assumido)
-- Cor por quadro, além da cor por workspace (referência Trello)? (não decidido)
