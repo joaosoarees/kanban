@@ -2,7 +2,13 @@ import "server-only";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import * as z from "zod";
+import type { ActionError } from "@/lib/action-result";
 import { db } from "@/lib/db";
+
+export const BOARD_GONE: ActionError = {
+  status: "error",
+  message: "Esse quadro não existe mais.",
+};
 
 export const COLUMN_ORDER = [{ position: "asc" }, { id: "asc" }] as const;
 

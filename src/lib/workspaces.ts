@@ -1,4 +1,5 @@
 import "server-only";
+import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import * as z from "zod";
@@ -6,6 +7,10 @@ import type { Role } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { can, type WorkspaceAction } from "@/lib/permissions";
+
+export function revalidateWorkspace(slug: string) {
+  revalidatePath(`/w/${slug}`, "layout");
+}
 
 export async function loadActor(workspaceId: unknown) {
   const user = await requireUser();
