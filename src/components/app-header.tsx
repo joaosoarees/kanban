@@ -35,7 +35,7 @@ function HeaderFrame({ children, actions }: HeaderFrameProps) {
   );
 }
 
-export async function AppHeader() {
+export async function AppHeader({ crumb }: { crumb: ReactNode }) {
   const [user, workspaces] = await Promise.all([
     requireUser(),
     getMyWorkspaces(),
@@ -50,6 +50,7 @@ export async function AppHeader() {
           slug,
         }))}
       />
+      {crumb}
     </HeaderFrame>
   );
 }
