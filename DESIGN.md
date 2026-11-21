@@ -8,7 +8,7 @@ Kanban por workspaces para times pequenos (2 a 10 pessoas). O time entra num wor
 
 - Hierarquia: Workspace → Quadro → Coluna → Card (título, descrição, responsável, etiquetas). Papéis fixos: Dono, Admin, Membro.
 - Entrada com e-mail e senha, sem login social nem convite por e-mail: um admin adiciona quem já tem conta.
-- Sem tempo real: o que outras pessoas mudam aparece ao recarregar ou navegar. Toda mudança no quadro aparece na hora, antes de o servidor confirmar; um erro desfaz a mudança com uma mensagem clara.
+- Sem tempo real: o que outras pessoas mudam aparece ao recarregar ou navegar. Mover uma coluna aparece na hora, antes de o servidor confirmar, e um erro desfaz o movimento com uma mensagem clara. Criar, renomear e excluir aparecem quando o servidor confirma.
 - Fora do escopo por enquanto: comentários, anexos, data de entrega, histórico de atividade, busca.
 - Princípios: o quadro é o produto, e tudo o mais serve para chegar a ele rápido; simplicidade antes de recurso.
 - Não há logo além da marca de barras, ilustrações, depoimentos nem dados reais: nenhuma tela inventa clientes, números ou depoimentos.
