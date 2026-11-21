@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { unstable_rethrow } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { renameColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
@@ -72,6 +73,7 @@ export function ColumnNameEditor({
           toast.error(result.message);
         }
       } catch (caught) {
+        unstable_rethrow(caught);
         console.error(caught);
         toast.error(RENAME_FAILED);
       }

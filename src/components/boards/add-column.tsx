@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { unstable_rethrow } from "next/navigation";
 import {
   useEffect,
   useRef,
@@ -114,6 +115,7 @@ function AddColumnForm({
         }
         toast.error(result.message);
       } catch (caught) {
+        unstable_rethrow(caught);
         console.error(caught);
         toast.error(CREATE_FAILED);
       }
