@@ -17,7 +17,8 @@ import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 
 const COLUMN_GONE: ActionError = {
   status: "error",
-  message: "Essa coluna não existe mais.",
+  message: "Essa coluna não existe mais. O quadro foi atualizado.",
+  gone: true,
 };
 
 async function lockBoardColumns(

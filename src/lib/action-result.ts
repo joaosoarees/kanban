@@ -4,6 +4,7 @@ export type ActionError = {
   status: "error";
   message: string;
   fieldErrors?: Record<string, string[] | undefined>;
+  gone?: boolean;
 };
 
 export type ActionResult<T = undefined> =
