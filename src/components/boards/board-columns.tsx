@@ -29,6 +29,7 @@ import {
 import { primaryButton } from "@/components/button-styles";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";
 
@@ -57,6 +58,7 @@ export function BoardColumns({
   );
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const hasLoadedCollapsed = useCollapsedColumns((state) => state.hasLoaded);
   const addAnchorRef = useRef<HTMLDivElement>(null);
   const revealAboveCount = useRef<number | null>(null);
   const columnsRef = useRef<HTMLElement>(null);
@@ -156,6 +158,22 @@ export function BoardColumns({
             </Button>
           }
         />
+      </div>
+    );
+  }
+
+  if (!hasLoadedCollapsed) {
+    return (
+      <div
+        aria-hidden
+        className="flex min-h-0 flex-1 gap-2.5 overflow-hidden px-3 pb-3 sm:gap-3 sm:px-6 sm:pb-4"
+      >
+        {columns.map(({ id }) => (
+          <Skeleton
+            key={id}
+            className="h-full w-[312px] shrink-0 rounded-xl bg-zinc-200 sm:w-72"
+          />
+        ))}
       </div>
     );
   }
