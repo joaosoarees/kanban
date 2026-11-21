@@ -32,6 +32,7 @@ model Workspace {
   createdAt DateTime @default(now())
 
   memberships Membership[]
+  boards      Board[]
 
   @@map("workspaces")
 }
@@ -48,4 +49,30 @@ model Membership {
   @@id([userId, workspaceId])
   @@index([workspaceId])
   @@map("memberships")
+}
+
+model Board {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  workspaceId String   @db.Uuid
+  name        String
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  columns   Column[]
+
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@map("boards")
+}
+
+model Column {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  boardId   String   @db.Uuid
+  name      String
+  position  String
+  createdAt DateTime @default(now())
+
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@index([boardId, position])
+  @@map("columns")
 }
