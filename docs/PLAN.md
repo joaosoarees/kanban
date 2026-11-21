@@ -45,6 +45,8 @@ Label (id, boardId, name, color) @@unique([boardId, name])
 CardLabel (cardId, labelId) @@id([cardId, labelId])
 ```
 
+Toda coluna `position` precisa de `COLLATE "C"` no SQL da migration: o Prisma não representa essa collation, e o `en_US` do banco ordenaria as chaves errado.
+
 Deletes em cascata de Workspace até Card. O responsável precisa ser membro do workspace (validado na action).
 
 ## Qualidade
