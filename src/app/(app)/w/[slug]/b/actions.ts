@@ -6,6 +6,7 @@ import * as z from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
+  INVALID,
   invalidFields,
   type ActionError,
   type ActionResult,
@@ -264,7 +265,7 @@ export async function moveColumnAction(
 
   const parsed = moveColumnSchema.safeParse(input);
   if (!parsed.success) {
-    return COLUMN_GONE;
+    return INVALID;
   }
 
   const failure = await db.$transaction(async (tx) => {
