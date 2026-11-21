@@ -10,4 +10,4 @@ RUN npm install --global --no-fund --no-audit "$(node -p "require('/tmp/package.
 
 USER node
 WORKDIR /app
-EXPOSE 3000 5555
+EXPOSE 3000
