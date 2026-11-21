@@ -73,7 +73,18 @@ export function BoardColumns({
   );
 
   useEffect(() => {
-    void useCollapsedColumns.persist.rehydrate();
+    const { persist } = useCollapsedColumns;
+    void persist.rehydrate();
+
+    const syncFromOtherTab = (event: StorageEvent) => {
+      if (event.key === null || event.key === persist.getOptions().name) {
+        void persist.rehydrate();
+      }
+    };
+    window.addEventListener("storage", syncFromOtherTab);
+    return () => {
+      window.removeEventListener("storage", syncFromOtherTab);
+    };
   }, []);
 
   useEffect(() => {
