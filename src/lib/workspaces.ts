@@ -1,9 +1,46 @@
 import "server-only";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import * as z from "zod";
 import type { Role } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { can, type WorkspaceAction } from "@/lib/permissions";
+
+export async function loadActor(workspaceId: unknown) {
+  const user = await requireUser();
+  const id = z.uuid().safeParse(workspaceId);
+  if (!id.success) {
+    return null;
+  }
+
+  const membership = await db.membership.findUnique({
+    where: { userId_workspaceId: { userId: user.id, workspaceId: id.data } },
+    select: { role: true, workspace: { select: { slug: true, name: true } } },
+  });
+  if (!membership) {
+    return null;
+  }
+
+  return {
+    userId: user.id,
+    workspaceId: id.data,
+    role: membership.role,
+    slug: membership.workspace.slug,
+    name: membership.workspace.name,
+  };
+}
+
+export async function loadActorAllowedTo(
+  workspaceId: unknown,
+  action: WorkspaceAction,
+) {
+  const actor = await loadActor(workspaceId);
+  if (!actor || !can(actor.role, action)) {
+    return null;
+  }
+  return actor;
+}
 
 export type WorkspaceSummary = {
   id: string;
