@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 import { useState, useTransition, type TransitionStartFunction } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
@@ -22,6 +23,8 @@ import type { ActionResult } from "@/lib/action-result";
 import { BOARD_NAME_MAX_LENGTH, boardNameSchema } from "@/lib/board-schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 import { cn } from "@/lib/utils";
+
+const SAVE_FAILED = "Não foi possível salvar o quadro. Tente de novo.";
 
 type BoardNameInput = z.input<typeof boardNameSchema>;
 type BoardNameOutput = z.output<typeof boardNameSchema>;
@@ -126,13 +129,19 @@ function BoardNameForm({
 
   const onSubmit = handleSubmit((values) => {
     startTransition(async () => {
-      const result = await submit(values);
-      if (result.status === "success") {
-        onDone();
-        return;
+      try {
+        const result = await submit(values);
+        if (result.status === "success") {
+          onDone();
+          return;
+        }
+        setIsGone(result.gone === true);
+        applyActionErrors(result, setError);
+      } catch (error) {
+        unstable_rethrow(error);
+        console.error(error);
+        setError("root", { message: SAVE_FAILED });
       }
-      setIsGone(result.gone === true);
-      applyActionErrors(result, setError);
     });
   });
 
