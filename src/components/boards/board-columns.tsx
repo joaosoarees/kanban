@@ -59,6 +59,10 @@ export function BoardColumns({
   const [isAdding, setIsAdding] = useState(false);
   const addAnchorRef = useRef<HTMLDivElement>(null);
   const revealAboveCount = useRef<number | null>(null);
+  const columnsRef = useRef<HTMLElement>(null);
+  const emptyActionRef = useRef<HTMLButtonElement>(null);
+  const refocusEmptyAction = useRef(false);
+  const deletedColumn = useRef<{ id: string; index: number } | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {
@@ -82,6 +86,29 @@ export function BoardColumns({
       });
     }
   }, [columns.length]);
+
+  useEffect(() => {
+    if (!isAdding && refocusEmptyAction.current) {
+      refocusEmptyAction.current = false;
+      emptyActionRef.current?.focus();
+    }
+  }, [isAdding]);
+
+  useEffect(() => {
+    const deleted = deletedColumn.current;
+    if (deleted === null || columns.some(({ id }) => id === deleted.id)) {
+      return;
+    }
+    deletedColumn.current = null;
+    const neighbor = columns.at(Math.min(deleted.index, columns.length - 1));
+    const neighborTarget = columnsRef.current?.querySelector<HTMLElement>(
+      `[data-column-focus="${neighbor?.id}"]`,
+    );
+    const anyTarget = columnsRef.current?.querySelector<HTMLElement>(
+      "[data-column-focus]",
+    );
+    (neighborTarget ?? anyTarget ?? emptyActionRef.current)?.focus();
+  }, [columns]);
 
   const nameOf = (id: UniqueIdentifier) =>
     columns.find((column) => column.id === id)?.name ?? "";
@@ -118,6 +145,7 @@ export function BoardColumns({
           description="Adicione a primeira coluna para organizar o trabalho."
           action={
             <Button
+              ref={emptyActionRef}
               onClick={() => {
                 setIsAdding(true);
               }}
@@ -147,6 +175,7 @@ export function BoardColumns({
       }}
     >
       <section
+        ref={columnsRef}
         aria-label="Colunas do quadro"
         className="flex min-h-0 flex-1 snap-x snap-mandatory gap-2.5 overflow-x-auto px-3 pb-3 sm:snap-none sm:gap-3 sm:px-6 sm:pb-4"
       >
@@ -163,6 +192,9 @@ export function BoardColumns({
               index={index}
               total={columns.length}
               onMove={move}
+              onDeleted={() => {
+                deletedColumn.current = { id: column.id, index };
+              }}
             />
           ))}
         </SortableContext>
@@ -170,7 +202,10 @@ export function BoardColumns({
           workspaceId={workspaceId}
           boardId={boardId}
           isOpen={isAdding}
-          onOpenChange={setIsAdding}
+          onOpenChange={(open) => {
+            refocusEmptyAction.current = !open;
+            setIsAdding(open);
+          }}
           anchorRef={addAnchorRef}
           onCreated={() => {
             revealAboveCount.current = columns.length;

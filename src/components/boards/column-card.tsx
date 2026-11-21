@@ -3,7 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, UnfoldHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { deleteColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { ColumnMenu } from "@/components/boards/column-menu";
 import { ColumnNameEditor } from "@/components/boards/column-name-editor";
@@ -23,6 +23,7 @@ type ColumnCardProps = {
   index: number;
   total: number;
   onMove: (columnId: string, targetIndex: number) => void;
+  onDeleted: () => void;
 };
 
 export function ColumnCard({
@@ -32,6 +33,7 @@ export function ColumnCard({
   index,
   total,
   onMove,
+  onDeleted,
 }: ColumnCardProps) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -50,6 +52,21 @@ export function ColumnCard({
     isDragging,
   } = useSortable({ id: column.id, disabled: isRenaming });
 
+  const titleRef = useRef<HTMLButtonElement>(null);
+  const expandRef = useRef<HTMLButtonElement>(null);
+  const pendingFocus = useRef<"title" | "expand" | null>(null);
+
+  useEffect(() => {
+    if (pendingFocus.current === "expand" && isCollapsed) {
+      pendingFocus.current = null;
+      expandRef.current?.focus();
+    }
+    if (pendingFocus.current === "title" && !isCollapsed && !isRenaming) {
+      pendingFocus.current = null;
+      titleRef.current?.focus();
+    }
+  }, [isCollapsed, isRenaming]);
+
   const style = { transform: CSS.Translate.toString(transform), transition };
 
   if (isCollapsed) {
@@ -61,10 +78,13 @@ export function ColumnCard({
         className="flex h-full w-12 shrink-0 snap-center flex-col items-center gap-3 rounded-xl bg-zinc-100 py-2 motion-reduce:transition-none!"
       >
         <Button
+          ref={expandRef}
+          data-column-focus={column.id}
           variant="ghost"
           size="icon"
           aria-label={`Expandir a coluna ${column.name}`}
           onClick={() => {
+            pendingFocus.current = "title";
             toggleCollapsed(column.id);
           }}
           className="size-11 text-zinc-600 hover:bg-zinc-200 sm:size-8"
@@ -112,12 +132,15 @@ export function ColumnCard({
               boardId={boardId}
               columnId={column.id}
               name={column.name}
-              onClose={() => {
+              onClose={(hadFocus) => {
+                pendingFocus.current = hadFocus ? "title" : null;
                 setIsRenaming(false);
               }}
             />
           ) : (
             <button
+              ref={titleRef}
+              data-column-focus={column.id}
               type="button"
               aria-label={`Renomear a coluna ${column.name}`}
               onClick={() => {
@@ -136,6 +159,8 @@ export function ColumnCard({
               setIsRenaming(true);
             }}
             onCollapse={() => {
+              pendingFocus.current = "expand";
+              setIsRenaming(false);
               toggleCollapsed(column.id);
             }}
             onMoveLeft={() => {
@@ -168,6 +193,7 @@ export function ColumnCard({
           );
           if (result.status === "success") {
             forgetCollapsed(column.id);
+            onDeleted();
           }
           return result;
         }}
