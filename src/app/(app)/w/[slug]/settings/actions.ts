@@ -17,17 +17,17 @@ import {
   removeMemberSchema,
   renameWorkspaceSchema,
 } from "@/lib/workspace-schemas";
-import { loadActor, loadActorAllowedTo } from "@/lib/workspaces";
+import {
+  loadActor,
+  loadActorAllowedTo,
+  revalidateWorkspace,
+} from "@/lib/workspaces";
 
 async function loadTarget(workspaceId: string, userId: string) {
   return db.membership.findUnique({
     where: { userId_workspaceId: { userId, workspaceId } },
     select: { role: true },
   });
-}
-
-function revalidateWorkspace(slug: string) {
-  revalidatePath(`/w/${slug}`, "layout");
 }
 
 export async function addMemberAction(
