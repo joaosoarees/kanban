@@ -52,20 +52,6 @@ export function ColumnCard({
 
   const style = { transform: CSS.Translate.toString(transform), transition };
 
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        aria-hidden
-        className={cn(
-          "h-full shrink-0 rounded-xl border-2 border-dashed border-brand bg-indigo-50",
-          isCollapsed ? "w-12" : "w-[312px] sm:w-72",
-        )}
-      />
-    );
-  }
-
   if (isCollapsed) {
     return (
       <section
@@ -97,65 +83,76 @@ export function ColumnCard({
       ref={setNodeRef}
       style={style}
       aria-label={`Coluna ${column.name}`}
-      className={cn(CARD, "motion-reduce:transition-none!")}
+      className={cn(
+        CARD,
+        "motion-reduce:transition-none!",
+        isDragging && "border-2 border-dashed border-brand bg-indigo-50 p-1.5",
+      )}
     >
-      <div className="relative flex h-11 shrink-0 items-center gap-1 sm:h-10">
-        <button
-          ref={setActivatorNodeRef}
-          type="button"
-          aria-label={`Arrastar a coluna ${column.name}`}
-          className="hidden h-8 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-zinc-500 outline-none hover:text-zinc-800 focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing sm:flex"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical aria-hidden className="size-[15px]" />
-        </button>
-        {isRenaming ? (
-          <ColumnNameEditor
-            workspaceId={workspaceId}
-            boardId={boardId}
-            columnId={column.id}
-            name={column.name}
-            onClose={() => {
-              setIsRenaming(false);
-            }}
-          />
-        ) : (
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 flex-col",
+          isDragging && "opacity-0",
+        )}
+      >
+        <div className="relative flex h-11 shrink-0 items-center gap-1 sm:h-10">
           <button
+            ref={setActivatorNodeRef}
             type="button"
-            aria-label={`Renomear a coluna ${column.name}`}
-            onClick={() => {
+            aria-label={`Arrastar a coluna ${column.name}`}
+            className="hidden h-8 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-zinc-500 outline-none hover:text-zinc-800 focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing sm:flex"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical aria-hidden className="size-[15px]" />
+          </button>
+          {isRenaming ? (
+            <ColumnNameEditor
+              workspaceId={workspaceId}
+              boardId={boardId}
+              columnId={column.id}
+              name={column.name}
+              onClose={() => {
+                setIsRenaming(false);
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              aria-label={`Renomear a coluna ${column.name}`}
+              onClick={() => {
+                setIsRenaming(true);
+              }}
+              className="h-11 min-w-0 flex-1 cursor-text truncate rounded-md px-2 text-left text-[15px] font-semibold outline-none hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-8 sm:text-sm"
+            >
+              {column.name}
+            </button>
+          )}
+          <ColumnMenu
+            name={column.name}
+            canMoveLeft={index > 0}
+            canMoveRight={index < total - 1}
+            onRename={() => {
               setIsRenaming(true);
             }}
-            className="h-11 min-w-0 flex-1 cursor-text truncate rounded-md px-2 text-left text-[15px] font-semibold outline-none hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-8 sm:text-sm"
-          >
-            {column.name}
-          </button>
-        )}
-        <ColumnMenu
-          name={column.name}
-          canMoveLeft={index > 0}
-          canMoveRight={index < total - 1}
-          onRename={() => {
-            setIsRenaming(true);
-          }}
-          onCollapse={() => {
-            toggleCollapsed(column.id);
-          }}
-          onMoveLeft={() => {
-            onMove(column.id, index - 1);
-          }}
-          onMoveRight={() => {
-            onMove(column.id, index + 1);
-          }}
-          onDelete={() => {
-            setIsDeleting(true);
-          }}
-        />
+            onCollapse={() => {
+              toggleCollapsed(column.id);
+            }}
+            onMoveLeft={() => {
+              onMove(column.id, index - 1);
+            }}
+            onMoveRight={() => {
+              onMove(column.id, index + 1);
+            }}
+            onDelete={() => {
+              setIsDeleting(true);
+            }}
+          />
+        </div>
+        <p className="mt-1 h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
+          Sem cards
+        </p>
       </div>
-      <p className="mt-1 h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
-        Sem cards
-      </p>
       <ConfirmDialog
         open={isDeleting}
         onOpenChange={setIsDeleting}
