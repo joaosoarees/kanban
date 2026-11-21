@@ -6,6 +6,18 @@ const admin = { role: "ADMIN", isSelf: false } as const;
 const member = { role: "MEMBER", isSelf: false } as const;
 
 describe("can", () => {
+  it("lets owners and admins manage boards, but not members", () => {
+    expect(can("OWNER", "manageBoards")).toBe(true);
+    expect(can("ADMIN", "manageBoards")).toBe(true);
+    expect(can("MEMBER", "manageBoards")).toBe(false);
+  });
+
+  it("lets every role manage columns", () => {
+    expect(can("OWNER", "manageColumns")).toBe(true);
+    expect(can("ADMIN", "manageColumns")).toBe(true);
+    expect(can("MEMBER", "manageColumns")).toBe(true);
+  });
+
   it("lets owners and admins add members and rename, but not members", () => {
     expect(can("OWNER", "addMember")).toBe(true);
     expect(can("ADMIN", "addMember")).toBe(true);

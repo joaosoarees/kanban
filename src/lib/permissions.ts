@@ -6,7 +6,9 @@ export type WorkspaceAction =
   | "removeMember"
   | "renameWorkspace"
   | "deleteWorkspace"
-  | "leaveWorkspace";
+  | "leaveWorkspace"
+  | "manageBoards"
+  | "manageColumns";
 
 export type MemberTarget = { role: Role; isSelf: boolean };
 
@@ -31,6 +33,8 @@ const RULES: Record<WorkspaceAction, Rule> = {
   leaveWorkspace: (actor) => actor !== "OWNER",
   changeRole: canManageMember,
   removeMember: canManageMember,
+  manageBoards: canManage,
+  manageColumns: () => true,
 };
 
 export function can(
