@@ -10,4 +10,9 @@ if ! docker compose exec -T app true >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! docker compose exec -T app timeout 120 sh -c 'until [ -f /tmp/app-setup-finished ]; do sleep 1; done'; then
+  echo "hook: the app container did not finish its setup, check: docker compose logs app" >&2
+  exit 1
+fi
+
 exec docker compose exec -T app "$@"

@@ -1,2 +1,5 @@
+#!/bin/sh
+set -e
+
 .husky/in-app bunx lint-staged
 .husky/in-app bun check
