@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
+import type { Prisma } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
   invalidFields,
@@ -17,7 +18,6 @@ import {
 import { COLUMN_ORDER } from "@/lib/boards";
 import { db } from "@/lib/db";
 import { initialPositions, planMove, positionAtEnd } from "@/lib/position";
-import { isForeignKeyViolation } from "@/lib/prisma-errors";
 import { loadActorAllowedTo } from "@/lib/workspaces";
 
 const DEFAULT_COLUMNS = ["A fazer", "Fazendo", "Feito"];
@@ -36,22 +36,31 @@ function revalidateWorkspace(slug: string) {
   revalidatePath(`/w/${slug}`, "layout");
 }
 
-async function loadBoardColumns(workspaceId: string, boardId: unknown) {
+async function lockBoardColumns(
+  tx: Prisma.TransactionClient,
+  workspaceId: string,
+  boardId: unknown,
+) {
   const id = z.uuid().safeParse(boardId);
   if (!id.success) {
     return null;
   }
 
-  return db.board.findFirst({
-    where: { id: id.data, workspaceId },
-    select: {
-      id: true,
-      columns: {
-        orderBy: [...COLUMN_ORDER],
-        select: { id: true, position: true },
-      },
-    },
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM boards
+    WHERE id = ${id.data}::uuid AND "workspaceId" = ${workspaceId}::uuid
+    FOR UPDATE
+  `;
+  if (locked.length === 0) {
+    return null;
+  }
+
+  const columns = await tx.column.findMany({
+    where: { boardId: id.data },
+    orderBy: [...COLUMN_ORDER],
+    select: { id: true, position: true },
   });
+  return { id: id.data, columns };
 }
 
 function parseColumnRef(boardId: unknown, columnId: unknown) {
@@ -162,14 +171,12 @@ export async function createColumnAction(
     return invalidFields(parsed.error);
   }
 
-  const board = await loadBoardColumns(actor.workspaceId, boardId);
-  if (!board) {
-    revalidateWorkspace(actor.slug);
-    return BOARD_GONE;
-  }
-
-  try {
-    const column = await db.column.create({
+  const column = await db.$transaction(async (tx) => {
+    const board = await lockBoardColumns(tx, actor.workspaceId, boardId);
+    if (!board) {
+      return null;
+    }
+    return tx.column.create({
       data: {
         boardId: board.id,
         name: parsed.data.name,
@@ -177,15 +184,10 @@ export async function createColumnAction(
       },
       select: { id: true },
     });
-    revalidateWorkspace(actor.slug);
-    return { status: "success", data: column };
-  } catch (error) {
-    if (isForeignKeyViolation(error)) {
-      revalidateWorkspace(actor.slug);
-      return BOARD_GONE;
-    }
-    throw error;
-  }
+  });
+
+  revalidateWorkspace(actor.slug);
+  return column ? { status: "success", data: column } : BOARD_GONE;
 }
 
 export async function renameColumnAction(
@@ -237,12 +239,13 @@ export async function deleteColumnAction(
     return COLUMN_GONE;
   }
 
-  await db.column.deleteMany({
-    where: {
-      id: ref.columnId,
-      boardId: ref.boardId,
-      board: { workspaceId: actor.workspaceId },
-    },
+  await db.$transaction(async (tx) => {
+    const board = await lockBoardColumns(tx, actor.workspaceId, ref.boardId);
+    if (board) {
+      await tx.column.deleteMany({
+        where: { id: ref.columnId, boardId: board.id },
+      });
+    }
   });
 
   revalidateWorkspace(actor.slug);
@@ -264,35 +267,29 @@ export async function moveColumnAction(
     return COLUMN_GONE;
   }
 
-  const board = await loadBoardColumns(actor.workspaceId, boardId);
-  if (!board) {
-    revalidateWorkspace(actor.slug);
-    return BOARD_GONE;
-  }
+  const failure = await db.$transaction(async (tx) => {
+    const board = await lockBoardColumns(tx, actor.workspaceId, boardId);
+    if (!board) {
+      return BOARD_GONE;
+    }
 
-  const updates = planMove(
-    board.columns,
-    parsed.data.columnId,
-    parsed.data.previousColumnId,
-  );
-  if (!updates) {
-    revalidateWorkspace(actor.slug);
-    return COLUMN_GONE;
-  }
+    const updates = planMove(
+      board.columns,
+      parsed.data.columnId,
+      parsed.data.previousColumnId,
+    );
+    if (!updates) {
+      return COLUMN_GONE;
+    }
 
-  const results = await db.$transaction(async (tx) =>
-    Promise.all(
+    await Promise.all(
       updates.map(async ({ id, position }) =>
-        tx.column.updateMany({
-          where: { id, boardId: board.id },
-          data: { position },
-        }),
+        tx.column.update({ where: { id }, data: { position } }),
       ),
-    ),
-  );
+    );
+    return null;
+  });
 
   revalidateWorkspace(actor.slug);
-  return results.some(({ count }) => count === 0)
-    ? COLUMN_GONE
-    : { status: "success", data: undefined };
+  return failure ?? { status: "success", data: undefined };
 }
