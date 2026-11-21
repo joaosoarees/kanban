@@ -1,6 +1,7 @@
 "use client";
 
 import { arrayMove } from "@dnd-kit/sortable";
+import { unstable_rethrow } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 import { moveColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
@@ -49,6 +50,7 @@ export function useBoardColumns(
           toast.error(result.message);
         }
       } catch (error) {
+        unstable_rethrow(error);
         console.error(error);
         toast.error(MOVE_FAILED);
       }
