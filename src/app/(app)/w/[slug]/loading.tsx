@@ -14,10 +14,20 @@ export default function WorkspaceLoading() {
                 <Skeleton className="h-3.5 w-72 max-w-full bg-zinc-200" />
               </div>
             </div>
-            <Skeleton className="h-9 w-full rounded-lg bg-zinc-200 sm:w-36" />
+            <Skeleton className="h-11 w-full rounded-lg bg-zinc-200 sm:h-9 sm:w-36" />
           </div>
-          <Skeleton className="mt-10 h-4 w-16 bg-zinc-200" />
-          <Skeleton className="mt-3 h-[230px] rounded-xl bg-zinc-200" />
+          <div className="mt-7 mb-2 flex h-11 items-center justify-between sm:mt-10 sm:mb-3 sm:h-9">
+            <Skeleton className="h-4 w-16 bg-zinc-200" />
+            <Skeleton className="h-11 w-32 rounded-lg bg-zinc-200 sm:h-9" />
+          </div>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-3 sm:gap-4">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <Skeleton
+                key={item}
+                className="h-[76px] rounded-xl bg-zinc-200 sm:h-[84px]"
+              />
+            ))}
+          </div>
         </div>
       </output>
     </main>
