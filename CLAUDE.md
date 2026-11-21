@@ -29,7 +29,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - Sem use cases, repositórios, containers de DI ou interfaces criadas só para testar. Camadas extras só quando o código pedir de verdade.
 - Testes só para lógica pura não trivial (ex.: cálculo de posição). Sem mocks, sem testes de componente.
 - Erros esperados: a action retorna `{ status: "error", message }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados: `error.tsx` por segmento; um bloco secundário da página, como a lista de quadros, pode mostrar a falha no próprio lugar.
-- Membership e papel checados no layout e em toda Server Action.
+- Membership e papel checados no layout, em toda página e em toda Server Action. O layout do workspace não segura as rotas filhas enquanto verifica, então cada página de `/w/[slug]` precisa chamar `requireMembership`.
 - Zustand só para preferências de UI; dados do servidor nunca vão para o store.
 
 ## Código
