@@ -17,7 +17,7 @@ type ColumnNameEditorProps = {
   boardId: string;
   columnId: string;
   name: string;
-  onClose: () => void;
+  onClose: (hadFocus: boolean) => void;
 };
 
 export function ColumnNameEditor({
@@ -38,6 +38,10 @@ export function ColumnNameEditor({
     inputRef.current?.select();
   }, []);
 
+  const close = () => {
+    onClose(document.activeElement === inputRef.current);
+  };
+
   const save = () => {
     if (isCancelled.current || isPending) {
       return;
@@ -48,7 +52,7 @@ export function ColumnNameEditor({
       return;
     }
     if (parsed.data.name === name) {
-      onClose();
+      close();
       return;
     }
 
@@ -76,7 +80,7 @@ export function ColumnNameEditor({
         console.error(caught);
         toast.error(RENAME_FAILED);
       }
-      onClose();
+      close();
     });
   };
 
@@ -112,7 +116,7 @@ export function ColumnNameEditor({
           if (event.key === "Escape" && !isPending) {
             event.stopPropagation();
             isCancelled.current = true;
-            onClose();
+            close();
           }
         }}
         className="h-9 bg-white pr-8 text-sm font-semibold sm:h-8"

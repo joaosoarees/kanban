@@ -37,6 +37,18 @@ export function AddColumn({
   onCreated,
   anchorRef,
 }: AddColumnProps) {
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const shouldRefocus = useRef(false);
+
+  useEffect(() => {
+    if (!isOpen && shouldRefocus.current) {
+      shouldRefocus.current = false;
+      if (document.activeElement === document.body) {
+        openButtonRef.current?.focus();
+      }
+    }
+  }, [isOpen]);
+
   return (
     <div
       ref={anchorRef}
@@ -47,12 +59,17 @@ export function AddColumn({
           workspaceId={workspaceId}
           boardId={boardId}
           onCancel={() => {
+            shouldRefocus.current = true;
             onOpenChange(false);
           }}
-          onCreated={onCreated}
+          onCreated={() => {
+            shouldRefocus.current = true;
+            onCreated();
+          }}
         />
       ) : (
         <button
+          ref={openButtonRef}
           type="button"
           onClick={() => {
             onOpenChange(true);
