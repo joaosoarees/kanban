@@ -5,15 +5,22 @@ import * as z from "zod";
 import {
   FORBIDDEN,
   invalidFields,
+  type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
 import { boardNameSchema } from "@/lib/board-schemas";
 import { BOARD_GONE } from "@/lib/boards";
 import { db } from "@/lib/db";
 import { initialPositions } from "@/lib/position";
+import { isForeignKeyViolation } from "@/lib/prisma-errors";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 
 const DEFAULT_COLUMNS = ["A fazer", "Fazendo", "Feito"];
+
+const WORKSPACE_GONE: ActionError = {
+  status: "error",
+  message: "Esse workspace não existe mais.",
+};
 
 export async function createBoardAction(
   workspaceId: unknown,
@@ -29,23 +36,37 @@ export async function createBoardAction(
     return invalidFields(parsed.error);
   }
 
-  const positions = initialPositions(DEFAULT_COLUMNS.length);
-  const board = await db.board.create({
-    data: {
-      workspaceId: actor.workspaceId,
-      name: parsed.data.name,
-      columns: {
-        create: DEFAULT_COLUMNS.map((name, index) => ({
-          name,
-          position: positions[index],
-        })),
-      },
-    },
-    select: { id: true },
-  });
+  const board = await insertBoard(actor.workspaceId, parsed.data.name);
+  if (!board) {
+    return WORKSPACE_GONE;
+  }
 
   revalidateWorkspace(actor.slug);
   return redirect(`/w/${actor.slug}/b/${board.id}`);
+}
+
+async function insertBoard(workspaceId: string, name: string) {
+  const positions = initialPositions(DEFAULT_COLUMNS.length);
+  try {
+    return await db.board.create({
+      data: {
+        workspaceId,
+        name,
+        columns: {
+          create: DEFAULT_COLUMNS.map((columnName, index) => ({
+            name: columnName,
+            position: positions[index],
+          })),
+        },
+      },
+      select: { id: true },
+    });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function renameBoardAction(
