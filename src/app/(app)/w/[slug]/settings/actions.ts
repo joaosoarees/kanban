@@ -2,11 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import * as z from "zod";
-import type { ActionResult } from "@/lib/action-result";
-import { requireUser } from "@/lib/auth";
+import {
+  FORBIDDEN,
+  INVALID,
+  invalidFields,
+  type ActionResult,
+} from "@/lib/action-result";
 import { db } from "@/lib/db";
-import { can, type WorkspaceAction } from "@/lib/permissions";
+import { can } from "@/lib/permissions";
 import { isUniqueViolation } from "@/lib/prisma-errors";
 import {
   addMemberSchema,
@@ -14,48 +17,7 @@ import {
   removeMemberSchema,
   renameWorkspaceSchema,
 } from "@/lib/workspace-schemas";
-
-const FORBIDDEN: ActionResult = {
-  status: "error",
-  message: "Você não tem permissão para fazer isso.",
-};
-
-const INVALID: ActionResult = {
-  status: "error",
-  message: "Confira os campos e tente de novo.",
-};
-
-function invalidFields(error: z.ZodError): ActionResult {
-  return {
-    status: "error",
-    message: "Confira os campos e tente de novo.",
-    fieldErrors: z.flattenError(error).fieldErrors,
-  };
-}
-
-async function loadActor(workspaceId: unknown) {
-  const user = await requireUser();
-  const id = z.uuid().safeParse(workspaceId);
-  if (!id.success) {
-    return null;
-  }
-
-  const membership = await db.membership.findUnique({
-    where: { userId_workspaceId: { userId: user.id, workspaceId: id.data } },
-    select: { role: true, workspace: { select: { slug: true, name: true } } },
-  });
-  if (!membership) {
-    return null;
-  }
-
-  return {
-    userId: user.id,
-    workspaceId: id.data,
-    role: membership.role,
-    slug: membership.workspace.slug,
-    name: membership.workspace.name,
-  };
-}
+import { loadActor, loadActorAllowedTo } from "@/lib/workspaces";
 
 async function loadTarget(workspaceId: string, userId: string) {
   return db.membership.findUnique({
@@ -66,17 +28,6 @@ async function loadTarget(workspaceId: string, userId: string) {
 
 function revalidateWorkspace(slug: string) {
   revalidatePath(`/w/${slug}`, "layout");
-}
-
-async function loadActorAllowedTo(
-  workspaceId: unknown,
-  action: WorkspaceAction,
-) {
-  const actor = await loadActor(workspaceId);
-  if (!actor || !can(actor.role, action)) {
-    return null;
-  }
-  return actor;
 }
 
 export async function addMemberAction(
