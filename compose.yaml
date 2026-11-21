@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    pull_policy: build
     command: sh -c "bun install --frozen-lockfile && bunx prisma migrate deploy && bunx next dev --hostname 0.0.0.0"
     environment:
       DATABASE_URL: postgresql://kanban:kanban@postgres:5432/kanban?schema=public
