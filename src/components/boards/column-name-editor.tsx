@@ -45,7 +45,6 @@ export function ColumnNameEditor({
     const parsed = columnNameSchema.safeParse({ name: value });
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
-      inputRef.current?.focus();
       return;
     }
     if (parsed.data.name === name) {
