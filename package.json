@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "prepare": "husky",
     "check": "next typegen && bun check --no-script"

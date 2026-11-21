@@ -6,7 +6,6 @@ services:
       DATABASE_URL: postgresql://kanban:kanban@postgres:5432/kanban?schema=public
     ports:
       - "127.0.0.1:3000:3000"
-      - "127.0.0.1:5555:5555"
     volumes:
       - .:/app
     depends_on:
