@@ -12,7 +12,7 @@ model User {
   name         String
   email        String   @unique
   passwordHash String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
 
   memberships Membership[]
 
@@ -29,7 +29,7 @@ model Workspace {
   id        String   @id @default(uuid(7)) @db.Uuid
   name      String
   slug      String   @unique
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   memberships Membership[]
   boards      Board[]
@@ -41,7 +41,7 @@ model Membership {
   userId      String   @db.Uuid
   workspaceId String   @db.Uuid
   role        Role
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -55,7 +55,7 @@ model Board {
   id          String   @id @default(uuid(7)) @db.Uuid
   workspaceId String   @db.Uuid
   name        String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   columns   Column[]
@@ -69,7 +69,7 @@ model Column {
   boardId   String   @db.Uuid
   name      String
   position  String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
