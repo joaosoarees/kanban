@@ -132,7 +132,7 @@ function BoardNameForm({
       try {
         const result = await submit(values);
         if (result.status === "success") {
-          onDone();
+          startTransition(onDone);
           return;
         }
         setIsGone(result.gone === true);
