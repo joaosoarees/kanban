@@ -28,7 +28,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - Convenção do Next: Server Components e Server Actions usam o Prisma direto (`@/lib/db`).
 - Sem use cases, repositórios, containers de DI ou interfaces criadas só para testar. Camadas extras só quando o código pedir de verdade.
 - Testes só para lógica pura não trivial (ex.: cálculo de posição). Sem mocks, sem testes de componente.
-- Erros esperados: a action retorna `{ ok: false, error }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados: `error.tsx` por segmento.
+- Erros esperados: a action retorna `{ status: "error", message }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados: `error.tsx` por segmento; um bloco secundário da página, como a lista de quadros, pode mostrar a falha no próprio lugar.
 - Membership e papel checados no layout e em toda Server Action.
 - Zustand só para preferências de UI; dados do servidor nunca vão para o store.
 
