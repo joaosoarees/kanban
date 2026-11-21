@@ -38,9 +38,13 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 
 ## Comandos
 
-- `bun db:up`: sobe o Postgres (Docker Compose)
-- `bun db:migrate --name <nome>`: cria e aplica uma migration
-- `bun dev`
-- `bun lint` / `bun check` / `bun test --isolate=modules` / `bun run build`: o mesmo que o CI roda
+O bun roda só no container `app`; não instale bun, hk ou pkl na máquina.
+
+- `docker compose up -d`: sobe Postgres e app, instala dependências, aplica migrations e inicia o Next
+- `docker compose exec app bun db:migrate --name <nome>`: cria e aplica uma migration
+- `docker compose exec app bun lint` / `bun check` / `bun test --isolate=modules` / `bun run build`: o mesmo que o CI roda
+- `npx prisma studio`: abre o Prisma Studio fora do container
+
+Os hooks do git rodam no container: ele precisa estar ligado para commitar, e commits a partir de git worktrees são recusados.
 
 Variáveis em `.env` (modelo em `.env.example`): `DATABASE_URL` e `SESSION_SECRET` (`openssl rand -base64 32`).
