@@ -1,2 +1,2 @@
-bunx lint-staged
-bun check
+.husky/in-app bunx lint-staged
+.husky/in-app bun check
