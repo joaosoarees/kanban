@@ -22,7 +22,7 @@ Projeto de estudo para treinar as skills. Roda só local, sem deploy. O código 
 
 ## Erros
 
-1. Erros esperados (validação, permissão, conflito): a action retorna `{ ok: false, error }`, sem lançar exceção.
+1. Erros esperados (validação, permissão, conflito): a action retorna `{ status: "error", message }`, sem lançar exceção.
 2. Recurso inexistente ou sem acesso: `notFound()` (404, não 403).
 3. Erros inesperados: `error.tsx` em níveis (`global-error`, área logada, workspace, board).
 
