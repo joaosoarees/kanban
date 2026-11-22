@@ -32,6 +32,11 @@ export const signUpSchema = z.object({
 });
 
 export const signInSchema = z.object({
-  email: z.string().trim().toLowerCase().min(1, "Digite seu e-mail."),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, "Digite seu e-mail.")
+    .refine(hasNoNul, INVALID_CHARACTER),
   password: z.string().min(1, "Digite sua senha."),
 });

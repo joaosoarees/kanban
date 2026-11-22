@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { signUpSchema } from "./auth-schemas";
+import { signInSchema, signUpSchema } from "./auth-schemas";
 import { boardNameSchema, columnNameSchema } from "./board-schemas";
 import { createWorkspaceSchema } from "./workspace-schemas";
 
@@ -19,5 +19,17 @@ describe.each(nameFields)("%s name", (_label, field) => {
 
   it("refuses a NUL character", () => {
     expect(field.safeParse(`a${NUL}b`).success).toBe(false);
+  });
+});
+
+describe("sign-in email", () => {
+  it("keeps a valid email", () => {
+    expect(signInSchema.shape.email.parse(" Ana@Example.com ")).toBe(
+      "ana@example.com",
+    );
+  });
+
+  it("refuses a NUL character", () => {
+    expect(signInSchema.shape.email.safeParse(`a${NUL}b`).success).toBe(false);
   });
 });
