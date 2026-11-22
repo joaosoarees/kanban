@@ -20,7 +20,11 @@ export default async function BoardPage({
   const { slug, boardId } = await params;
   const workspace = await requireMembership(slug);
   const board = await requireBoard(workspace.id, boardId);
-  const columns = board.columns.map(({ id, name }) => ({ id, name }));
+  const columns = board.columns.map(({ id, name, cards }) => ({
+    id,
+    name,
+    cards,
+  }));
 
   return (
     <main className="flex h-[calc(100svh-3.5rem)] min-h-0 flex-col">
