@@ -90,13 +90,15 @@ export function CardDialog({
       >
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
-            <CardTitle
-              workspaceId={workspaceId}
-              boardId={boardId}
-              cardId={card.id}
-              title={card.title}
-            />
-            <DialogDescription className="mt-0.5 truncate px-1.5 text-[13px] text-zinc-600">
+            <div className="-mx-1.5">
+              <CardTitle
+                workspaceId={workspaceId}
+                boardId={boardId}
+                cardId={card.id}
+                title={card.title}
+              />
+            </div>
+            <DialogDescription className="mt-0.5 truncate text-[13px] text-zinc-600">
               Na coluna {column.name}
             </DialogDescription>
           </div>
