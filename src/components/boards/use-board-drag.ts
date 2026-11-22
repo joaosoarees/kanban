@@ -142,7 +142,9 @@ export function useBoardDrag({
     onDragOver: ({ active, over }) =>
       over ? describeOver(active.id, over.id) : undefined,
     onDragEnd: ({ active, over }) =>
-      over ? `Solto. ${describeOver(active.id, over.id)}` : undefined,
+      over
+        ? `Solto. ${describeOver(active.id, over.id)}`
+        : `Movimento de ${nameOf(active.id)} cancelado.`,
     onDragCancel: ({ active }) =>
       `Movimento de ${nameOf(active.id)} cancelado.`,
   };
@@ -174,11 +176,11 @@ export function useBoardDrag({
     }
   };
 
-  const finishCardDrag = (cardId: string, over: Over | null) => {
+  const finishCardDrag = (cardId: string, over: Over) => {
     const overLocation =
-      over && over.data.current?.type !== COLUMN_DROP
-        ? locateCard(displayed, String(over.id))
-        : null;
+      over.data.current?.type === COLUMN_DROP
+        ? null
+        : locateCard(displayed, String(over.id));
     const origin = locateCard(displayed, cardId);
     const reordered =
       overLocation && origin?.column.id === overLocation.column.id
@@ -197,7 +199,7 @@ export function useBoardDrag({
   };
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (activeDrag?.kind === "card") {
+    if (over && activeDrag?.kind === "card") {
       finishCardDrag(activeDrag.id, over);
     } else if (over && active.id !== over.id) {
       onMoveColumn(String(active.id), columnPosition(over.id) - 1);
