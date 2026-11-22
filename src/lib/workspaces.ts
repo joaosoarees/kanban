@@ -7,6 +7,7 @@ import type { Role } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { can, type WorkspaceAction } from "@/lib/permissions";
+import { hasNoNul } from "@/lib/text";
 
 export function revalidateWorkspace(slug: string) {
   revalidatePath(`/w/${slug}`, "layout");
@@ -119,6 +120,10 @@ export async function getMembers(
 
 export const requireMembership = cache(async (slug: string) => {
   const user = await requireUser();
+
+  if (!hasNoNul(slug)) {
+    notFound();
+  }
 
   const membership = await db.membership.findFirst({
     where: { userId: user.id, workspace: { slug } },
