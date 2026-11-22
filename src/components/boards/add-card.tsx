@@ -53,6 +53,7 @@ export function AddCard({
   return (
     <button
       ref={openButtonRef}
+      data-card-focus={columnId}
       type="button"
       onClick={() => {
         setIsOpen(true);

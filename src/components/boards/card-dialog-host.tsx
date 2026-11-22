@@ -39,6 +39,28 @@ export function CardDialogHost({
   const location = cardId === null ? null : locateCard(columns, cardId);
   const shownId = useRef<string | null>(null);
   const isMissing = cardId !== null && location === null;
+  const deletedCard = useRef<{
+    id: string;
+    columnId: string;
+    index: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const deleted = deletedCard.current;
+    if (deleted === null || locateCard(columns, deleted.id)) {
+      return;
+    }
+    deletedCard.current = null;
+    const column = columns.find(({ id }) => id === deleted.columnId);
+    const neighbor = column?.cards.at(
+      Math.min(deleted.index, column.cards.length - 1),
+    );
+    document
+      .querySelector<HTMLElement>(
+        `[data-card-focus="${neighbor?.id ?? deleted.columnId}"]`,
+      )
+      ?.focus();
+  }, [columns]);
 
   useEffect(() => {
     if (cardId === null) {
@@ -76,6 +98,13 @@ export function CardDialogHost({
       }}
       onDiscardLeaving={() => {
         setDirtyCardId(null);
+      }}
+      onDeleted={() => {
+        deletedCard.current = {
+          id: cardId,
+          columnId: location.column.id,
+          index: location.index,
+        };
       }}
       onClose={() => {
         setDirtyCardId(null);

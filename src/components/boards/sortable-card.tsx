@@ -36,6 +36,7 @@ export function SortableCard({
     <BoardCardButton
       ref={setNodeRef}
       card={card}
+      data-card-focus={card.id}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         "motion-reduce:transition-none!",

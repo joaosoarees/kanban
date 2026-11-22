@@ -38,6 +38,7 @@ type CardDialogProps = {
   onDirtyChange: (isDirty: boolean) => void;
   onKeepEditing: () => void;
   onDiscardLeaving: () => void;
+  onDeleted: () => void;
   onClose: () => void;
   onMoveCard: (cardId: string, columnId: string, index: number) => void;
 };
@@ -53,6 +54,7 @@ export function CardDialog({
   onDirtyChange,
   onKeepEditing,
   onDiscardLeaving,
+  onDeleted,
   onClose,
   onMoveCard,
 }: CardDialogProps) {
@@ -182,6 +184,7 @@ export function CardDialog({
               card.id,
             );
             if (result.status === "success") {
+              onDeleted();
               onClose();
             }
             return result;
