@@ -72,7 +72,7 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogContent className="gap-0 p-6 sm:max-w-[440px]">
+      <AlertDialogContent className="gap-0 p-6 data-[size=default]:sm:max-w-[440px]">
         <AlertDialogHeader className="gap-2">
           <AlertDialogTitle className="text-lg font-semibold tracking-tight text-balance">
             {title}
