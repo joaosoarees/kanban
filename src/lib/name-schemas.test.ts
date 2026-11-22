@@ -6,6 +6,14 @@ import { createWorkspaceSchema } from "./workspace-schemas";
 const NUL = String.fromCodePoint(0);
 const ZERO_WIDTH = String.fromCodePoint(0x200b);
 const INVISIBLE_CODE_POINTS = [
+  "0001",
+  "007F",
+  "0085",
+  "009F",
+  "0600",
+  "2800",
+  "FFF9",
+  "1D159",
   "00AD",
   "034F",
   "061C",
