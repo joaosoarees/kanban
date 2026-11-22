@@ -96,11 +96,11 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
           onClick={state.startEditing}
           className={cn(
             BOX,
-            "cursor-text overflow-y-auto border-zinc-200 text-left transition-colors duration-150 hover:border-zinc-400 focus-visible:border-brand focus-visible:ring-ring/50 motion-reduce:transition-none",
+            "flex cursor-text items-start overflow-y-auto border-zinc-200 text-left transition-colors duration-150 hover:border-zinc-400 focus-visible:border-brand focus-visible:ring-ring/50 motion-reduce:transition-none",
             saved === null && "text-zinc-600",
           )}
         >
-          {saved ?? "Adicione uma descrição…"}
+          <span className="min-w-0">{saved ?? "Adicione uma descrição…"}</span>
         </button>
       )}
     </div>
