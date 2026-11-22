@@ -40,14 +40,14 @@ Workspace (id, name, slug @unique)
 Membership (userId, workspaceId, role) @@id([userId, workspaceId])
 Board (id, workspaceId, name)
 Column (id, boardId, name, position: String) @@index([boardId, position])
-Card (id, columnId, title, description?, assigneeId?, position: String)
+Card (id, columnId, title, description?, position: String) @@unique([columnId, position])
 Label (id, boardId, name, color) @@unique([boardId, name])
 CardLabel (cardId, labelId) @@id([cardId, labelId])
 ```
 
 Toda coluna `position` precisa de `COLLATE "C"` no SQL da migration: o Prisma não representa essa collation, e o `en_US` do banco ordenaria as chaves errado.
 
-Deletes em cascata de Workspace até Card. O responsável precisa ser membro do workspace (validado na action).
+Deletes em cascata de Workspace até Card. O responsável precisa ser membro do workspace (validado na action). `assigneeId`, `Label` e `CardLabel` entram na fatia 7.
 
 ## Qualidade
 
