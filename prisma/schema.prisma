@@ -71,8 +71,23 @@ model Column {
   position  String
   createdAt DateTime @default(now()) @db.Timestamptz(3)
 
-  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards Card[]
 
   @@index([boardId, position])
   @@map("columns")
+}
+
+model Card {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  columnId    String   @db.Uuid
+  title       String
+  description String?
+  position    String
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  column Column @relation(fields: [columnId], references: [id], onDelete: Cascade)
+
+  @@unique([columnId, position])
+  @@map("cards")
 }
