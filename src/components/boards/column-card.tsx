@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { deleteColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { AddCard } from "@/components/boards/add-card";
 import { BoardCardButton } from "@/components/boards/board-card";
+import { pushCardUrl } from "@/components/boards/card-url";
 import { ColumnMenu } from "@/components/boards/column-menu";
 import { ColumnNameEditor } from "@/components/boards/column-name-editor";
 import type { BoardColumn } from "@/components/boards/use-board-columns";
@@ -224,7 +225,13 @@ export function ColumnCard({
             </p>
           ) : (
             column.cards.map((card) => (
-              <BoardCardButton key={card.id} card={card} />
+              <BoardCardButton
+                key={card.id}
+                card={card}
+                onClick={() => {
+                  pushCardUrl(card.id);
+                }}
+              />
             ))
           )}
         </div>

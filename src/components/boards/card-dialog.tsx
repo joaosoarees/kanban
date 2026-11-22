@@ -1,0 +1,180 @@
+"use client";
+
+import { X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { deleteCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
+import {
+  CardDescription,
+  CardDescriptionActions,
+} from "@/components/boards/card-description";
+import { CardTitle } from "@/components/boards/card-title";
+import type {
+  BoardCard,
+  BoardColumn,
+} from "@/components/boards/use-board-columns";
+import { useCardDescription } from "@/components/boards/use-card-description";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import type { ActionResult } from "@/lib/action-result";
+
+const DISCARDED: ActionResult = { status: "success", data: undefined };
+
+type CardDialogProps = {
+  workspaceId: string;
+  boardId: string;
+  card: BoardCard;
+  column: BoardColumn;
+  index: number;
+  columns: BoardColumn[];
+  isLeaving: boolean;
+  onDirtyChange: (isDirty: boolean) => void;
+  onKeepEditing: () => void;
+  onDiscardLeaving: () => void;
+  onClose: () => void;
+  onMoveCard: (cardId: string, columnId: string, index: number) => void;
+};
+
+export function CardDialog({
+  workspaceId,
+  boardId,
+  card,
+  column,
+  isLeaving,
+  onDirtyChange,
+  onKeepEditing,
+  onDiscardLeaving,
+  onClose,
+}: CardDialogProps) {
+  const [isDiscarding, setIsDiscarding] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const description = useCardDescription({
+    workspaceId,
+    boardId,
+    cardId: card.id,
+    hasDescription: card.hasDescription,
+    onDirtyChange,
+    onLoadFailed: (message) => {
+      toast.error(message);
+      onClose();
+    },
+  });
+
+  return (
+    <Dialog
+      open
+      onOpenChange={(open) => {
+        if (open || description.isSaving) {
+          return;
+        }
+        if (description.isDirty) {
+          setIsDiscarding(true);
+          return;
+        }
+        onClose();
+      }}
+    >
+      <DialogContent
+        showCloseButton={false}
+        className="top-3 flex max-h-[calc(100svh-1.5rem)] translate-y-0 flex-col gap-4 overflow-y-auto p-5 sm:top-[88px] sm:max-h-[calc(100svh-7rem)] sm:max-w-[600px]"
+      >
+        <div className="flex items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <CardTitle
+              workspaceId={workspaceId}
+              boardId={boardId}
+              cardId={card.id}
+              title={card.title}
+            />
+            <DialogDescription className="mt-0.5 truncate px-1.5 text-[13px] text-zinc-600">
+              Na coluna {column.name}
+            </DialogDescription>
+          </div>
+          <DialogClose
+            aria-label="Fechar"
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-11 shrink-0 text-zinc-600 sm:size-8"
+              />
+            }
+          >
+            <X aria-hidden />
+          </DialogClose>
+        </div>
+
+        <CardDescription cardId={card.id} state={description} />
+
+        <div className="flex items-center justify-between gap-2">
+          <Button
+            variant="outline"
+            disabled={description.isSaving}
+            onClick={() => {
+              setIsDeleting(true);
+            }}
+            className="h-11 border-red-200 px-3.5 text-red-700 hover:bg-red-50 hover:text-red-700 sm:h-9"
+          >
+            Excluir card
+          </Button>
+          {description.isEditing && (
+            <CardDescriptionActions state={description} />
+          )}
+        </div>
+
+        <ConfirmDialog
+          open={isDiscarding || isLeaving}
+          onOpenChange={(open) => {
+            if (open) {
+              return;
+            }
+            setIsDiscarding(false);
+            if (isLeaving) {
+              onKeepEditing();
+            }
+          }}
+          title="Descartar as alterações?"
+          description="A descrição editada ainda não foi salva e será perdida."
+          confirmLabel="Descartar"
+          pendingLabel="Descartando…"
+          cancelLabel="Continuar editando"
+          onConfirm={() => {
+            setIsDiscarding(false);
+            description.cancel();
+            if (isLeaving) {
+              onDiscardLeaving();
+            } else {
+              onClose();
+            }
+            return DISCARDED;
+          }}
+        />
+        <ConfirmDialog
+          open={isDeleting}
+          onOpenChange={setIsDeleting}
+          title={`Excluir o card ${card.title}?`}
+          description="O card será apagado para todo o workspace. Isso não pode ser desfeito."
+          confirmLabel="Excluir card"
+          pendingLabel="Excluindo card…"
+          onConfirm={async () => {
+            const result = await deleteCardAction(
+              workspaceId,
+              boardId,
+              card.id,
+            );
+            if (result.status === "success") {
+              onClose();
+            }
+            return result;
+          }}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
