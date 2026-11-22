@@ -5,6 +5,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, UnfoldHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { deleteColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
+import { AddCard } from "@/components/boards/add-card";
+import { BoardCardButton } from "@/components/boards/board-card";
 import { ColumnMenu } from "@/components/boards/column-menu";
 import { ColumnNameEditor } from "@/components/boards/column-name-editor";
 import type { BoardColumn } from "@/components/boards/use-board-columns";
@@ -15,6 +17,21 @@ import { useCollapsedColumns } from "@/stores/collapsed-columns";
 
 const CARD =
   "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-zinc-100 p-2 sm:w-72";
+
+function cardCountLabel(count: number) {
+  if (count === 0) {
+    return "Sem cards";
+  }
+  return count === 1 ? "1 card" : `${count} cards`;
+}
+
+function deleteDescription(cardCount: number) {
+  if (cardCount === 0) {
+    return "A coluna será apagada para todo o workspace. Isso não pode ser desfeito.";
+  }
+  const cards = cardCount === 1 ? "seu card" : `seus ${cardCount} cards`;
+  return `A coluna e ${cards} serão apagados para todo o workspace. Isso não pode ser desfeito.`;
+}
 
 type ColumnCardProps = {
   workspaceId: string;
@@ -55,6 +72,9 @@ export function ColumnCard({
   const titleRef = useRef<HTMLButtonElement>(null);
   const expandRef = useRef<HTMLButtonElement>(null);
   const pendingFocus = useRef<"title" | "expand" | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const revealAboveCount = useRef<number | null>(null);
+  const cardCount = column.cards.length;
 
   useEffect(() => {
     if (pendingFocus.current === "expand" && isCollapsed) {
@@ -66,6 +86,16 @@ export function ColumnCard({
       titleRef.current?.focus();
     }
   }, [isCollapsed, isRenaming]);
+
+  useEffect(() => {
+    if (
+      revealAboveCount.current !== null &&
+      cardCount > revealAboveCount.current
+    ) {
+      revealAboveCount.current = null;
+      listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+    }
+  }, [cardCount]);
 
   const style = { transform: CSS.Translate.toString(transform), transition };
 
@@ -91,6 +121,10 @@ export function ColumnCard({
         >
           <UnfoldHorizontal aria-hidden />
         </Button>
+        <span className="text-[13px] font-medium text-zinc-600">
+          <span aria-hidden>{cardCount}</span>
+          <span className="sr-only">{cardCountLabel(cardCount)}</span>
+        </span>
         <span className="min-h-0 truncate text-sm font-semibold [writing-mode:vertical-rl]">
           {column.name}
         </span>
@@ -151,6 +185,12 @@ export function ColumnCard({
               {column.name}
             </button>
           )}
+          {!isRenaming && (
+            <span className="min-w-5 shrink-0 text-center text-[13px] font-medium text-zinc-600">
+              <span aria-hidden>{cardCount}</span>
+              <span className="sr-only">{cardCountLabel(cardCount)}</span>
+            </span>
+          )}
           <ColumnMenu
             name={column.name}
             canMoveLeft={index > 0}
@@ -174,15 +214,34 @@ export function ColumnCard({
             }}
           />
         </div>
-        <p className="mt-1 h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
-          Sem cards
-        </p>
+        <div
+          ref={listRef}
+          className="mt-1 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-px"
+        >
+          {cardCount === 0 ? (
+            <p className="h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
+              Sem cards
+            </p>
+          ) : (
+            column.cards.map((card) => (
+              <BoardCardButton key={card.id} card={card} />
+            ))
+          )}
+        </div>
+        <AddCard
+          workspaceId={workspaceId}
+          boardId={boardId}
+          columnId={column.id}
+          onCreated={() => {
+            revealAboveCount.current = cardCount;
+          }}
+        />
       </div>
       <ConfirmDialog
         open={isDeleting}
         onOpenChange={setIsDeleting}
         title={`Excluir a coluna ${column.name}?`}
-        description="A coluna será apagada para todo o workspace. Isso não pode ser desfeito."
+        description={deleteDescription(cardCount)}
         confirmLabel="Excluir coluna"
         pendingLabel="Excluindo coluna…"
         onConfirm={async () => {
@@ -202,7 +261,13 @@ export function ColumnCard({
   );
 }
 
-export function ColumnPreview({ name }: { name: string }) {
+export function ColumnPreview({
+  name,
+  cardCount,
+}: {
+  name: string;
+  cardCount: number;
+}) {
   return (
     <div
       className={cn(
@@ -216,7 +281,9 @@ export function ColumnPreview({ name }: { name: string }) {
         </span>
         <span className="truncate px-2 text-sm font-semibold">{name}</span>
       </div>
-      <p className="mt-1 h-6 px-2 text-[13px]/6 text-zinc-600">Sem cards</p>
+      <p className="mt-1 h-6 px-2 text-[13px]/6 text-zinc-600">
+        {cardCountLabel(cardCount)}
+      </p>
     </div>
   );
 }

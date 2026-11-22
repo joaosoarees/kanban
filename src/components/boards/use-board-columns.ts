@@ -6,9 +6,16 @@ import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 import { moveColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 
+export type BoardCard = {
+  id: string;
+  title: string;
+  hasDescription: boolean;
+};
+
 export type BoardColumn = {
   id: string;
   name: string;
+  cards: BoardCard[];
 };
 
 const MOVE_FAILED = "Não foi possível mover a coluna. Tente de novo.";

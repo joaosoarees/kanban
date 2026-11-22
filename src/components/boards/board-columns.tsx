@@ -206,7 +206,7 @@ export function BoardColumns({
       <section
         ref={columnsRef}
         aria-label="Colunas do quadro"
-        className="flex min-h-0 flex-1 snap-x snap-mandatory gap-2.5 overflow-x-auto px-3 pb-3 sm:snap-none sm:gap-3 sm:px-6 sm:pb-4"
+        className="relative flex min-h-0 flex-1 snap-x snap-mandatory gap-2.5 overflow-x-auto px-3 pb-3 sm:snap-none sm:gap-3 sm:px-6 sm:pb-4"
       >
         <SortableContext
           items={columns.map(({ id }) => id)}
@@ -243,7 +243,14 @@ export function BoardColumns({
         />
       </section>
       <DragOverlay dropAnimation={null} modifiers={[horizontalOnly]}>
-        {activeId === null ? null : <ColumnPreview name={nameOf(activeId)} />}
+        {activeId === null ? null : (
+          <ColumnPreview
+            name={nameOf(activeId)}
+            cardCount={
+              columns.find(({ id }) => id === activeId)?.cards.length ?? 0
+            }
+          />
+        )}
       </DragOverlay>
     </DndContext>
   );
