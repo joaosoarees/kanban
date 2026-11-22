@@ -1,5 +1,6 @@
 const NUL = String.fromCodePoint(0);
-const BLANK = /^[\s\p{Default_Ignorable_Code_Point}]*$/u;
+const BLANK =
+  /^[\s\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}\u2800\u{1D159}]*$/u;
 
 export const INVALID_CHARACTER = "Remova os caracteres inválidos.";
 
