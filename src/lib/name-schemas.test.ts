@@ -4,6 +4,24 @@ import { boardNameSchema, columnNameSchema } from "./board-schemas";
 import { createWorkspaceSchema } from "./workspace-schemas";
 
 const NUL = String.fromCodePoint(0);
+const ZERO_WIDTH = String.fromCodePoint(0x200b);
+const INVISIBLE_CODE_POINTS = [
+  "00AD",
+  "034F",
+  "061C",
+  "115F",
+  "17B4",
+  "180E",
+  "200E",
+  "202A",
+  "2061",
+  "2066",
+  "3164",
+  "FE0F",
+  "FFA0",
+  "1D173",
+  "E0020",
+];
 
 const nameFields = [
   ["board", boardNameSchema.shape.name],
@@ -19,6 +37,20 @@ describe.each(nameFields)("%s name", (_label, field) => {
 
   it("refuses a NUL character", () => {
     expect(field.safeParse(`a${NUL}b`).success).toBe(false);
+  });
+
+  it("refuses a name with only zero-width characters", () => {
+    expect(field.safeParse(`${ZERO_WIDTH} ${ZERO_WIDTH}`).success).toBe(false);
+  });
+
+  it.each(INVISIBLE_CODE_POINTS)("refuses only U+%s", (codePoint) => {
+    const name = String.fromCodePoint(Number.parseInt(codePoint, 16));
+    expect(field.safeParse(name).success).toBe(false);
+  });
+
+  it("keeps a zero-width character inside visible text", () => {
+    const name = `a${ZERO_WIDTH}b`;
+    expect(field.parse(name)).toBe(name);
   });
 });
 
