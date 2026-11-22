@@ -3,6 +3,7 @@ import {
   initialPositions,
   planMove,
   positionAtEnd,
+  positionInColumn,
   type Positioned,
 } from "./position";
 
@@ -33,6 +34,60 @@ function applyMove(ordered: Positioned[], updates: Positioned[]) {
     .toSorted((a, b) => (a.position < b.position ? -1 : 1))
     .map(({ id }) => id);
 }
+
+function plannedPosition(
+  ordered: Positioned[],
+  movedId: string,
+  previousId: string | null,
+) {
+  const position = positionInColumn(ordered, movedId, previousId);
+  if (position === null) {
+    throw new Error("expected a planned position");
+  }
+  return position;
+}
+
+describe("positionInColumn", () => {
+  const [a, b, c] = board(["a", "b", "c"]);
+
+  it("creates a position in an empty column", () => {
+    expect(positionInColumn([], "moved", null)).toBe(initialPositions(1)[0]);
+  });
+
+  it("places the card before the first one", () => {
+    const position = plannedPosition([a, b, c], "moved", null);
+    expect(position < a.position).toBe(true);
+  });
+
+  it("places the card between two others", () => {
+    const position = plannedPosition([a, b, c], "moved", "a");
+    expect(a.position < position).toBe(true);
+    expect(position < b.position).toBe(true);
+  });
+
+  it("places the card after the last one", () => {
+    const position = plannedPosition([a, b, c], "moved", "c");
+    expect(c.position < position).toBe(true);
+  });
+
+  it("ignores the card's own position when moving inside the column", () => {
+    const position = plannedPosition([a, b, c], "b", "c");
+    expect(c.position < position).toBe(true);
+  });
+
+  it("moves a card to the top of its own column", () => {
+    const position = plannedPosition([a, b, c], "c", null);
+    expect(position < a.position).toBe(true);
+  });
+
+  it("refuses a previous card that is not in the column", () => {
+    expect(positionInColumn([a, b, c], "moved", "missing")).toBeNull();
+  });
+
+  it("refuses the card as its own previous card", () => {
+    expect(positionInColumn([a, b, c], "b", "b")).toBeNull();
+  });
+});
 
 describe("initialPositions", () => {
   it("creates strictly increasing positions", () => {
