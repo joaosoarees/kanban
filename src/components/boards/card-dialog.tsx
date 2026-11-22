@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
@@ -58,6 +59,7 @@ export function CardDialog({
   onClose,
   onMoveCard,
 }: CardDialogProps) {
+  const router = useRouter();
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const description = useCardDescription({
@@ -65,9 +67,12 @@ export function CardDialog({
     boardId,
     cardId: card.id,
     onDirtyChange,
-    onLoadFailed: (message) => {
+    onLoadFailed: (message, isGone) => {
       toast.error(message);
       onClose();
+      if (isGone) {
+        router.refresh();
+      }
     },
   });
 

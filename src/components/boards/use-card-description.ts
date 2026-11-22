@@ -26,7 +26,7 @@ type UseCardDescriptionOptions = {
   boardId: string;
   cardId: string;
   onDirtyChange: (isDirty: boolean) => void;
-  onLoadFailed: (message: string) => void;
+  onLoadFailed: (message: string, isGone: boolean) => void;
 };
 
 export function useCardDescription({
@@ -62,12 +62,12 @@ export function useCardDescription({
         if (result.status === "success") {
           setSaved(result.data.description);
         } else {
-          reportLoadFailure(result.message);
+          reportLoadFailure(result.message, result.gone === true);
         }
       } catch (caught) {
         console.error(caught);
         if (isCurrent) {
-          reportLoadFailure(LOAD_FAILED);
+          reportLoadFailure(LOAD_FAILED, false);
         }
       }
     };
