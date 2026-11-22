@@ -39,6 +39,34 @@ function parseCardRef(boardId: unknown, cardId: unknown) {
   return { boardId: board.data, cardId: card.data };
 }
 
+export async function getCardDescriptionAction(
+  workspaceId: unknown,
+  boardId: unknown,
+  cardId: unknown,
+): Promise<ActionResult<{ description: string | null }>> {
+  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
+  if (!actor) {
+    return FORBIDDEN;
+  }
+
+  const ref = parseCardRef(boardId, cardId);
+  if (!ref) {
+    return CARD_GONE;
+  }
+
+  const card = await db.card.findFirst({
+    where: {
+      id: ref.cardId,
+      column: {
+        boardId: ref.boardId,
+        board: { workspaceId: actor.workspaceId },
+      },
+    },
+    select: { description: true },
+  });
+  return card ? { status: "success", data: card } : CARD_GONE;
+}
+
 export async function createCardAction(
   workspaceId: unknown,
   boardId: unknown,

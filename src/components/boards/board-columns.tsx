@@ -19,8 +19,9 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { Plus, SquareKanban } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { AddColumn } from "@/components/boards/add-column";
+import { CardDialogHost } from "@/components/boards/card-dialog-host";
 import { ColumnCard, ColumnPreview } from "@/components/boards/column-card";
 import {
   useBoardColumns,
@@ -51,7 +52,7 @@ export function BoardColumns({
   boardId,
   columns: serverColumns,
 }: BoardColumnsProps) {
-  const { columns, move } = useBoardColumns(
+  const { columns, move, moveCard } = useBoardColumns(
     workspaceId,
     boardId,
     serverColumns,
@@ -149,6 +150,17 @@ export function BoardColumns({
     }
   };
 
+  const cardDialog = (
+    <Suspense fallback={null}>
+      <CardDialogHost
+        workspaceId={workspaceId}
+        boardId={boardId}
+        columns={columns}
+        onMoveCard={moveCard}
+      />
+    </Suspense>
+  );
+
   if (columns.length === 0 && !isAdding) {
     return (
       <div className="mx-auto mt-2 w-full max-w-5xl px-3 sm:mt-8 sm:px-6">
@@ -169,6 +181,7 @@ export function BoardColumns({
             </Button>
           }
         />
+        {cardDialog}
       </div>
     );
   }
@@ -252,6 +265,7 @@ export function BoardColumns({
           />
         )}
       </DragOverlay>
+      {cardDialog}
     </DndContext>
   );
 }

@@ -25,8 +25,9 @@ type ConfirmDialogProps = {
   description: string;
   confirmLabel: string;
   pendingLabel: string;
+  cancelLabel?: string;
   confirmDisabled?: boolean;
-  onConfirm: () => Promise<ActionResult> | undefined;
+  onConfirm: () => Promise<ActionResult> | ActionResult | undefined;
   children?: ReactNode;
 };
 
@@ -37,6 +38,7 @@ export function ConfirmDialog({
   description,
   confirmLabel,
   pendingLabel,
+  cancelLabel = "Cancelar",
   confirmDisabled = false,
   onConfirm,
   children,
@@ -89,7 +91,7 @@ export function ConfirmDialog({
         </div>
         <AlertDialogFooter className="mx-0 mt-5 mb-0 border-0 bg-transparent p-0">
           <AlertDialogCancel disabled={isPending} className="h-10 px-4">
-            Cancelar
+            {cancelLabel}
           </AlertDialogCancel>
           <PendingButton
             onClick={confirm}

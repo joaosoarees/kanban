@@ -4,7 +4,9 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { unstable_rethrow } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
+import { moveCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
 import { moveColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
+import { moveCardTo, previousCardIdOf } from "@/lib/card-moves";
 
 export type BoardCard = {
   id: string;
@@ -19,6 +21,8 @@ export type BoardColumn = {
 };
 
 const MOVE_FAILED = "Não foi possível mover a coluna. Tente de novo.";
+const CARD_MOVE_FAILED =
+  "Não foi possível mover o card. Desfizemos o movimento. Tente de novo.";
 
 export function useBoardColumns(
   workspaceId: string,
@@ -64,5 +68,38 @@ export function useBoardColumns(
     });
   };
 
-  return { columns, move };
+  const commitCardMove = (
+    next: BoardColumn[],
+    cardId: string,
+    columnId: string,
+  ) => {
+    const previousCardId = previousCardIdOf(next, cardId);
+
+    startTransition(async () => {
+      setOptimisticColumns(next);
+      try {
+        const result = await moveCardAction(workspaceId, boardId, {
+          cardId,
+          columnId,
+          previousCardId,
+        });
+        if (result.status === "error") {
+          toast.error(result.message);
+        }
+      } catch (error) {
+        unstable_rethrow(error);
+        console.error(error);
+        toast.error(CARD_MOVE_FAILED);
+      }
+    });
+  };
+
+  const moveCard = (cardId: string, columnId: string, index: number) => {
+    const next = moveCardTo(columns, cardId, columnId, index);
+    if (next !== null) {
+      commitCardMove(next, cardId, columnId);
+    }
+  };
+
+  return { columns, move, moveCard, commitCardMove };
 }
