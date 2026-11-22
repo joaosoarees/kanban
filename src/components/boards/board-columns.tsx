@@ -1,45 +1,34 @@
 "use client";
 
-import {
-  closestCenter,
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type Announcements,
-  type DragEndEvent,
-  type Modifier,
-  type UniqueIdentifier,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay, type Modifier } from "@dnd-kit/core";
 import {
   horizontalListSortingStrategy,
   SortableContext,
-  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { Plus, SquareKanban } from "lucide-react";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { AddColumn } from "@/components/boards/add-column";
+import { BoardCardPreview } from "@/components/boards/board-card";
 import { CardDialogHost } from "@/components/boards/card-dialog-host";
-import { ColumnCard, ColumnPreview } from "@/components/boards/column-card";
+import { ColumnCard } from "@/components/boards/column-card";
+import { ColumnPreview } from "@/components/boards/column-preview";
 import {
   useBoardColumns,
   type BoardColumn,
 } from "@/components/boards/use-board-columns";
+import {
+  screenReaderInstructions,
+  useBoardDrag,
+} from "@/components/boards/use-board-drag";
 import { primaryButton } from "@/components/button-styles";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { locateCard } from "@/lib/card-moves";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";
 
 const horizontalOnly: Modifier = ({ transform }) => ({ ...transform, y: 0 });
-
-const screenReaderInstructions = {
-  draggable:
-    "Pressione espaço para pegar a coluna, use as setas para mudar de lugar, espaço para soltar e Esc para cancelar.",
-};
 
 type BoardColumnsProps = {
   workspaceId: string;
@@ -52,12 +41,27 @@ export function BoardColumns({
   boardId,
   columns: serverColumns,
 }: BoardColumnsProps) {
-  const { columns, move, moveCard } = useBoardColumns(
-    workspaceId,
-    boardId,
-    serverColumns,
-  );
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const {
+    columns: confirmedColumns,
+    move,
+    moveCard,
+    commitCardMove,
+  } = useBoardColumns(workspaceId, boardId, serverColumns);
+  const {
+    activeDrag,
+    displayed: columns,
+    sensors,
+    announcements,
+    collisionDetection,
+    onDragStart,
+    onDragOver,
+    onDragEnd,
+    onDragCancel,
+  } = useBoardDrag({
+    columns: confirmedColumns,
+    onMoveColumn: move,
+    onCommitCard: commitCardMove,
+  });
   const [isAdding, setIsAdding] = useState(false);
   const hasLoadedCollapsed = useCollapsedColumns((state) => state.hasLoaded);
   const addAnchorRef = useRef<HTMLDivElement>(null);
@@ -66,12 +70,6 @@ export function BoardColumns({
   const emptyActionRef = useRef<HTMLButtonElement>(null);
   const refocusEmptyAction = useRef(false);
   const deletedColumn = useRef<{ id: string; index: number } | null>(null);
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
 
   useEffect(() => {
     const { persist } = useCollapsedColumns;
@@ -124,38 +122,21 @@ export function BoardColumns({
     (neighborTarget ?? anyTarget ?? emptyActionRef.current)?.focus();
   }, [columns]);
 
-  const nameOf = (id: UniqueIdentifier) =>
-    columns.find((column) => column.id === id)?.name ?? "";
-  const positionOf = (id: UniqueIdentifier) =>
-    columns.findIndex((column) => column.id === id) + 1;
-
-  const announcements: Announcements = {
-    onDragStart: ({ active }) => `Coluna ${nameOf(active.id)} selecionada.`,
-    onDragOver: ({ active, over }) =>
-      over
-        ? `Coluna ${nameOf(active.id)} na posição ${positionOf(over.id)} de ${columns.length}.`
-        : undefined,
-    onDragEnd: ({ active, over }) =>
-      over
-        ? `Coluna ${nameOf(active.id)} solta na posição ${positionOf(over.id)}.`
-        : undefined,
-    onDragCancel: ({ active }) =>
-      `Movimento da coluna ${nameOf(active.id)} cancelado.`,
-  };
-
-  const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    setActiveId(null);
-    if (over && active.id !== over.id) {
-      move(String(active.id), positionOf(over.id) - 1);
-    }
-  };
+  const activeColumn =
+    activeDrag?.kind === "column"
+      ? columns.find(({ id }) => id === activeDrag.id)
+      : undefined;
+  const activeCard =
+    activeDrag?.kind === "card"
+      ? locateCard(columns, activeDrag.id)?.card
+      : undefined;
 
   const cardDialog = (
     <Suspense fallback={null}>
       <CardDialogHost
         workspaceId={workspaceId}
         boardId={boardId}
-        columns={columns}
+        columns={confirmedColumns}
         onMoveCard={moveCard}
       />
     </Suspense>
@@ -206,15 +187,12 @@ export function BoardColumns({
     <DndContext
       id="board-columns"
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={collisionDetection}
       accessibility={{ announcements, screenReaderInstructions }}
-      onDragStart={({ active }) => {
-        setActiveId(active.id);
-      }}
-      onDragEnd={handleDragEnd}
-      onDragCancel={() => {
-        setActiveId(null);
-      }}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
+      onDragCancel={onDragCancel}
     >
       <section
         ref={columnsRef}
@@ -233,6 +211,7 @@ export function BoardColumns({
               column={column}
               index={index}
               total={columns.length}
+              dragKind={activeDrag?.kind ?? null}
               onMove={move}
               onDeleted={() => {
                 deletedColumn.current = { id: column.id, index };
@@ -255,15 +234,17 @@ export function BoardColumns({
           }}
         />
       </section>
-      <DragOverlay dropAnimation={null} modifiers={[horizontalOnly]}>
-        {activeId === null ? null : (
+      <DragOverlay
+        dropAnimation={null}
+        modifiers={activeColumn ? [horizontalOnly] : []}
+      >
+        {activeColumn && (
           <ColumnPreview
-            name={nameOf(activeId)}
-            cardCount={
-              columns.find(({ id }) => id === activeId)?.cards.length ?? 0
-            }
+            name={activeColumn.name}
+            cardCount={activeColumn.cards.length}
           />
         )}
+        {activeCard && <BoardCardPreview card={activeCard} />}
       </DragOverlay>
       {cardDialog}
     </DndContext>

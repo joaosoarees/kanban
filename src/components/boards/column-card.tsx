@@ -1,30 +1,29 @@
 "use client";
 
-import { useSortable } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, UnfoldHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { deleteColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { AddCard } from "@/components/boards/add-card";
-import { BoardCardButton } from "@/components/boards/board-card";
-import { pushCardUrl } from "@/components/boards/card-url";
 import { ColumnMenu } from "@/components/boards/column-menu";
 import { ColumnNameEditor } from "@/components/boards/column-name-editor";
+import {
+  cardCountLabel,
+  COLUMN_SHELL,
+} from "@/components/boards/column-preview";
+import { SortableCard } from "@/components/boards/sortable-card";
 import type { BoardColumn } from "@/components/boards/use-board-columns";
+import { COLUMN_DROP, type DragKind } from "@/components/boards/use-board-drag";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";
-
-const CARD =
-  "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-zinc-100 p-2 sm:w-72";
-
-function cardCountLabel(count: number) {
-  if (count === 0) {
-    return "Sem cards";
-  }
-  return count === 1 ? "1 card" : `${count} cards`;
-}
 
 function deleteDescription(cardCount: number) {
   if (cardCount === 0) {
@@ -40,6 +39,7 @@ type ColumnCardProps = {
   column: BoardColumn;
   index: number;
   total: number;
+  dragKind: DragKind | null;
   onMove: (columnId: string, targetIndex: number) => void;
   onDeleted: () => void;
 };
@@ -50,6 +50,7 @@ export function ColumnCard({
   column,
   index,
   total,
+  dragKind,
   onMove,
   onDeleted,
 }: ColumnCardProps) {
@@ -68,7 +69,16 @@ export function ColumnCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: column.id, disabled: isRenaming });
+  } = useSortable({
+    id: column.id,
+    data: { type: "column" },
+    disabled: { draggable: isRenaming, droppable: dragKind === "card" },
+  });
+  const { setNodeRef: setDropRef, isOver } = useDroppable({
+    id: `${COLUMN_DROP}:${column.id}`,
+    data: { type: COLUMN_DROP, columnId: column.id },
+    disabled: dragKind !== "card" || isCollapsed,
+  });
 
   const titleRef = useRef<HTMLButtonElement>(null);
   const expandRef = useRef<HTMLButtonElement>(null);
@@ -106,7 +116,10 @@ export function ColumnCard({
         ref={setNodeRef}
         style={style}
         aria-label={`Coluna ${column.name}, recolhida`}
-        className="flex h-full w-12 shrink-0 snap-center flex-col items-center gap-3 rounded-xl bg-zinc-100 py-2 motion-reduce:transition-none!"
+        className={cn(
+          "flex h-full w-12 shrink-0 snap-center flex-col items-center gap-3 rounded-xl bg-zinc-100 py-2 motion-reduce:transition-none!",
+          dragKind === "card" && "opacity-55",
+        )}
       >
         <Button
           ref={expandRef}
@@ -139,12 +152,14 @@ export function ColumnCard({
       style={style}
       aria-label={`Coluna ${column.name}`}
       className={cn(
-        CARD,
+        COLUMN_SHELL,
         "motion-reduce:transition-none!",
         isDragging && "border-2 border-dashed border-brand bg-indigo-50 p-1.5",
+        isOver && "bg-indigo-50",
       )}
     >
       <div
+        ref={setDropRef}
         className={cn(
           "flex min-h-0 flex-1 flex-col",
           isDragging && "opacity-0",
@@ -219,21 +234,25 @@ export function ColumnCard({
           ref={listRef}
           className="mt-1 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-px"
         >
-          {cardCount === 0 ? (
-            <p className="h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
-              Sem cards
-            </p>
-          ) : (
-            column.cards.map((card) => (
-              <BoardCardButton
-                key={card.id}
-                card={card}
-                onClick={() => {
-                  pushCardUrl(card.id);
-                }}
-              />
-            ))
-          )}
+          <SortableContext
+            items={column.cards.map(({ id }) => id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {cardCount === 0 ? (
+              <p className="h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
+                Sem cards
+              </p>
+            ) : (
+              column.cards.map((card) => (
+                <SortableCard
+                  key={card.id}
+                  card={card}
+                  columnId={column.id}
+                  isDropDisabled={dragKind === "column"}
+                />
+              ))
+            )}
+          </SortableContext>
         </div>
         <AddCard
           workspaceId={workspaceId}
@@ -265,32 +284,5 @@ export function ColumnCard({
         }}
       />
     </section>
-  );
-}
-
-export function ColumnPreview({
-  name,
-  cardCount,
-}: {
-  name: string;
-  cardCount: number;
-}) {
-  return (
-    <div
-      className={cn(
-        CARD,
-        "rotate-[1.5deg] cursor-grabbing shadow-xl motion-reduce:rotate-0",
-      )}
-    >
-      <div className="flex h-10 items-center gap-1">
-        <span className="flex h-8 w-5 items-center justify-center text-zinc-500">
-          <GripVertical aria-hidden className="size-[15px]" />
-        </span>
-        <span className="truncate px-2 text-sm font-semibold">{name}</span>
-      </div>
-      <p className="mt-1 h-6 px-2 text-[13px]/6 text-zinc-600">
-        {cardCountLabel(cardCount)}
-      </p>
-    </div>
   );
 }
