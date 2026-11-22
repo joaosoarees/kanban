@@ -8,7 +8,7 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { BOARD_GONE, COLUMN_GONE, lockBoard } from "@/lib/boards";
+import { BOARD_GONE, CARD_GONE, COLUMN_GONE, lockBoard } from "@/lib/boards";
 import {
   cardDescriptionSchema,
   cardTitleSchema,
@@ -18,12 +18,6 @@ import {
 import { db } from "@/lib/db";
 import { positionAtEnd, positionInColumn } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
-
-const CARD_GONE: ActionError = {
-  status: "error",
-  message: "Esse card não existe mais. O quadro foi atualizado.",
-  gone: true,
-};
 
 const BOARD_CHANGED: ActionError = {
   status: "error",
@@ -37,34 +31,6 @@ function parseCardRef(boardId: unknown, cardId: unknown) {
     return null;
   }
   return { boardId: board.data, cardId: card.data };
-}
-
-export async function getCardDescriptionAction(
-  workspaceId: unknown,
-  boardId: unknown,
-  cardId: unknown,
-): Promise<ActionResult<{ description: string | null }>> {
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-
-  const ref = parseCardRef(boardId, cardId);
-  if (!ref) {
-    return CARD_GONE;
-  }
-
-  const card = await db.card.findFirst({
-    where: {
-      id: ref.cardId,
-      column: {
-        boardId: ref.boardId,
-        board: { workspaceId: actor.workspaceId },
-      },
-    },
-    select: { description: true },
-  });
-  return card ? { status: "success", data: card } : CARD_GONE;
 }
 
 export async function createCardAction(

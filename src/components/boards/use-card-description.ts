@@ -2,14 +2,24 @@
 
 import { unstable_rethrow } from "next/navigation";
 import { useEffect, useEffectEvent, useState, useTransition } from "react";
-import {
-  getCardDescriptionAction,
-  updateCardDescriptionAction,
-} from "@/app/(app)/w/[slug]/b/card-actions";
+import * as z from "zod";
+import { updateCardDescriptionAction } from "@/app/(app)/w/[slug]/b/card-actions";
 import { cardDescriptionSchema } from "@/lib/card-schemas";
 
 const LOAD_FAILED = "Não foi possível abrir o card. Tente de novo.";
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";
+
+const descriptionResponseSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("success"),
+    data: z.object({ description: z.string().nullable() }),
+  }),
+  z.object({
+    status: z.literal("error"),
+    message: z.string(),
+    gone: z.boolean().optional(),
+  }),
+]);
 
 type UseCardDescriptionOptions = {
   workspaceId: string;
@@ -41,11 +51,11 @@ export function useCardDescription({
     let isCurrent = true;
     const load = async () => {
       try {
-        const result = await getCardDescriptionAction(
-          workspaceId,
-          boardId,
-          cardId,
+        const response = await fetch(
+          `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/description`,
+          { cache: "no-store", redirect: "error" },
         );
+        const result = descriptionResponseSchema.parse(await response.json());
         if (!isCurrent) {
           return;
         }
@@ -55,7 +65,6 @@ export function useCardDescription({
           reportLoadFailure(result.message);
         }
       } catch (caught) {
-        unstable_rethrow(caught);
         console.error(caught);
         if (isCurrent) {
           reportLoadFailure(LOAD_FAILED);
