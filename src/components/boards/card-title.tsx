@@ -125,15 +125,16 @@ function CardTitleEditor({
             setError(fieldError);
             return;
           }
-          if (result.gone === true) {
-            return;
+          if (result.gone !== true) {
+            toast.error(result.message);
           }
-          toast.error(result.message);
+          return;
         }
       } catch (caught) {
         unstable_rethrow(caught);
         console.error(caught);
         toast.error(RENAME_FAILED);
+        return;
       }
       startTransition(close);
     });
