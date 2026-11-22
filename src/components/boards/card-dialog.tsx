@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardDescriptionActions,
 } from "@/components/boards/card-description";
+import { CardMoveMenu } from "@/components/boards/card-move-menu";
 import { CardTitle } from "@/components/boards/card-title";
 import type {
   BoardCard,
@@ -46,11 +47,14 @@ export function CardDialog({
   boardId,
   card,
   column,
+  index,
+  columns,
   isLeaving,
   onDirtyChange,
   onKeepEditing,
   onDiscardLeaving,
   onClose,
+  onMoveCard,
 }: CardDialogProps) {
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -123,8 +127,16 @@ export function CardDialog({
           >
             Excluir card
           </Button>
-          {description.isEditing && (
+          {description.isEditing ? (
             <CardDescriptionActions state={description} />
+          ) : (
+            <CardMoveMenu
+              cardId={card.id}
+              column={column}
+              index={index}
+              columns={columns}
+              onMove={onMoveCard}
+            />
           )}
         </div>
 
