@@ -67,8 +67,8 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-21 — A lista de quadros é uma grade de tiles com nome e data de criação — repete o padrão da tela inicial.
 - 2026-11-21 — Mover coluna para a esquerda e a direita fica no mesmo menu no desktop e no celular — dá uma alternativa ao arraste para toque e teclado.
 - 2026-11-21 — Sem cor por quadro por enquanto — a cor continua sendo do workspace.
-- 2026-11-22 — Telas de cards desenhadas em https://claude.ai/artifact/TTG9TsGjnmSzBWKA8CqrCH — canvas próprio da fatia 6, aguardando aprovação.
-- 2026-11-22 — "Mover para" no celular fica dentro do diálogo do card — o card continua limpo e o toque sempre abre.
+- 2026-11-22 — Telas de cards desenhadas em https://claude.ai/artifact/TTG9TsGjnmSzBWKA8CqrCH — canvas próprio da fatia 6, aprovado.
+- 2026-11-22 — "Mover para" no celular e em telas de toque maiores fica dentro do diálogo do card — o card continua limpo, o toque sempre abre e tablets também conseguem mover.
 - 2026-11-22 — Indicador de descrição é só um ícone discreto, sem prévia — mantém a coluna densa e fácil de ler.
 - 2026-11-22 — Título do card aparece em até 3 linhas e a rolagem fica só na lista da coluna — cabeçalho e "Adicionar card" não saem do lugar.
 
