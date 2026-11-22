@@ -2,7 +2,6 @@
 
 import {
   closestCenter,
-  closestCorners,
   KeyboardCode,
   KeyboardSensor,
   PointerSensor,
@@ -18,14 +17,15 @@ import {
   type Over,
   type UniqueIdentifier,
 } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useState } from "react";
+import {
+  boardKeyboardCoordinates,
+  COLUMN_DROP,
+} from "@/components/boards/card-keyboard";
 import type { BoardColumn } from "@/components/boards/use-board-columns";
 import { locateCard, moveCardTo } from "@/lib/card-moves";
 
 export type DragKind = "column" | "card";
-
-export const COLUMN_DROP = "column-drop";
 
 export const screenReaderInstructions = {
   draggable:
@@ -36,11 +36,12 @@ const boardCollision: CollisionDetection = (args) => {
   if (args.active.data.current?.type !== "card") {
     return closestCenter(args);
   }
-  if (args.pointerCoordinates === null) {
-    return closestCorners(args);
-  }
+  const point = args.pointerCoordinates ?? {
+    x: args.collisionRect.left + args.collisionRect.width / 2,
+    y: args.collisionRect.top + args.collisionRect.height / 2,
+  };
 
-  const columnHit = pointerWithin(args)
+  const columnHit = pointerWithin({ ...args, pointerCoordinates: point })
     .map(({ id }) => args.droppableContainers.find((item) => item.id === id))
     .find((item) => item?.data.current?.type === COLUMN_DROP);
   if (!columnHit) {
@@ -105,7 +106,7 @@ export function useBoardDrag({
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: boardKeyboardCoordinates,
       keyboardCodes: {
         start: [KeyboardCode.Space],
         cancel: [KeyboardCode.Esc],
