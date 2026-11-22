@@ -18,6 +18,12 @@ export const COLUMN_GONE: ActionError = {
   gone: true,
 };
 
+export const CARD_GONE: ActionError = {
+  status: "error",
+  message: "Esse card não existe mais. O quadro foi atualizado.",
+  gone: true,
+};
+
 export const COLUMN_ORDER = [{ position: "asc" }, { id: "asc" }] as const;
 
 type CardRow = {
