@@ -18,6 +18,12 @@ describe("can", () => {
     expect(can("MEMBER", "manageColumns")).toBe(true);
   });
 
+  it("lets every role manage cards", () => {
+    expect(can("OWNER", "manageCards")).toBe(true);
+    expect(can("ADMIN", "manageCards")).toBe(true);
+    expect(can("MEMBER", "manageCards")).toBe(true);
+  });
+
   it("lets owners and admins add members and rename, but not members", () => {
     expect(can("OWNER", "addMember")).toBe(true);
     expect(can("ADMIN", "addMember")).toBe(true);
