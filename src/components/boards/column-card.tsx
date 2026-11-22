@@ -11,6 +11,7 @@ import { GripVertical, UnfoldHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { deleteColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { AddCard } from "@/components/boards/add-card";
+import { COLUMN_DROP } from "@/components/boards/card-keyboard";
 import { ColumnMenu } from "@/components/boards/column-menu";
 import { ColumnNameEditor } from "@/components/boards/column-name-editor";
 import {
@@ -19,7 +20,7 @@ import {
 } from "@/components/boards/column-preview";
 import { SortableCard } from "@/components/boards/sortable-card";
 import type { BoardColumn } from "@/components/boards/use-board-columns";
-import { COLUMN_DROP, type DragKind } from "@/components/boards/use-board-drag";
+import type { DragKind } from "@/components/boards/use-board-drag";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
