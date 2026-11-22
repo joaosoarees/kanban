@@ -54,19 +54,24 @@ export function CardTitle({
   }
 
   return (
-    <DialogTitle className="text-xl/7">
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-label={`Renomear o card ${title}`}
-        onClick={() => {
-          setIsEditing(true);
-        }}
-        className={`${TITLE_TEXT} cursor-text text-left outline-hidden transition-colors duration-150 hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none`}
-      >
-        {title}
-      </button>
-    </DialogTitle>
+    <>
+      <DialogTitle className="text-xl/7">
+        <button
+          ref={buttonRef}
+          type="button"
+          aria-describedby={`${cardId}-title-hint`}
+          onClick={() => {
+            setIsEditing(true);
+          }}
+          className={`${TITLE_TEXT} cursor-text text-left outline-hidden transition-colors duration-150 hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none`}
+        >
+          {title}
+        </button>
+      </DialogTitle>
+      <span id={`${cardId}-title-hint`} hidden>
+        Renomear o card
+      </span>
+    </>
   );
 }
 
