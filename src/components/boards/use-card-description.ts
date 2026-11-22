@@ -15,7 +15,6 @@ type UseCardDescriptionOptions = {
   workspaceId: string;
   boardId: string;
   cardId: string;
-  hasDescription: boolean;
   onDirtyChange: (isDirty: boolean) => void;
   onLoadFailed: (message: string) => void;
 };
@@ -24,13 +23,10 @@ export function useCardDescription({
   workspaceId,
   boardId,
   cardId,
-  hasDescription,
   onDirtyChange,
   onLoadFailed,
 }: UseCardDescriptionOptions) {
-  const [saved, setSaved] = useState<string | null | undefined>(
-    hasDescription ? undefined : null,
-  );
+  const [saved, setSaved] = useState<string | null>();
   const [draft, setDraft] = useState<string | null>(null);
   const [error, setError] = useState<string>();
   const [isSaving, startSaving] = useTransition();
