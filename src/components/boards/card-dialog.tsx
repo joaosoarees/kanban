@@ -62,7 +62,6 @@ export function CardDialog({
     workspaceId,
     boardId,
     cardId: card.id,
-    hasDescription: card.hasDescription,
     onDirtyChange,
     onLoadFailed: (message) => {
       toast.error(message);
