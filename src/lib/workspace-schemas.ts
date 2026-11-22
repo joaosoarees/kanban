@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { hasNoNul, INVALID_CHARACTER } from "@/lib/text";
 
 export const WORKSPACE_NAME_MAX_LENGTH = 60;
 
@@ -10,7 +11,8 @@ export const createWorkspaceSchema = z.object({
     .max(
       WORKSPACE_NAME_MAX_LENGTH,
       `Use no máximo ${WORKSPACE_NAME_MAX_LENGTH} caracteres.`,
-    ),
+    )
+    .refine(hasNoNul, INVALID_CHARACTER),
 });
 
 export const renameWorkspaceSchema = createWorkspaceSchema;

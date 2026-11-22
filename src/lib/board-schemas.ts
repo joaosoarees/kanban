@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { hasNoNul, INVALID_CHARACTER } from "@/lib/text";
 
 export const BOARD_NAME_MAX_LENGTH = 60;
 export const COLUMN_NAME_MAX_LENGTH = 40;
@@ -10,7 +11,8 @@ const boardName = z
   .max(
     BOARD_NAME_MAX_LENGTH,
     `Use no máximo ${BOARD_NAME_MAX_LENGTH} caracteres.`,
-  );
+  )
+  .refine(hasNoNul, INVALID_CHARACTER);
 
 const columnName = z
   .string()
@@ -19,7 +21,8 @@ const columnName = z
   .max(
     COLUMN_NAME_MAX_LENGTH,
     `Use no máximo ${COLUMN_NAME_MAX_LENGTH} caracteres.`,
-  );
+  )
+  .refine(hasNoNul, INVALID_CHARACTER);
 
 export const boardNameSchema = z.object({ name: boardName });
 
