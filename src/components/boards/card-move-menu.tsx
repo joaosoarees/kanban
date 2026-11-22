@@ -35,7 +35,12 @@ export function CardMoveMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={<Button variant="outline" className="h-11 px-3.5 sm:hidden" />}
+        render={
+          <Button
+            variant="outline"
+            className="h-11 px-3.5 sm:hidden sm:pointer-coarse:inline-flex"
+          />
+        }
       >
         Mover para
         <ChevronDown aria-hidden />
