@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { hasNoNul, INVALID_CHARACTER } from "@/lib/text";
+import { hasNoNul, hasVisibleText, INVALID_CHARACTER } from "@/lib/text";
 
 const PASSWORD_MAX_BYTES = 72;
 
@@ -11,8 +11,8 @@ export const signUpSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Digite seu nome.")
     .max(120, "Use no máximo 120 caracteres.")
+    .refine(hasVisibleText, "Digite seu nome.")
     .refine(hasNoNul, INVALID_CHARACTER),
   email: z
     .string()
