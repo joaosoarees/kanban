@@ -10,6 +10,30 @@ export function positionAtEnd(ordered: Positioned[]): string {
   return generateKeyBetween(ordered.at(-1)?.position ?? null, null);
 }
 
+function insertionIndex(others: Positioned[], previousId: string | null) {
+  if (previousId === null) {
+    return 0;
+  }
+  const previousIndex = others.findIndex(({ id }) => id === previousId);
+  return previousIndex === -1 ? null : previousIndex + 1;
+}
+
+export function positionInColumn(
+  ordered: Positioned[],
+  movedId: string,
+  previousId: string | null,
+): string | null {
+  const others = ordered.filter(({ id }) => id !== movedId);
+  const insertAt = insertionIndex(others, previousId);
+  if (insertAt === null) {
+    return null;
+  }
+
+  const before = insertAt > 0 ? others[insertAt - 1].position : null;
+  const after = insertAt < others.length ? others[insertAt].position : null;
+  return generateKeyBetween(before, after);
+}
+
 export function planMove(
   ordered: Positioned[],
   movedId: string,
@@ -20,11 +44,8 @@ export function planMove(
     return null;
   }
 
-  const insertAt =
-    previousId === null
-      ? 0
-      : others.findIndex(({ id }) => id === previousId) + 1;
-  if (previousId !== null && insertAt === 0) {
+  const insertAt = insertionIndex(others, previousId);
+  if (insertAt === null) {
     return null;
   }
 
