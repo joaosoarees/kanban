@@ -6,46 +6,30 @@ import {
   FORBIDDEN,
   INVALID,
   invalidFields,
-  type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
 import { columnNameSchema, moveColumnSchema } from "@/lib/board-schemas";
-import { BOARD_GONE, COLUMN_ORDER } from "@/lib/boards";
+import { BOARD_GONE, COLUMN_GONE, COLUMN_ORDER, lockBoard } from "@/lib/boards";
 import { db } from "@/lib/db";
 import { planMove, positionAtEnd } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
-
-const COLUMN_GONE: ActionError = {
-  status: "error",
-  message: "Essa coluna não existe mais. O quadro foi atualizado.",
-  gone: true,
-};
 
 async function lockBoardColumns(
   tx: Prisma.TransactionClient,
   workspaceId: string,
   boardId: unknown,
 ) {
-  const id = z.uuid().safeParse(boardId);
-  if (!id.success) {
-    return null;
-  }
-
-  const locked = await tx.$queryRaw<{ id: string }[]>`
-    SELECT id FROM boards
-    WHERE id = ${id.data}::uuid AND "workspaceId" = ${workspaceId}::uuid
-    FOR UPDATE
-  `;
-  if (locked.length === 0) {
+  const id = await lockBoard(tx, workspaceId, boardId);
+  if (id === null) {
     return null;
   }
 
   const columns = await tx.column.findMany({
-    where: { boardId: id.data },
+    where: { boardId: id },
     orderBy: [...COLUMN_ORDER],
     select: { id: true, position: true },
   });
-  return { id: id.data, columns };
+  return { id, columns };
 }
 
 function parseColumnRef(boardId: unknown, columnId: unknown) {
