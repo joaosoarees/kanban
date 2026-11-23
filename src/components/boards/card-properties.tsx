@@ -1,8 +1,11 @@
 import { AssigneePicker } from "@/components/boards/assignee-picker";
+import { LabelPicker } from "@/components/boards/label-picker";
 import type {
   BoardCard,
+  BoardColumn,
   CardUpdate,
 } from "@/components/boards/use-board-columns";
+import { cn } from "@/lib/utils";
 
 const PROPERTY_LABEL =
   "h-[22px] text-[13px]/[22px] font-medium text-zinc-600 sm:h-8 sm:text-[13px]/8";
@@ -11,6 +14,7 @@ type CardPropertiesProps = {
   workspaceId: string;
   boardId: string;
   card: BoardCard;
+  columns: BoardColumn[];
   onUpdateCard: (update: CardUpdate) => void;
 };
 
@@ -18,6 +22,7 @@ export function CardProperties({
   workspaceId,
   boardId,
   card,
+  columns,
   onUpdateCard,
 }: CardPropertiesProps) {
   return (
@@ -27,6 +32,14 @@ export function CardProperties({
         workspaceId={workspaceId}
         boardId={boardId}
         card={card}
+        onUpdateCard={onUpdateCard}
+      />
+      <span className={cn(PROPERTY_LABEL, "mt-1.5 sm:mt-0")}>Etiquetas</span>
+      <LabelPicker
+        workspaceId={workspaceId}
+        boardId={boardId}
+        card={card}
+        columns={columns}
         onUpdateCard={onUpdateCard}
       />
     </div>

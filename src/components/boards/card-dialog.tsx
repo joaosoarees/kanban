@@ -130,6 +130,7 @@ export function CardDialog({
           workspaceId={workspaceId}
           boardId={boardId}
           card={card}
+          columns={columns}
           onUpdateCard={onUpdateCard}
         />
 
