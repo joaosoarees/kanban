@@ -71,9 +71,14 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-22 — "Mover para" no celular e em telas de toque maiores fica dentro do diálogo do card — o card continua limpo, o toque sempre abre e tablets também conseguem mover.
 - 2026-11-22 — Indicador de descrição é só um ícone discreto, sem prévia — mantém a coluna densa e fácil de ler.
 - 2026-11-22 — Título do card aparece em até 3 linhas e a rolagem fica só na lista da coluna — cabeçalho e "Adicionar card" não saem do lugar.
+- 2026-11-23 — Telas de etiquetas e responsável desenhadas em https://claude.ai/artifact/JkNNHZ4uxdCtgEFqKXEpHS — canvas próprio da fatia 7, aprovado.
+- 2026-11-23 — Etiquetas usam 8 cores em tons claros com texto escuro — identificam o card sem competir com o título e mantêm o contraste.
+- 2026-11-23 — Avatares continuam indigo claro — a cor do card fica reservada às etiquetas.
+- 2026-11-23 — O card mostra até 3 etiquetas e "+N" — a altura continua previsível em colunas cheias.
+- 2026-11-23 — Responsável e etiquetas ficam numa faixa abaixo do título do diálogo — ficam perto do que identifica o card e a descrição mantém o espaço.
+- 2026-11-23 — Popover entra no sistema para o seletor de etiquetas — busca, lista e edição precisam de um painel que não feche ao marcar.
+- 2026-11-23 — Excluir etiqueta, remover membro e sair do workspace informam quantos cards serão afetados — a pessoa decide sabendo o impacto.
 
 ## Perguntas abertas
 
-- Avatares coloridos por pessoa (referência Height/Plane): hoje todos os avatares são indigo claro. Mudar? (não decidido)
 - Texto secundário em 12–13px aparece em vários lugares, e a referência pede evitar texto pequeno. Subir o mínimo para 13px? (assumido: 13px mínimo)
-- Paleta das etiquetas de cards (fatia 7): tons claros com texto escuro, sem saturação forte. (assumido)
