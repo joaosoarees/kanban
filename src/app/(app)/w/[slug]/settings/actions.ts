@@ -20,6 +20,7 @@ import {
 import {
   loadActor,
   loadActorAllowedTo,
+  removeMembership,
   revalidateWorkspace,
 } from "@/lib/workspaces";
 
@@ -142,14 +143,7 @@ export async function removeMemberAction(
     return FORBIDDEN;
   }
 
-  await db.membership.delete({
-    where: {
-      userId_workspaceId: {
-        userId: parsed.data.userId,
-        workspaceId: actor.workspaceId,
-      },
-    },
-  });
+  await removeMembership(actor.workspaceId, parsed.data.userId);
 
   revalidateWorkspace(actor.slug);
   return { status: "success", data: undefined };
@@ -163,14 +157,7 @@ export async function leaveWorkspaceAction(
     return FORBIDDEN;
   }
 
-  await db.membership.delete({
-    where: {
-      userId_workspaceId: {
-        userId: actor.userId,
-        workspaceId: actor.workspaceId,
-      },
-    },
-  });
+  await removeMembership(actor.workspaceId, actor.userId);
 
   revalidatePath("/", "layout");
   return redirect("/");
