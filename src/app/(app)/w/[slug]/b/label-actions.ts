@@ -10,6 +10,7 @@ import {
 import { BOARD_GONE, CARD_GONE, lockBoard } from "@/lib/boards";
 import { db } from "@/lib/db";
 import {
+  LABEL_GONE_MESSAGE,
   labelSchema,
   MAX_LABELS_PER_BOARD,
   MAX_LABELS_PER_CARD,
@@ -19,10 +20,10 @@ import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 
 const LABEL_GONE: ActionError = {
   status: "error",
-  message: "Essa etiqueta não existe mais. O quadro foi atualizado.",
+  message: LABEL_GONE_MESSAGE,
 };
 
-const NAME_TAKEN_MESSAGE = "Já existe uma etiqueta com esse nome neste quadro.";
+const NAME_TAKEN_MESSAGE = "Já existe uma etiqueta com esse nome.";
 
 const NAME_TAKEN: ActionError = {
   status: "error",

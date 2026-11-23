@@ -10,6 +10,8 @@ import {
 export const LABEL_NAME_MAX_LENGTH = 30;
 export const MAX_LABELS_PER_BOARD = 50;
 export const MAX_LABELS_PER_CARD = 8;
+export const LABEL_GONE_MESSAGE =
+  "Essa etiqueta não existe mais. O quadro foi atualizado.";
 
 const labelName = z
   .string()
