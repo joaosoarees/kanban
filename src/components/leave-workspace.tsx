@@ -6,16 +6,19 @@ import { leaveWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { dangerOutlineButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { assignedCardsLabel } from "@/lib/assigned-cards";
 import { cn } from "@/lib/utils";
 
 type LeaveWorkspaceProps = {
   workspaceId: string;
   workspaceName: string;
+  assignedCards: number;
 };
 
 export function LeaveWorkspace({
   workspaceId,
   workspaceName,
+  assignedCards,
 }: LeaveWorkspaceProps) {
   const [open, setOpen] = useState(false);
 
@@ -46,9 +49,11 @@ export function LeaveWorkspace({
         open={open}
         onOpenChange={setOpen}
         title={`Sair de ${workspaceName}?`}
-        description={
-          "Você perde o acesso aos quadros deste workspace. Para voltar, um admin precisa adicionar você de\u00A0novo."
-        }
+        description={`${
+          assignedCards === 0
+            ? "Você perde o acesso aos quadros deste workspace"
+            : `Você perde o acesso aos quadros e deixa de ser responsável por ${assignedCardsLabel(assignedCards)}`
+        }. Para voltar, um admin precisa adicionar você de\u00A0novo.`}
         confirmLabel="Sair do workspace"
         pendingLabel="Saindo…"
         onConfirm={async () => leaveWorkspaceAction(workspaceId)}

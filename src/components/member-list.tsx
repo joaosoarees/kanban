@@ -16,6 +16,7 @@ import {
 } from "@/components/role-menu";
 import { Button } from "@/components/ui/button";
 import type { Role } from "@/generated/prisma/enums";
+import { assignedCardsLabel } from "@/lib/assigned-cards";
 import { initialsOf } from "@/lib/initials";
 import { can } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,16 @@ function applyChange(members: WorkspaceMember[], change: OptimisticChange) {
   return members.map((member) =>
     member.userId === change.userId ? { ...member, role: change.role } : member,
   );
+}
+
+function removeDescription(member: WorkspaceMember | null) {
+  const name = member?.name ?? "";
+  const assigned = member?.assignedCards ?? 0;
+  const loss =
+    assigned === 0
+      ? "perde o acesso aos quadros deste workspace"
+      : `perde o acesso aos quadros e deixa de ser responsável por ${assignedCardsLabel(assigned)}`;
+  return `${name} ${loss}. Dá para adicionar de\u00A0novo\u00A0depois.`;
 }
 
 type MemberListProps = {
@@ -175,7 +186,7 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
         open={isRemoveOpen}
         onOpenChange={setIsRemoveOpen}
         title={`Remover ${removeTarget?.name ?? ""}?`}
-        description={`${removeTarget?.name ?? ""} perde o acesso aos quadros deste workspace. Dá para adicionar de\u00A0novo\u00A0depois.`}
+        description={removeDescription(removeTarget)}
         confirmLabel="Remover"
         pendingLabel="Removendo…"
         onConfirm={confirmRemove}

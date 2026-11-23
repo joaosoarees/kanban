@@ -38,6 +38,9 @@ export default async function MembersPage({
         <LeaveWorkspace
           workspaceId={workspace.id}
           workspaceName={workspace.name}
+          assignedCards={
+            members.find(({ userId }) => userId === user.id)?.assignedCards ?? 0
+          }
         />
       )}
     </>
