@@ -40,14 +40,25 @@ Workspace (id, name, slug @unique)
 Membership (userId, workspaceId, role) @@id([userId, workspaceId])
 Board (id, workspaceId, name)
 Column (id, boardId, name, position: String) @@index([boardId, position])
-Card (id, columnId, title, description?, position: String) @@unique([columnId, position])
-Label (id, boardId, name, color) @@unique([boardId, name])
-CardLabel (cardId, labelId) @@id([cardId, labelId])
+Card (id, columnId, assigneeId?, title, description?, position: String) @@unique([columnId, position]) @@index([assigneeId])
+Label (id, boardId, name, color: LabelColor) UNIQUE (boardId, lower(name))
+CardLabel (cardId, labelId) @@id([cardId, labelId]) @@index([labelId])
 ```
 
 Toda coluna `position` precisa de `COLLATE "C"` no SQL da migration: o Prisma não representa essa collation, e o `en_US` do banco ordenaria as chaves errado.
 
-Deletes em cascata de Workspace até Card. O responsável precisa ser membro do workspace (validado na action). `assigneeId`, `Label` e `CardLabel` entram na fatia 7.
+Deletes em cascata de Workspace até Card.
+
+### Responsável, etiquetas e filtros (fatia 7)
+
+- Cada card tem no máximo um responsável, que precisa ser membro do workspace. Atribuir trava o membership com `FOR KEY SHARE`; remover um membro ou sair limpa os cards dele na mesma transação, e a confirmação informa quantos.
+- Etiquetas pertencem ao quadro e qualquer membro as gerencia. Paleta fixa de 8 cores, nome com até 30 caracteres, único no quadro sem diferenciar maiúsculas. Limites: 50 por quadro e 8 por card, sob o lock do quadro.
+- Aplicar etiqueta usa um único `INSERT ... SELECT` que exige card e etiqueta no mesmo quadro. Excluir etiqueta pede confirmação com a quantidade de cards.
+- Etiquetas e responsável salvam na hora, de forma otimista e idempotente; a última escrita vence.
+- Filtros no cliente: `?labels=id,id&assignee=id|none`. Etiquetas valem como "qualquer uma", combinadas com o responsável por "e". IDs inválidos são ignorados.
+- Com filtro ativo o arraste de cards fica desligado, o menu "Mover para" só troca de coluna e reordenar colunas continua permitido. Um card que deixa de bater com o filtro segue visível até o filtro mudar ou a página recarregar. A coluna mostra "3 de 12".
+- Edição só no diálogo do card. O card mostra até 3 etiquetas, "+N" e o avatar. O cliente recebe só `id` e nome dos membros; a própria pessoa aparece primeiro, com "(você)", e nomes e etiquetas ficam em ordem alfabética.
+- Entrega em três PRs: backend, telas e filtros.
 
 ## Qualidade
 
