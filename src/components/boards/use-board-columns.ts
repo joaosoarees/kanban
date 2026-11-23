@@ -12,6 +12,8 @@ export type BoardCard = {
   id: string;
   title: string;
   hasDescription: boolean;
+  assigneeId: string | null;
+  labelIds: string[];
 };
 
 export type BoardColumn = {

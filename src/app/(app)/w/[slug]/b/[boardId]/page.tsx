@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { BoardColumns } from "@/components/boards/board-columns";
 import { BoardMenu } from "@/components/boards/board-menu";
+import { BoardMetaProvider } from "@/components/boards/board-meta";
+import { requireUser } from "@/lib/auth";
 import { requireBoard } from "@/lib/boards";
 import { can } from "@/lib/permissions";
-import { requireMembership } from "@/lib/workspaces";
+import { getAssignableMembers, requireMembership } from "@/lib/workspaces";
 
 export async function generateMetadata({
   params,
@@ -19,7 +21,11 @@ export default async function BoardPage({
 }: PageProps<"/w/[slug]/b/[boardId]">) {
   const { slug, boardId } = await params;
   const workspace = await requireMembership(slug);
-  const board = await requireBoard(workspace.id, boardId);
+  const user = await requireUser();
+  const [board, members] = await Promise.all([
+    requireBoard(workspace.id, boardId),
+    getAssignableMembers(workspace.id, user.id),
+  ]);
   const columns = board.columns.map(({ id, name, cards }) => ({
     id,
     name,
@@ -42,12 +48,14 @@ export default async function BoardPage({
           />
         )}
       </div>
-      <BoardColumns
-        key={board.id}
-        workspaceId={workspace.id}
-        boardId={board.id}
-        columns={columns}
-      />
+      <BoardMetaProvider labels={board.labels} members={members}>
+        <BoardColumns
+          key={board.id}
+          workspaceId={workspace.id}
+          boardId={board.id}
+          columns={columns}
+        />
+      </BoardMetaProvider>
     </main>
   );
 }
