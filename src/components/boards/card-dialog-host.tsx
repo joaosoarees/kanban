@@ -9,7 +9,10 @@ import {
   readCardParam,
   replaceCardUrl,
 } from "@/components/boards/card-url";
-import type { BoardColumn } from "@/components/boards/use-board-columns";
+import type {
+  BoardColumn,
+  CardUpdate,
+} from "@/components/boards/use-board-columns";
 import { locateCard } from "@/lib/card-moves";
 
 const CARD_NOT_FOUND =
@@ -21,6 +24,7 @@ type CardDialogHostProps = {
   boardId: string;
   columns: BoardColumn[];
   onMoveCard: (cardId: string, columnId: string, index: number) => void;
+  onUpdateCard: (update: CardUpdate) => void;
 };
 
 export function CardDialogHost({
@@ -28,6 +32,7 @@ export function CardDialogHost({
   boardId,
   columns,
   onMoveCard,
+  onUpdateCard,
 }: CardDialogHostProps) {
   const requestedId = readCardParam(useSearchParams());
   const [dirtyCardId, setDirtyCardId] = useState<string | null>(null);
@@ -112,6 +117,7 @@ export function CardDialogHost({
         pushCardUrl(null);
       }}
       onMoveCard={onMoveCard}
+      onUpdateCard={onUpdateCard}
     />
   );
 }

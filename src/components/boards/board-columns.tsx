@@ -46,6 +46,7 @@ export function BoardColumns({
     move,
     moveCard,
     commitCardMove,
+    updateCard,
   } = useBoardColumns(workspaceId, boardId, serverColumns);
   const {
     activeDrag,
@@ -138,6 +139,7 @@ export function BoardColumns({
         boardId={boardId}
         columns={confirmedColumns}
         onMoveCard={moveCard}
+        onUpdateCard={updateCard}
       />
     </Suspense>
   );
