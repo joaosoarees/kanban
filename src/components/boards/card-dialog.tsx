@@ -10,10 +10,12 @@ import {
   CardDescriptionActions,
 } from "@/components/boards/card-description";
 import { CardMoveMenu } from "@/components/boards/card-move-menu";
+import { CardProperties } from "@/components/boards/card-properties";
 import { CardTitle } from "@/components/boards/card-title";
 import type {
   BoardCard,
   BoardColumn,
+  CardUpdate,
 } from "@/components/boards/use-board-columns";
 import { useCardDescription } from "@/components/boards/use-card-description";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -42,6 +44,7 @@ type CardDialogProps = {
   onDeleted: () => void;
   onClose: () => void;
   onMoveCard: (cardId: string, columnId: string, index: number) => void;
+  onUpdateCard: (update: CardUpdate) => void;
 };
 
 export function CardDialog({
@@ -58,6 +61,7 @@ export function CardDialog({
   onDeleted,
   onClose,
   onMoveCard,
+  onUpdateCard,
 }: CardDialogProps) {
   const router = useRouter();
   const [isDiscarding, setIsDiscarding] = useState(false);
@@ -121,6 +125,13 @@ export function CardDialog({
             <X aria-hidden />
           </DialogClose>
         </div>
+
+        <CardProperties
+          workspaceId={workspaceId}
+          boardId={boardId}
+          card={card}
+          onUpdateCard={onUpdateCard}
+        />
 
         <CardDescription cardId={card.id} state={description} />
 

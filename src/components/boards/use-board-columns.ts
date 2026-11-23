@@ -6,6 +6,7 @@ import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 import { moveCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
 import { moveColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
+import type { ActionResult } from "@/lib/action-result";
 import { moveCardTo, previousCardIdOf } from "@/lib/card-moves";
 
 export type BoardCard = {
@@ -22,6 +23,16 @@ export type BoardColumn = {
   cards: BoardCard[];
 };
 
+type ColumnsUpdate =
+  BoardColumn[] | ((current: BoardColumn[]) => BoardColumn[]);
+
+export type CardUpdate = {
+  cardId: string;
+  change: (card: BoardCard) => BoardCard;
+  write: () => Promise<ActionResult>;
+  failure: string;
+};
+
 const MOVE_FAILED = "Não foi possível mover a coluna. Tente de novo.";
 const CARD_MOVE_FAILED =
   "Não foi possível mover o card. Desfizemos o movimento. Tente de novo.";
@@ -33,9 +44,34 @@ export function useBoardColumns(
 ) {
   const [columns, setOptimisticColumns] = useOptimistic(
     serverColumns,
-    (_current, next: BoardColumn[]) => next,
+    (current, update: ColumnsUpdate) =>
+      typeof update === "function" ? update(current) : update,
   );
   const [, startTransition] = useTransition();
+
+  const updateCard = ({ cardId, change, write, failure }: CardUpdate) => {
+    startTransition(async () => {
+      setOptimisticColumns((current) =>
+        current.map((column) => ({
+          id: column.id,
+          name: column.name,
+          cards: column.cards.map((card) =>
+            card.id === cardId ? change(card) : card,
+          ),
+        })),
+      );
+      try {
+        const result = await write();
+        if (result.status === "error" && result.gone !== true) {
+          toast.error(result.message);
+        }
+      } catch (error) {
+        unstable_rethrow(error);
+        console.error(error);
+        toast.error(failure);
+      }
+    });
+  };
 
   const move = (columnId: string, targetIndex: number) => {
     const currentIndex = columns.findIndex(({ id }) => id === columnId);
@@ -103,5 +139,5 @@ export function useBoardColumns(
     }
   };
 
-  return { columns, move, moveCard, commitCardMove };
+  return { columns, move, moveCard, commitCardMove, updateCard };
 }
