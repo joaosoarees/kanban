@@ -16,12 +16,18 @@ import {
   moveCardSchema,
 } from "@/lib/card-schemas";
 import { db } from "@/lib/db";
+import { cardAssigneeSchema } from "@/lib/label-schemas";
 import { positionAtEnd, positionInColumn } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 
 const BOARD_CHANGED: ActionError = {
   status: "error",
   message: "O quadro mudou enquanto você movia o card. Tente de novo.",
+};
+
+const MEMBER_GONE: ActionError = {
+  status: "error",
+  message: "Essa pessoa não faz mais parte do workspace.",
 };
 
 function parseCardRef(boardId: unknown, cardId: unknown) {
@@ -143,6 +149,58 @@ export async function updateCardDescriptionAction(
     const parsed = cardDescriptionSchema.safeParse(input);
     return parsed.success ? parsed.data : invalidFields(parsed.error);
   });
+}
+
+export async function setCardAssigneeAction(
+  workspaceId: unknown,
+  boardId: unknown,
+  cardId: unknown,
+  input: unknown,
+): Promise<ActionResult> {
+  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
+  if (!actor) {
+    return FORBIDDEN;
+  }
+
+  const ref = parseCardRef(boardId, cardId);
+  if (!ref) {
+    return CARD_GONE;
+  }
+
+  const parsed = cardAssigneeSchema.safeParse(input);
+  if (!parsed.success) {
+    return INVALID;
+  }
+  const { assigneeId } = parsed.data;
+
+  const failure = await db.$transaction(async (tx) => {
+    if (assigneeId !== null) {
+      const member = await tx.$queryRaw<{ userId: string }[]>`
+        SELECT "userId" FROM memberships
+        WHERE "userId" = ${assigneeId}::uuid
+          AND "workspaceId" = ${actor.workspaceId}::uuid
+        FOR KEY SHARE
+      `;
+      if (member.length === 0) {
+        return MEMBER_GONE;
+      }
+    }
+
+    const { count } = await tx.card.updateMany({
+      where: {
+        id: ref.cardId,
+        column: {
+          boardId: ref.boardId,
+          board: { workspaceId: actor.workspaceId },
+        },
+      },
+      data: { assigneeId },
+    });
+    return count === 0 ? CARD_GONE : null;
+  });
+
+  revalidateWorkspace(actor.slug);
+  return failure ?? { status: "success", data: undefined };
 }
 
 export async function moveCardAction(
