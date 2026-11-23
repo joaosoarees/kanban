@@ -1,3 +1,3 @@
-export function assignedCardsLabel(count: number) {
+export function cardsLabel(count: number) {
   return count === 1 ? "1 card" : `${count} cards`;
 }

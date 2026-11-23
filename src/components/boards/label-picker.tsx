@@ -26,6 +26,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cardsLabel } from "@/lib/card-count";
 import { MAX_LABELS_PER_CARD } from "@/lib/label-schemas";
 
 const TOGGLE_FAILED = "Não foi possível salvar a etiqueta. Tente de novo.";
@@ -36,8 +37,7 @@ function deleteDescription(cardCount: number) {
   if (cardCount === 0) {
     return "Ela não está em nenhum card. Isso não pode ser desfeito.";
   }
-  const cards = cardCount === 1 ? "1 card" : `${cardCount} cards`;
-  return `Ela será removida de ${cards}. Isso não pode ser desfeito.`;
+  return `Ela será removida de ${cardsLabel(cardCount)}. Isso não pode ser desfeito.`;
 }
 
 type LabelPickerProps = {
