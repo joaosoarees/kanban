@@ -31,6 +31,8 @@ type CardRow = {
   columnId: string;
   title: string;
   hasDescription: boolean;
+  assigneeId: string | null;
+  labelIds: string[];
 };
 
 export async function lockBoard(
@@ -75,6 +77,7 @@ export const requireBoard = cache(
           orderBy: [...COLUMN_ORDER],
           select: { id: true, name: true, position: true },
         },
+        labels: { select: { id: true, name: true, color: true } },
       },
     });
     if (!board) {
@@ -86,7 +89,13 @@ export const requireBoard = cache(
         card.id,
         card."columnId",
         card.title,
-        card.description IS NOT NULL AS "hasDescription"
+        card.description IS NOT NULL AS "hasDescription",
+        card."assigneeId",
+        ARRAY(
+          SELECT applied."labelId"::text
+          FROM card_labels applied
+          WHERE applied."cardId" = card.id
+        ) AS "labelIds"
       FROM cards card
       JOIN columns board_column ON board_column.id = card."columnId"
       WHERE board_column."boardId" = ${board.id}::uuid
@@ -103,6 +112,11 @@ export const requireBoard = cache(
     return {
       id: board.id,
       name: board.name,
+      labels: board.labels.toSorted(
+        (a, b) =>
+          a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" }) ||
+          a.id.localeCompare(b.id),
+      ),
       columns: board.columns.map((column) => ({
         id: column.id,
         name: column.name,
