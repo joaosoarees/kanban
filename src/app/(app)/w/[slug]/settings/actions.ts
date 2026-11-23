@@ -6,6 +6,7 @@ import {
   FORBIDDEN,
   INVALID,
   invalidFields,
+  type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/lib/db";
@@ -23,6 +24,11 @@ import {
   removeMembership,
   revalidateWorkspace,
 } from "@/lib/workspaces";
+
+const MEMBER_CHANGED: ActionError = {
+  status: "error",
+  message: "Os dados dessa pessoa mudaram. Confira e tente de novo.",
+};
 
 async function loadTarget(workspaceId: string, userId: string) {
   return db.membership.findUnique({
@@ -102,18 +108,17 @@ export async function changeRoleAction(
     return FORBIDDEN;
   }
 
-  await db.membership.update({
+  const { count } = await db.membership.updateMany({
     where: {
-      userId_workspaceId: {
-        userId: parsed.data.userId,
-        workspaceId: actor.workspaceId,
-      },
+      userId: parsed.data.userId,
+      workspaceId: actor.workspaceId,
+      role: target.role,
     },
     data: { role: parsed.data.role },
   });
 
   revalidateWorkspace(actor.slug);
-  return { status: "success", data: undefined };
+  return count === 0 ? MEMBER_CHANGED : { status: "success", data: undefined };
 }
 
 export async function removeMemberAction(
@@ -143,10 +148,14 @@ export async function removeMemberAction(
     return FORBIDDEN;
   }
 
-  await removeMembership(actor.workspaceId, parsed.data.userId);
+  const removed = await removeMembership({
+    workspaceId: actor.workspaceId,
+    userId: parsed.data.userId,
+    role: target.role,
+  });
 
   revalidateWorkspace(actor.slug);
-  return { status: "success", data: undefined };
+  return removed ? { status: "success", data: undefined } : MEMBER_CHANGED;
 }
 
 export async function leaveWorkspaceAction(
@@ -157,7 +166,10 @@ export async function leaveWorkspaceAction(
     return FORBIDDEN;
   }
 
-  await removeMembership(actor.workspaceId, actor.userId);
+  await removeMembership({
+    workspaceId: actor.workspaceId,
+    userId: actor.userId,
+  });
 
   revalidatePath("/", "layout");
   return redirect("/");
