@@ -1,10 +1,13 @@
 import * as z from "zod";
-import { hasNoNul, hasVisibleText, INVALID_CHARACTER } from "@/lib/text";
+import {
+  hasNoLineBreak,
+  hasNoNul,
+  hasVisibleText,
+  INVALID_CHARACTER,
+} from "@/lib/text";
 
 export const CARD_TITLE_MAX_LENGTH = 200;
 export const CARD_DESCRIPTION_MAX_LENGTH = 5000;
-
-const LINE_BREAK = /[\n\v\f\r\u0085\u2028\u2029]/u;
 
 const cardTitle = z
   .string()
@@ -14,7 +17,7 @@ const cardTitle = z
     `Use no máximo ${CARD_TITLE_MAX_LENGTH} caracteres.`,
   )
   .refine(hasVisibleText, "Dê um título ao card.")
-  .refine((title) => !LINE_BREAK.test(title), "Use uma única linha.")
+  .refine(hasNoLineBreak, "Use uma única linha.")
   .refine(hasNoNul, INVALID_CHARACTER);
 
 const cardDescription = z
