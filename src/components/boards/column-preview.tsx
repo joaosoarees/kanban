@@ -1,14 +1,12 @@
 import { GripVertical } from "lucide-react";
+import { cardsLabel } from "@/lib/card-count";
 import { cn } from "@/lib/utils";
 
 export const COLUMN_SHELL =
   "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-zinc-100 p-2 sm:w-72";
 
 export function cardCountLabel(count: number) {
-  if (count === 0) {
-    return "Sem cards";
-  }
-  return count === 1 ? "1 card" : `${count} cards`;
+  return count === 0 ? "Sem cards" : cardsLabel(count);
 }
 
 export function ColumnPreview({

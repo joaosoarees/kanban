@@ -16,7 +16,7 @@ import {
 } from "@/components/role-menu";
 import { Button } from "@/components/ui/button";
 import type { Role } from "@/generated/prisma/enums";
-import { assignedCardsLabel } from "@/lib/assigned-cards";
+import { cardsLabel } from "@/lib/card-count";
 import { initialsOf } from "@/lib/initials";
 import { can } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ function removeDescription(member: WorkspaceMember | null) {
   const loss =
     assigned === 0
       ? "perde o acesso aos quadros deste workspace"
-      : `perde o acesso aos quadros e deixa de ser responsável por ${assignedCardsLabel(assigned)}`;
+      : `perde o acesso aos quadros e deixa de ser responsável por ${cardsLabel(assigned)}`;
   return `${name} ${loss}. Dá para adicionar de\u00A0novo\u00A0depois.`;
 }
 
