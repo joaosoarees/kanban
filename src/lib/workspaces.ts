@@ -9,14 +9,31 @@ import { db } from "@/lib/db";
 import { can, type WorkspaceAction } from "@/lib/permissions";
 import { hasNoNul } from "@/lib/text";
 
-export async function removeMembership(workspaceId: string, userId: string) {
-  await db.$transaction([
-    db.membership.deleteMany({ where: { userId, workspaceId } }),
-    db.card.updateMany({
+export async function removeMembership(target: {
+  workspaceId: string;
+  userId: string;
+  role?: Role;
+}) {
+  const { workspaceId, userId } = target;
+  return db.$transaction(async (tx) => {
+    await tx.$queryRaw`
+      SELECT id FROM boards
+      WHERE "workspaceId" = ${workspaceId}::uuid
+      ORDER BY id
+      FOR UPDATE
+    `;
+
+    const { count } = await tx.membership.deleteMany({ where: target });
+    if (count === 0) {
+      return false;
+    }
+
+    await tx.card.updateMany({
       where: { assigneeId: userId, column: { board: { workspaceId } } },
       data: { assigneeId: null },
-    }),
-  ]);
+    });
+    return true;
+  });
 }
 
 export function revalidateWorkspace(slug: string) {
