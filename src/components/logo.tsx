@@ -9,9 +9,9 @@ export function LogoMark({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="h-full flex-1 rounded-[1px] bg-card" />
-      <span className="h-2/3 flex-1 rounded-[1px] bg-card" />
-      <span className="h-2/5 flex-1 rounded-[1px] bg-card" />
+      <span className="h-full flex-1 rounded-[1px] bg-on-color" />
+      <span className="h-2/3 flex-1 rounded-[1px] bg-on-color" />
+      <span className="h-2/5 flex-1 rounded-[1px] bg-on-color" />
     </span>
   );
 }
