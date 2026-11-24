@@ -11,7 +11,7 @@ import {
 } from "@/lib/label-schemas";
 import { cn } from "@/lib/utils";
 
-function comparable(text: string) {
+export function comparable(text: string) {
   return text.trim().normalize("NFC").toLocaleLowerCase("pt-BR");
 }
 
