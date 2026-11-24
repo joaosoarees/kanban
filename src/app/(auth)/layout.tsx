@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { BoardPreview } from "@/components/board-preview";
+import { FreshDocument } from "@/components/fresh-document";
 import { Logo } from "@/components/logo";
 import { getCurrentUser } from "@/lib/auth";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
     <main className="grid min-h-svh lg:grid-cols-2">
+      <FreshDocument />
       <div className="flex flex-col px-6 py-8 sm:px-12">
         <Logo />
         <div className="flex flex-1 justify-center py-12 lg:pt-34">
