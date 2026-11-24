@@ -52,7 +52,7 @@ export function SettingsTabs({
             className={cn(
               "-mb-px inline-flex h-10 items-center gap-1.5 rounded-t-sm border-b-2 px-0.5 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
               isActive
-                ? "border-brand text-foreground"
+                ? "border-brand-fg text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
