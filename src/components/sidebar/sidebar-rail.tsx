@@ -9,7 +9,7 @@ import {
   ICON_BUTTON_CURRENT,
 } from "@/components/sidebar/sidebar-links";
 import {
-  BoardLinks,
+  BoardsBody,
   revealCurrentLink,
   sidebarPaths,
   useIsCurrentPath,
@@ -118,7 +118,7 @@ function RailBoards({ data }: { data: SidebarData }) {
 }
 
 function RailBoardsBody({ data }: { data: SidebarData }) {
-  const { workspace, boards } = data;
+  const { workspace } = data;
   const isCurrent = useIsCurrentPath();
   const paths = sidebarPaths(workspace.slug);
 
@@ -139,12 +139,8 @@ function RailBoardsBody({ data }: { data: SidebarData }) {
         <LayoutGrid aria-hidden className="size-4 text-fg-muted" />
         Todos os quadros
       </Link>
-      {boards !== null && boards.length > 0 && (
-        <>
-          <div aria-hidden className="mx-2 my-1 h-px bg-border" />
-          <BoardLinks slug={workspace.slug} boards={boards} />
-        </>
-      )}
+      <div aria-hidden className="mx-2 my-1 h-px bg-border" />
+      <BoardsBody data={data} allowCreate={false} />
     </>
   );
 }

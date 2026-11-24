@@ -72,7 +72,7 @@ export function SidebarHome() {
   );
 }
 
-export function BoardLinks({
+function BoardLinks({
   slug,
   boards,
 }: {
@@ -98,7 +98,13 @@ export function BoardLinks({
   );
 }
 
-function BoardsBody({ data }: { data: SidebarData }) {
+export function BoardsBody({
+  data,
+  allowCreate,
+}: {
+  data: SidebarData;
+  allowCreate: boolean;
+}) {
   const { workspace, boards } = data;
 
   if (boards === null) {
@@ -113,6 +119,13 @@ function BoardsBody({ data }: { data: SidebarData }) {
   }
 
   if (boards.length === 0) {
+    if (workspace.canManageBoards && !allowCreate) {
+      return (
+        <p className="px-2.5 py-2 text-[13px] text-fg-muted">
+          Nenhum quadro ainda.
+        </p>
+      );
+    }
     return workspace.canManageBoards ? (
       <div className="flex flex-col items-start gap-2.5 px-2.5 py-2">
         <p className="text-[13px] text-fg-muted">Nenhum quadro ainda.</p>
@@ -190,7 +203,7 @@ export function SidebarPanel({ data, headerAction }: SidebarPanelProps) {
           ref={scrollRef}
           className="relative min-h-0 flex-1 overflow-y-auto px-2 pb-2"
         >
-          <BoardsBody data={data} />
+          <BoardsBody data={data} allowCreate />
         </div>
       </nav>
       <nav
