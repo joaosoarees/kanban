@@ -17,27 +17,25 @@ import { ColumnNameEditor } from "@/components/boards/column-name-editor";
 import {
   cardCountLabel,
   COLUMN_SHELL,
+  deleteColumnDescription,
 } from "@/components/boards/column-preview";
 import { SortableCard } from "@/components/boards/sortable-card";
-import type { BoardColumn } from "@/components/boards/use-board-columns";
+import type {
+  BoardCard,
+  BoardColumn,
+} from "@/components/boards/use-board-columns";
 import type { DragKind } from "@/components/boards/use-board-drag";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";
 
-function deleteDescription(cardCount: number) {
-  if (cardCount === 0) {
-    return "A coluna será apagada para todo o workspace. Isso não pode ser desfeito.";
-  }
-  const cards = cardCount === 1 ? "seu card" : `seus ${cardCount} cards`;
-  return `A coluna e ${cards} serão apagados para todo o workspace. Isso não pode ser desfeito.`;
-}
-
 type ColumnCardProps = {
   workspaceId: string;
   boardId: string;
   column: BoardColumn;
+  visibleCards: BoardCard[] | null;
+  onCardCreated: (cardId: string) => void;
   index: number;
   total: number;
   dragKind: DragKind | null;
@@ -49,6 +47,8 @@ export function ColumnCard({
   workspaceId,
   boardId,
   column,
+  visibleCards,
+  onCardCreated,
   index,
   total,
   dragKind,
@@ -87,6 +87,11 @@ export function ColumnCard({
   const listRef = useRef<HTMLDivElement>(null);
   const revealAboveCount = useRef<number | null>(null);
   const cardCount = column.cards.length;
+  const filteredCards = cardCount > 0 ? visibleCards : null;
+  const cards = filteredCards ?? column.cards;
+  const countLabel = cardCountLabel(cardCount, filteredCards?.length ?? null);
+  const countText =
+    filteredCards === null ? cardCount : `${cards.length} de ${cardCount}`;
 
   useEffect(() => {
     if (pendingFocus.current === "expand" && isCollapsed) {
@@ -137,8 +142,8 @@ export function ColumnCard({
           <UnfoldHorizontal aria-hidden />
         </Button>
         <span className="text-[13px] font-medium text-zinc-600">
-          <span aria-hidden>{cardCount}</span>
-          <span className="sr-only">{cardCountLabel(cardCount)}</span>
+          <span aria-hidden>{cards.length}</span>
+          <span className="sr-only">{countLabel}</span>
         </span>
         <span className="min-h-0 truncate text-sm font-semibold [writing-mode:vertical-rl]">
           {column.name}
@@ -203,9 +208,9 @@ export function ColumnCard({
             </button>
           )}
           {!isRenaming && (
-            <span className="min-w-5 shrink-0 text-center text-[13px] font-medium text-zinc-600">
-              <span aria-hidden>{cardCount}</span>
-              <span className="sr-only">{cardCountLabel(cardCount)}</span>
+            <span className="min-w-5 shrink-0 text-center text-[13px] font-medium whitespace-nowrap text-zinc-600">
+              <span aria-hidden>{countText}</span>
+              <span className="sr-only">{countLabel}</span>
             </span>
           )}
           <ColumnMenu
@@ -236,19 +241,22 @@ export function ColumnCard({
           className="mt-1 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-px"
         >
           <SortableContext
-            items={column.cards.map(({ id }) => id)}
+            items={cards.map(({ id }) => id)}
             strategy={verticalListSortingStrategy}
           >
-            {cardCount === 0 ? (
+            {cards.length === 0 ? (
               <p className="h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
-                Sem cards
+                {filteredCards === null
+                  ? "Sem cards"
+                  : "Nenhum card com esses filtros."}
               </p>
             ) : (
-              column.cards.map((card) => (
+              cards.map((card) => (
                 <SortableCard
                   key={card.id}
                   card={card}
                   columnId={column.id}
+                  isDragDisabled={visibleCards !== null}
                   isDropDisabled={dragKind === "column"}
                 />
               ))
@@ -259,8 +267,9 @@ export function ColumnCard({
           workspaceId={workspaceId}
           boardId={boardId}
           columnId={column.id}
-          onCreated={() => {
+          onCreated={(cardId) => {
             revealAboveCount.current = cardCount;
+            onCardCreated(cardId);
           }}
         />
       </div>
@@ -268,7 +277,7 @@ export function ColumnCard({
         open={isDeleting}
         onOpenChange={setIsDeleting}
         title={`Excluir a coluna ${column.name}?`}
-        description={deleteDescription(cardCount)}
+        description={deleteColumnDescription(cardCount)}
         confirmLabel="Excluir coluna"
         pendingLabel="Excluindo coluna…"
         onConfirm={async () => {

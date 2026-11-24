@@ -12,6 +12,7 @@ import {
   isCardVisible,
   isFilterActive,
   parseBoardFilter,
+  revealCard,
   takeFilterSnapshot,
   writeBoardFilter,
   type BoardFilter,
@@ -33,10 +34,7 @@ export function replaceBoardFilter(filter: BoardFilter) {
   window.history.replaceState(null, "", url);
 }
 
-export function useVisibleCards(
-  columns: BoardColumn[],
-  filter: BoardFilter,
-): ((column: BoardColumn) => BoardCard[]) | null {
+export function useVisibleCards(columns: BoardColumn[], filter: BoardFilter) {
   const [snapshot, setSnapshot] = useState(() =>
     takeFilterSnapshot(
       columns.flatMap(({ cards }) => cards),
@@ -52,9 +50,12 @@ export function useVisibleCards(
     setSnapshot(current);
   }
 
-  if (!isFilterActive(filter)) {
-    return null;
-  }
-  return (column) =>
-    column.cards.filter((card) => isCardVisible(card, filter, current));
+  const reveal = (cardId: string) => {
+    setSnapshot((latest) => revealCard(latest, cardId));
+  };
+  const cardsOf = isFilterActive(filter)
+    ? (column: BoardColumn): BoardCard[] =>
+        column.cards.filter((card) => isCardVisible(card, filter, current))
+    : null;
+  return { cardsOf, reveal };
 }

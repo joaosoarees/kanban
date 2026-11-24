@@ -27,6 +27,10 @@ type CardDialogHostProps = {
   onUpdateCard: (update: CardUpdate) => void;
 };
 
+function focusTargetOf(id: string) {
+  return document.querySelector<HTMLElement>(`[data-card-focus="${id}"]`);
+}
+
 export function CardDialogHost({
   workspaceId,
   boardId,
@@ -56,15 +60,16 @@ export function CardDialogHost({
       return;
     }
     deletedCard.current = null;
-    const column = columns.find(({ id }) => id === deleted.columnId);
-    const neighbor = column?.cards.at(
-      Math.min(deleted.index, column.cards.length - 1),
-    );
-    document
-      .querySelector<HTMLElement>(
-        `[data-card-focus="${neighbor?.id ?? deleted.columnId}"]`,
-      )
-      ?.focus();
+    const cards =
+      columns.find(({ id }) => id === deleted.columnId)?.cards ?? [];
+    const neighbors = [
+      ...cards.slice(deleted.index),
+      ...cards.slice(0, deleted.index).toReversed(),
+    ];
+    const neighbor = neighbors
+      .map(({ id }) => focusTargetOf(id))
+      .find((element) => element !== null);
+    (neighbor ?? focusTargetOf(deleted.columnId))?.focus();
   }, [columns]);
 
   useEffect(() => {
