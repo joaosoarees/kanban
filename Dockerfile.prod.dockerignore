@@ -1,0 +1,12 @@
+*
+!package.json
+!bun.lock
+!bunfig.toml
+!prisma7.config.ts
+!prisma
+!next.config.ts
+!tsconfig.json
+!components.json
+!public
+!src
+src/generated

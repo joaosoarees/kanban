@@ -1,0 +1,45 @@
+FROM node:24-trixie-slim AS base
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates openssl \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY package.json /tmp/package.json
+RUN npm install --global --no-fund --no-audit "$(node -p "require('/tmp/package.json').packageManager")" \
+  && rm /tmp/package.json
+
+WORKDIR /app
+
+FROM base AS deps
+
+COPY package.json bun.lock bunfig.toml prisma7.config.ts ./
+COPY prisma ./prisma
+RUN bun install --frozen-lockfile --ignore-scripts \
+  && bunx prisma generate
+
+FROM deps AS migrate
+
+RUN chown -R node:node /app
+USER node
+CMD ["bunx", "prisma", "migrate", "deploy"]
+
+FROM deps AS build
+
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN bun run build
+
+FROM gcr.io/distroless/nodejs24-debian13:nonroot AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production \
+  NEXT_TELEMETRY_DISABLED=1 \
+  HOSTNAME=0.0.0.0 \
+  PORT=3000
+
+COPY --from=build --chown=nonroot:nonroot /app/.next/standalone ./
+COPY --from=build --chown=nonroot:nonroot /app/.next/static ./.next/static
+COPY --from=build --chown=nonroot:nonroot /app/public ./public
+
+EXPOSE 3000
+CMD ["server.js"]
