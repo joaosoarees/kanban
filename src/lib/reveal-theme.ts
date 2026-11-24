@@ -5,6 +5,8 @@ const REVEAL_EASING = "cubic-bezier(0.4, 0, 0.2, 1)";
 
 type Point = { x: number; y: number };
 
+let activeTransition: ViewTransition | null = null;
+
 export function revealTheme(applyTheme: () => void, origin: Point) {
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
@@ -28,6 +30,7 @@ export function revealTheme(applyTheme: () => void, origin: Point) {
   const transition = document.startViewTransition(() => {
     flushSync(applyTheme);
   });
+  activeTransition = transition;
   animateReveal(transition, origin, radius).catch(() => null);
 }
 
@@ -54,6 +57,9 @@ async function animateReveal(
     );
     await transition.finished;
   } finally {
-    root.classList.remove("theme-reveal");
+    if (activeTransition === transition) {
+      activeTransition = null;
+      root.classList.remove("theme-reveal");
+    }
   }
 }
