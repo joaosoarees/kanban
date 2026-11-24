@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition, type BaseSyntheticEvent } from "react";
+import { useRef, useTransition, type BaseSyntheticEvent } from "react";
 import { useForm, type DefaultValues, type FieldValues } from "react-hook-form";
 import type * as z from "zod";
 import type { ActionError, ActionResult } from "@/lib/action-result";
@@ -37,24 +37,36 @@ export function useActionForm<
     defaultValues,
   });
 
-  const handleValid = form.handleSubmit((values) => {
-    startTransition(async () => {
-      const result = await runAction(async () => action(values), failure);
-      if (result.status === "success") {
-        startTransition(() => {
-          onSuccess?.(result.data, values);
-        });
-        return;
-      }
-      applyActionErrors(result, form.setError);
-      startTransition(() => {
-        onError?.(result);
-      });
-    });
-  });
+  const isSubmitting = useRef(false);
 
   const submit = (event?: BaseSyntheticEvent) => {
-    void handleValid(event);
+    if (isSubmitting.current) {
+      event?.preventDefault();
+      return;
+    }
+    isSubmitting.current = true;
+    const handleSubmit = form.handleSubmit(
+      (values) => {
+        startTransition(async () => {
+          const result = await runAction(async () => action(values), failure);
+          isSubmitting.current = false;
+          if (result.status === "success") {
+            startTransition(() => {
+              onSuccess?.(result.data, values);
+            });
+            return;
+          }
+          applyActionErrors(result, form.setError);
+          startTransition(() => {
+            onError?.(result);
+          });
+        });
+      },
+      () => {
+        isSubmitting.current = false;
+      },
+    );
+    void handleSubmit(event);
   };
 
   return { form, submit, isPending };
