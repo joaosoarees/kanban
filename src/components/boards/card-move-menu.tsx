@@ -20,6 +20,7 @@ type CardMoveMenuProps = {
   column: BoardColumn;
   index: number;
   columns: BoardColumn[];
+  canReorder: boolean;
   onMove: (cardId: string, columnId: string, index: number) => void;
 };
 
@@ -28,9 +29,14 @@ export function CardMoveMenu({
   column,
   index,
   columns,
+  canReorder,
   onMove,
 }: CardMoveMenuProps) {
   const otherColumns = columns.filter(({ id }) => id !== column.id);
+
+  if (!canReorder && otherColumns.length === 0) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -46,29 +52,33 @@ export function CardMoveMenu({
         <ChevronDown aria-hidden />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[252px] p-1">
-        <DropdownMenuItem
-          className={ITEM}
-          disabled={index === 0}
-          onClick={() => {
-            onMove(cardId, column.id, index - 1);
-          }}
-        >
-          <ArrowUp aria-hidden className="text-zinc-600" />
-          Mover para cima
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className={ITEM}
-          disabled={index === column.cards.length - 1}
-          onClick={() => {
-            onMove(cardId, column.id, index + 1);
-          }}
-        >
-          <ArrowDown aria-hidden className="text-zinc-600" />
-          Mover para baixo
-        </DropdownMenuItem>
+        {canReorder && (
+          <>
+            <DropdownMenuItem
+              className={ITEM}
+              disabled={index === 0}
+              onClick={() => {
+                onMove(cardId, column.id, index - 1);
+              }}
+            >
+              <ArrowUp aria-hidden className="text-zinc-600" />
+              Mover para cima
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className={ITEM}
+              disabled={index === column.cards.length - 1}
+              onClick={() => {
+                onMove(cardId, column.id, index + 1);
+              }}
+            >
+              <ArrowDown aria-hidden className="text-zinc-600" />
+              Mover para baixo
+            </DropdownMenuItem>
+          </>
+        )}
         {otherColumns.length > 0 && (
           <>
-            <DropdownMenuSeparator />
+            {canReorder && <DropdownMenuSeparator />}
             <DropdownMenuGroup>
               <DropdownMenuLabel className="text-[13px] font-medium text-zinc-600">
                 Para o fim da coluna
