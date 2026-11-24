@@ -47,6 +47,18 @@ services:
     environment:
       DATABASE_URL: *database-url
       SESSION_SECRET: ${SERVICE_BASE64_64_SESSION}
+    labels:
+      - traefik.http.middlewares.kanban-auth-ratelimit.ratelimit.average=10
+      - traefik.http.middlewares.kanban-auth-ratelimit.ratelimit.period=1m
+      - traefik.http.middlewares.kanban-auth-ratelimit.ratelimit.burst=10
+      - traefik.http.routers.kanban-auth.rule=Host(`${SERVICE_FQDN_APP}`) && Method(`POST`) && (Path(`/sign-in`) || Path(`/sign-up`))
+      - traefik.http.routers.kanban-auth.priority=1000
+      - traefik.http.routers.kanban-auth.entrypoints=https
+      - traefik.http.routers.kanban-auth.tls=true
+      - traefik.http.routers.kanban-auth.tls.certresolver=letsencrypt
+      - traefik.http.routers.kanban-auth.middlewares=kanban-auth-ratelimit
+      - traefik.http.routers.kanban-auth.service=kanban-auth
+      - traefik.http.services.kanban-auth.loadbalancer.server.port=3000
     depends_on:
       postgres:
         condition: service_healthy
