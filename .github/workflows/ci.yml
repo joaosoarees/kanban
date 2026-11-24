@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://kanban.joaodevdude.com
+      url: ${{ vars.APP_URL }}
     concurrency:
       group: deploy-production
       cancel-in-progress: false
@@ -81,6 +81,7 @@ jobs:
       COOLIFY_URL: ${{ vars.COOLIFY_URL }}
       COOLIFY_APP_UUID: ${{ vars.COOLIFY_APP_UUID }}
       COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+      APP_URL: ${{ vars.APP_URL }}
     steps:
       - name: Trigger the Coolify deployment
         id: trigger
@@ -104,4 +105,4 @@ jobs:
             esac
           done
       - name: Check the live health endpoint
-        run: curl -fsS --retry 5 --retry-delay 5 --retry-all-errors https://kanban.joaodevdude.com/api/health
+        run: curl -fsS --retry 5 --retry-delay 5 --retry-all-errors "$APP_URL/api/health"
