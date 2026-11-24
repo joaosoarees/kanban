@@ -244,7 +244,7 @@
   }
   html {
     @apply font-sans;
-    caret-color: var(--brand);
+    caret-color: var(--brand-fg);
   }
   ::selection {
     background-color: var(--accent-strong);
