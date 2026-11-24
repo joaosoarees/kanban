@@ -1,16 +1,18 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { unstable_rethrow } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef } from "react";
+import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { renameColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { Input } from "@/components/ui/input";
+import { useActionForm } from "@/hooks/use-action-form";
 import { COLUMN_NAME_MAX_LENGTH, columnNameSchema } from "@/lib/board-schemas";
 import { cn } from "@/lib/utils";
 
 const COUNTER_FROM = COLUMN_NAME_MAX_LENGTH - 5;
 const RENAME_FAILED = "Não foi possível renomear a coluna. Tente de novo.";
+const UNCHANGED = { status: "success", data: undefined } as const;
 
 type ColumnNameEditorProps = {
   workspaceId: string;
@@ -27,61 +29,50 @@ export function ColumnNameEditor({
   name,
   onClose,
 }: ColumnNameEditorProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const isCancelled = useRef(false);
-  const [value, setValue] = useState(name);
-  const [error, setError] = useState<string>();
-  const [isPending, startTransition] = useTransition();
+
+  const close = () => {
+    onClose(document.activeElement === inputRef.current);
+  };
+
+  const {
+    form: {
+      register,
+      control,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: columnNameSchema,
+    defaultValues: { name },
+    action: async (values) =>
+      values.name === name
+        ? UNCHANGED
+        : renameColumnAction(workspaceId, boardId, columnId, values),
+    failure: RENAME_FAILED,
+    onSuccess: close,
+    onError: (error) => {
+      if (error.fieldErrors === undefined) {
+        toast.error(error.message);
+        close();
+      }
+    },
+  });
+  const { ref: registerRef, onBlur, ...field } = register("name");
+  const value = useWatch({ control, name: "name" });
+  const error = errors.name?.message;
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
   }, []);
 
-  const close = () => {
-    onClose(document.activeElement === inputRef.current);
-  };
-
   const save = () => {
-    if (isCancelled.current || isPending) {
-      return;
+    if (!isCancelled.current && !isPending) {
+      submit();
     }
-    const parsed = columnNameSchema.safeParse({ name: value });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0].message);
-      return;
-    }
-    if (parsed.data.name === name) {
-      close();
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const result = await renameColumnAction(
-          workspaceId,
-          boardId,
-          columnId,
-          parsed.data,
-        );
-        const fieldError =
-          result.status === "error"
-            ? result.fieldErrors?.name?.at(0)
-            : undefined;
-        if (fieldError !== undefined) {
-          setError(fieldError);
-          return;
-        }
-        if (result.status === "error") {
-          toast.error(result.message);
-        }
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        toast.error(RENAME_FAILED);
-      }
-      startTransition(close);
-    });
   };
 
   const message =
@@ -93,21 +84,23 @@ export function ColumnNameEditor({
   return (
     <div className="relative min-w-0 flex-1">
       <Input
-        ref={inputRef}
+        {...field}
+        ref={(element) => {
+          registerRef(element);
+          inputRef.current = element;
+        }}
         aria-label="Nome da coluna"
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby={
           message === undefined ? undefined : `${columnId}-name-message`
         }
-        value={value}
         readOnly={isPending}
         maxLength={COLUMN_NAME_MAX_LENGTH}
         autoComplete="off"
-        onChange={(event) => {
-          setValue(event.target.value);
-          setError(undefined);
+        onBlur={(event) => {
+          void onBlur(event);
+          save();
         }}
-        onBlur={save}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             event.preventDefault();
