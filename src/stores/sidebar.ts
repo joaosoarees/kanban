@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { preferenceStorage } from "@/stores/preference-storage";
 
 type SidebarState = {
   collapsed: boolean;
@@ -18,6 +19,7 @@ export const useSidebar = create<SidebarState>()(
     }),
     {
       name: "kanbanary-sidebar",
+      storage: createJSONStorage(() => preferenceStorage),
       skipHydration: true,
       partialize: ({ collapsed }) => ({ collapsed }),
     },
