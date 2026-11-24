@@ -1,6 +1,6 @@
 # Kanban — plano
 
-Projeto de estudo para treinar as skills. Roda só local, sem deploy. O código é público no GitHub (o plano gratuito só tem branch protection em repositório público).
+Projeto de estudo para treinar as skills. Roda local em Docker Compose e em produção numa VPS com Coolify (ver [DEPLOY.md](DEPLOY.md)). O código é público no GitHub (o plano gratuito só tem branch protection em repositório público).
 
 ## Stack
 
@@ -68,6 +68,17 @@ Deletes em cascata de Workspace até Card.
 - CI no GitHub Actions: lint, format, typecheck, test, build. Branch protection na `main`.
 - Testes: só o teste unitário da lógica de posição. Sem mocks e sem testes de componente.
 
+## Deploy
+
+- VPS ARM com Coolify. O Coolify builda o `compose.prod.yaml` na própria VPS; sem registry de imagens.
+- Deploy automático na `main`: o job `deploy` do CI roda depois do `check` e chama a API do Coolify com um token só de `deploy`. Auto-deploy por webhook e previews de PR ficam desligados.
+- Imagem de produção com `output: "standalone"`, build com Bun e runtime Node distroless, sem root.
+- Postgres no mesmo compose, sem porta publicada. Migrations num serviço `migrate` que roda antes do `app`; elas são sempre compatíveis com a versão anterior do código.
+- Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura no repositório.
+- Backup: `pg_dump` a cada hora e envio diário ao S3 com 7 dias de retenção.
+- Rate limit no Traefik para `POST` de login e cadastro.
+- Rollback por `git revert` em PR.
+
 ## Processo
 
 - Commits pequenos, um assunto por commit.
@@ -84,3 +95,4 @@ Deletes em cascata de Workspace até Card.
 6. [x] Cards: CRUD, drag optimistic, teste de posição
 7. [x] Etiquetas e responsável, optimistic
 8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
+9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
