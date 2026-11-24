@@ -119,13 +119,13 @@ export function ColumnNameEditor({
             close();
           }
         }}
-        className="h-9 bg-white pr-8 text-sm font-semibold sm:h-8"
+        className="h-9 bg-card pr-8 text-sm font-semibold sm:h-8"
       />
       {isPending && (
         <span className="absolute inset-y-0 right-2 flex items-center">
           <Loader2
             aria-hidden
-            className="size-4 animate-spin text-zinc-600 motion-reduce:animate-none"
+            className="size-4 animate-spin text-fg-muted motion-reduce:animate-none"
           />
           <span className="sr-only">Salvando o nome…</span>
         </span>
@@ -135,8 +135,8 @@ export function ColumnNameEditor({
           id={`${columnId}-name-message`}
           aria-live="polite"
           className={cn(
-            "absolute inset-x-0 top-full z-10 mt-1 h-6 truncate bg-zinc-100 text-[13px]/6",
-            error === undefined ? "text-zinc-600" : "text-red-700",
+            "absolute inset-x-0 top-full z-10 mt-1 h-6 truncate bg-muted text-[13px]/6",
+            error === undefined ? "text-fg-muted" : "text-danger-text",
           )}
         >
           {message}

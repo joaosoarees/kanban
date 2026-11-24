@@ -6,7 +6,7 @@ export function MemberAvatar({ name }: { name: string | null }) {
     return (
       <span
         aria-hidden
-        className="flex size-6 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-400 bg-white text-zinc-600"
+        className="flex size-6 shrink-0 items-center justify-center rounded-full border border-dashed border-border-control bg-card text-fg-muted"
       >
         <UserRound className="size-[13px]" />
       </span>
@@ -16,7 +16,7 @@ export function MemberAvatar({ name }: { name: string | null }) {
   return (
     <span
       aria-hidden
-      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[11px] font-semibold text-brand-strong"
+      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-strong text-[11px] font-semibold text-brand-strong"
     >
       {initialsOf(name)}
     </span>

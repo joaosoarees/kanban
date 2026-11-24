@@ -61,7 +61,7 @@ export function CardMoveMenu({
                 onMove(cardId, column.id, index - 1);
               }}
             >
-              <ArrowUp aria-hidden className="text-zinc-600" />
+              <ArrowUp aria-hidden className="text-fg-muted" />
               Mover para cima
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -71,7 +71,7 @@ export function CardMoveMenu({
                 onMove(cardId, column.id, index + 1);
               }}
             >
-              <ArrowDown aria-hidden className="text-zinc-600" />
+              <ArrowDown aria-hidden className="text-fg-muted" />
               Mover para baixo
             </DropdownMenuItem>
           </>
@@ -80,7 +80,7 @@ export function CardMoveMenu({
           <>
             {canReorder && <DropdownMenuSeparator />}
             <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-[13px] font-medium text-zinc-600">
+              <DropdownMenuLabel className="text-[13px] font-medium text-fg-muted">
                 Para o fim da coluna
               </DropdownMenuLabel>
               {otherColumns.map((other) => (

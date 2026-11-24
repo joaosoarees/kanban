@@ -58,7 +58,7 @@ export function AddCard({
       onClick={() => {
         setIsOpen(true);
       }}
-      className="mt-1.5 flex h-11 w-full shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2 text-sm font-medium text-zinc-700 outline-hidden transition-colors duration-150 hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-9"
+      className="mt-1.5 flex h-11 w-full shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2 text-sm font-medium text-fg-secondary outline-hidden transition-colors duration-150 hover:bg-muted-strong focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-9"
     >
       <Plus aria-hidden className="size-4" />
       Adicionar card
@@ -162,7 +162,7 @@ function AddCardForm({
           }
         }}
         className={cn(
-          "block w-full resize-none rounded-lg border bg-white px-2.5 py-2 text-[15px]/5 outline-hidden placeholder:text-zinc-500 focus-visible:ring-3 sm:text-sm/5",
+          "block w-full resize-none rounded-lg border bg-card px-2.5 py-2 text-[15px]/5 outline-hidden placeholder:text-muted-foreground focus-visible:ring-3 sm:text-sm/5",
           error === undefined
             ? "border-brand focus-visible:ring-ring/50"
             : "border-destructive focus-visible:ring-destructive/20",
@@ -173,7 +173,7 @@ function AddCardForm({
         aria-live="polite"
         className={cn(
           "mt-1 flex h-5 items-center gap-1.5 truncate px-0.5 text-[13px]/5",
-          error === undefined ? "text-zinc-600" : "text-red-700",
+          error === undefined ? "text-fg-muted" : "text-danger-text",
         )}
       >
         {error !== undefined && (

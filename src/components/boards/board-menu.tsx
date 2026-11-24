@@ -52,7 +52,7 @@ export function BoardMenu({
             <Button
               variant="outline"
               size="icon"
-              className="size-11 shrink-0 bg-white text-zinc-600 sm:size-8"
+              className="size-11 shrink-0 bg-card text-fg-muted sm:size-8"
             />
           }
         >
@@ -65,7 +65,7 @@ export function BoardMenu({
               setIsRenaming(true);
             }}
           >
-            <Pencil aria-hidden className="text-zinc-600" />
+            <Pencil aria-hidden className="text-fg-muted" />
             Renomear quadro
           </DropdownMenuItem>
           <DropdownMenuSeparator className="-mx-1.5 my-1.5" />

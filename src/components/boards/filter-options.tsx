@@ -11,11 +11,11 @@ import { NO_ASSIGNEE, type BoardFilter } from "@/lib/board-filter";
 import { cn } from "@/lib/utils";
 
 const ANY_ASSIGNEE = "any";
-const LEGEND = "px-3 pt-2.5 pb-1 text-[13px] font-medium text-zinc-600";
+const LEGEND = "px-3 pt-2.5 pb-1 text-[13px] font-medium text-fg-muted";
 const LIST =
   "relative flex max-h-[min(188px,25svh)] flex-col overflow-y-auto p-1 pt-0";
 const OPTION =
-  "relative flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-md px-2 text-[15px] hover:bg-zinc-100 has-focus-visible:ring-3 has-focus-visible:ring-ring/50 sm:h-9 sm:text-sm";
+  "relative flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-md px-2 text-[15px] hover:bg-muted has-focus-visible:ring-3 has-focus-visible:ring-ring/50 sm:h-9 sm:text-sm";
 
 type PersonOption = {
   value: string;
@@ -41,7 +41,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
       avatar: (
         <span
           aria-hidden
-          className="flex size-6 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-400 bg-white text-zinc-600"
+          className="flex size-6 shrink-0 items-center justify-center rounded-full border border-dashed border-border-control bg-card text-fg-muted"
         >
           <UsersRound className="size-[13px]" />
         </span>
@@ -96,7 +96,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
               <span className="min-w-0 flex-1 truncate">
                 {person.name}
                 {person.suffix !== "" && (
-                  <span className="text-zinc-600">{person.suffix}</span>
+                  <span className="text-fg-muted">{person.suffix}</span>
                 )}
               </span>
               {selected === person.value && (
@@ -115,12 +115,12 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
         <fieldset className="m-0 min-w-0 border-0 p-0">
           <legend className={LEGEND}>Etiquetas</legend>
           {labels.length === 0 ? (
-            <p className="px-3 pb-3 text-sm text-zinc-700">
+            <p className="px-3 pb-3 text-sm text-fg-secondary">
               Este quadro ainda não tem etiquetas. Crie pelo card.
             </p>
           ) : (
             <>
-              <label className="flex h-12 shrink-0 items-center gap-2 border-y px-2.5 text-zinc-600 sm:h-10">
+              <label className="flex h-12 shrink-0 items-center gap-2 border-y px-2.5 text-fg-muted sm:h-10">
                 <Search aria-hidden className="size-4 shrink-0" />
                 <input
                   value={query}
@@ -129,11 +129,11 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                   onChange={(event) => {
                     setQuery(event.target.value);
                   }}
-                  className="min-w-0 flex-1 bg-transparent text-base text-zinc-900 outline-hidden placeholder:text-zinc-500 sm:text-sm"
+                  className="min-w-0 flex-1 bg-transparent text-base text-foreground outline-hidden placeholder:text-muted-foreground sm:text-sm"
                 />
               </label>
               {matches.length === 0 && (
-                <p className="px-3 pt-3 pb-2 text-sm text-zinc-700">
+                <p className="px-3 pt-3 pb-2 text-sm text-fg-secondary">
                   Nenhuma etiqueta com esse nome.
                 </p>
               )}
@@ -153,7 +153,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                       <span
                         aria-hidden
                         className={cn(
-                          "flex size-4 shrink-0 items-center justify-center rounded border border-zinc-400 bg-white text-white",
+                          "flex size-4 shrink-0 items-center justify-center rounded border border-border-control bg-card text-on-color",
                           isChecked && "border-brand bg-brand",
                         )}
                       >

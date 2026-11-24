@@ -27,7 +27,7 @@ export function FilterMenu() {
     <div className="flex shrink-0 items-center gap-2 max-sm:order-1 sm:ml-auto">
       {count > 0 && (
         <>
-          <p className="hidden text-[13px] text-zinc-600 lg:block">
+          <p className="hidden text-[13px] text-fg-muted lg:block">
             Limpe os filtros para arrastar cards.
           </p>
           <Button
@@ -47,9 +47,9 @@ export function FilterMenu() {
               : `Filtrar, ${count} ${count === 1 ? "filtro ativo" : "filtros ativos"}`
           }
           className={cn(
-            "inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-hidden transition-colors duration-150 hover:border-zinc-400 focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-8 sm:px-2.5",
+            "inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground outline-hidden transition-colors duration-150 hover:border-border-control focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-8 sm:px-2.5",
             count > 0 &&
-              "border-indigo-300 bg-indigo-50 text-brand-deep hover:border-indigo-400",
+              "border-accent-border bg-accent text-brand-deep hover:border-accent-border-hover",
           )}
         >
           <ListFilter aria-hidden className="size-4" />
@@ -57,7 +57,7 @@ export function FilterMenu() {
           {count > 0 && (
             <span
               aria-hidden
-              className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[13px] font-semibold text-white"
+              className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[13px] font-semibold text-on-color"
             >
               {count}
             </span>

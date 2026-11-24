@@ -3,7 +3,7 @@ import { cardsLabel } from "@/lib/card-count";
 import { cn } from "@/lib/utils";
 
 export const COLUMN_SHELL =
-  "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-zinc-100 p-2 sm:w-72";
+  "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-muted p-2 sm:w-72";
 
 export function cardCountLabel(count: number, visible: number | null = null) {
   if (visible !== null) {
@@ -35,12 +35,12 @@ export function ColumnPreview({
       )}
     >
       <div className="flex h-10 items-center gap-1">
-        <span className="flex h-8 w-5 items-center justify-center text-zinc-500">
+        <span className="flex h-8 w-5 items-center justify-center text-muted-foreground">
           <GripVertical aria-hidden className="size-[15px]" />
         </span>
         <span className="truncate px-2 text-sm font-semibold">{name}</span>
       </div>
-      <p className="mt-1 h-6 px-2 text-[13px]/6 text-zinc-600">
+      <p className="mt-1 h-6 px-2 text-[13px]/6 text-fg-muted">
         {cardCountLabel(cardCount)}
       </p>
     </div>

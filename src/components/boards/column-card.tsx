@@ -123,7 +123,7 @@ export function ColumnCard({
         style={style}
         aria-label={`Coluna ${column.name}, recolhida`}
         className={cn(
-          "flex h-full w-12 shrink-0 snap-center flex-col items-center gap-3 rounded-xl bg-zinc-100 py-2 motion-reduce:transition-none!",
+          "flex h-full w-12 shrink-0 snap-center flex-col items-center gap-3 rounded-xl bg-muted py-2 motion-reduce:transition-none!",
           dragKind === "card" && "opacity-55",
         )}
       >
@@ -137,11 +137,11 @@ export function ColumnCard({
             pendingFocus.current = "title";
             toggleCollapsed(column.id);
           }}
-          className="size-11 text-zinc-600 hover:bg-zinc-200 sm:size-8"
+          className="size-11 text-fg-muted hover:bg-muted-strong sm:size-8"
         >
           <UnfoldHorizontal aria-hidden />
         </Button>
-        <span className="text-[13px] font-medium text-zinc-600">
+        <span className="text-[13px] font-medium text-fg-muted">
           <span aria-hidden>{cards.length}</span>
           <span className="sr-only">{countLabel}</span>
         </span>
@@ -160,8 +160,8 @@ export function ColumnCard({
       className={cn(
         COLUMN_SHELL,
         "motion-reduce:transition-none!",
-        isDragging && "border-2 border-dashed border-brand bg-indigo-50 p-1.5",
-        isOver && "bg-indigo-50",
+        isDragging && "border-2 border-dashed border-brand bg-accent p-1.5",
+        isOver && "bg-accent",
       )}
     >
       <div
@@ -176,7 +176,7 @@ export function ColumnCard({
             ref={setActivatorNodeRef}
             type="button"
             aria-label={`Arrastar a coluna ${column.name}`}
-            className="hidden h-8 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-zinc-500 outline-hidden hover:text-zinc-800 focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing sm:flex"
+            className="hidden h-8 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground outline-hidden hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing sm:flex"
             {...attributes}
             {...listeners}
           >
@@ -202,13 +202,13 @@ export function ColumnCard({
               onClick={() => {
                 setIsRenaming(true);
               }}
-              className="h-11 min-w-0 flex-1 cursor-text truncate rounded-md px-2 text-left text-[15px] font-semibold outline-hidden hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-8 sm:text-sm"
+              className="h-11 min-w-0 flex-1 cursor-text truncate rounded-md px-2 text-left text-[15px] font-semibold outline-hidden hover:bg-muted-strong focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-8 sm:text-sm"
             >
               {column.name}
             </button>
           )}
           {!isRenaming && (
-            <span className="min-w-5 shrink-0 text-center text-[13px] font-medium whitespace-nowrap text-zinc-600">
+            <span className="min-w-5 shrink-0 text-center text-[13px] font-medium whitespace-nowrap text-fg-muted">
               <span aria-hidden>{countText}</span>
               <span className="sr-only">{countLabel}</span>
             </span>
@@ -245,7 +245,7 @@ export function ColumnCard({
             strategy={verticalListSortingStrategy}
           >
             {cards.length === 0 ? (
-              <p className="h-6 shrink-0 px-2 text-[13px]/6 text-zinc-600">
+              <p className="h-6 shrink-0 px-2 text-[13px]/6 text-fg-muted">
                 {filteredCards === null
                   ? "Sem cards"
                   : "Nenhum card com esses filtros."}

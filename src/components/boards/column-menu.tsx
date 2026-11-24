@@ -57,7 +57,7 @@ export function ColumnMenu({
           <Button
             variant="ghost"
             size="icon"
-            className="size-11 shrink-0 text-zinc-600 hover:bg-zinc-200 data-popup-open:bg-zinc-200 sm:size-8"
+            className="size-11 shrink-0 text-fg-muted hover:bg-muted-strong data-popup-open:bg-muted-strong sm:size-8"
           />
         }
       >
@@ -75,7 +75,7 @@ export function ColumnMenu({
             onRename();
           }}
         >
-          <Pencil aria-hidden className="text-zinc-600" />
+          <Pencil aria-hidden className="text-fg-muted" />
           Renomear
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -85,7 +85,7 @@ export function ColumnMenu({
             onCollapse();
           }}
         >
-          <FoldHorizontal aria-hidden className="text-zinc-600" />
+          <FoldHorizontal aria-hidden className="text-fg-muted" />
           Recolher
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -93,7 +93,7 @@ export function ColumnMenu({
           disabled={!canMoveLeft}
           onClick={onMoveLeft}
         >
-          <ArrowLeft aria-hidden className="text-zinc-600" />
+          <ArrowLeft aria-hidden className="text-fg-muted" />
           Mover para a esquerda
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -101,7 +101,7 @@ export function ColumnMenu({
           disabled={!canMoveRight}
           onClick={onMoveRight}
         >
-          <ArrowRight aria-hidden className="text-zinc-600" />
+          <ArrowRight aria-hidden className="text-fg-muted" />
           Mover para a direita
         </DropdownMenuItem>
         <DropdownMenuSeparator className="-mx-1.5 my-1.5" />

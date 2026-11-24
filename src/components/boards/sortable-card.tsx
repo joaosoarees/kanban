@@ -43,7 +43,7 @@ export function SortableCard({
       className={cn(
         "motion-reduce:transition-none!",
         isDragging &&
-          "border-2 border-dashed border-brand bg-indigo-50 shadow-none *:invisible",
+          "border-2 border-dashed border-brand bg-accent shadow-none *:invisible",
       )}
       {...(isDragDisabled
         ? {}

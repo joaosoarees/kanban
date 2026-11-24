@@ -171,7 +171,7 @@ function BoardNameForm({
       </fieldset>
       <div role="alert" className="empty:hidden">
         {errors.root?.message !== undefined && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="mt-2 rounded-lg border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text">
             {errors.root.message}
           </p>
         )}

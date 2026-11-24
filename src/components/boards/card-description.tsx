@@ -10,7 +10,7 @@ import { CARD_DESCRIPTION_MAX_LENGTH } from "@/lib/card-schemas";
 import { cn } from "@/lib/utils";
 
 const BOX =
-  "max-h-[50svh] min-h-37 w-full flex-1 rounded-lg border bg-white px-2.5 py-2 text-[15px]/[22px] whitespace-pre-wrap wrap-anywhere outline-hidden focus-visible:ring-3 sm:text-sm/[22px]";
+  "max-h-[50svh] min-h-37 w-full flex-1 rounded-lg border bg-card px-2.5 py-2 text-[15px]/[22px] whitespace-pre-wrap wrap-anywhere outline-hidden focus-visible:ring-3 sm:text-sm/[22px]";
 const numberFormat = new Intl.NumberFormat("pt-BR");
 
 type CardDescriptionProps = {
@@ -43,7 +43,7 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
       {state.isLoading && (
         <output className="block">
           <span className="sr-only">Carregando a descrição…</span>
-          <Skeleton aria-hidden className="h-37 w-full bg-zinc-200" />
+          <Skeleton aria-hidden className="h-37 w-full bg-muted-strong" />
         </output>
       )}
       {!state.isLoading && draft !== null && (
@@ -72,7 +72,7 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
             aria-live="polite"
             className={cn(
               "mt-1 flex h-5 items-center gap-1.5 text-[13px]/5",
-              error === undefined ? "text-zinc-600" : "text-red-700",
+              error === undefined ? "text-fg-muted" : "text-danger-text",
             )}
           >
             {error !== undefined && (
@@ -96,8 +96,8 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
           onClick={state.startEditing}
           className={cn(
             BOX,
-            "flex cursor-text items-start overflow-y-auto border-zinc-200 text-left transition-colors duration-150 hover:border-zinc-400 focus-visible:border-brand focus-visible:ring-ring/50 motion-reduce:transition-none",
-            saved === null && "text-zinc-600",
+            "flex cursor-text items-start overflow-y-auto border-border text-left transition-colors duration-150 hover:border-border-control focus-visible:border-brand focus-visible:ring-ring/50 motion-reduce:transition-none",
+            saved === null && "text-fg-muted",
           )}
         >
           <span className="min-w-0">{saved ?? "Adicione uma descrição…"}</span>

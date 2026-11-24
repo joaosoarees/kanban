@@ -2,14 +2,14 @@ import type { LabelColor } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 
 export const LABEL_COLOR_CLASSES: Record<LabelColor, string> = {
-  GRAY: "bg-zinc-200 text-zinc-700",
-  RED: "bg-red-100 text-red-800",
-  ORANGE: "bg-orange-100 text-orange-800",
-  YELLOW: "bg-amber-100 text-yellow-800",
-  GREEN: "bg-green-100 text-green-800",
-  TEAL: "bg-teal-100 text-teal-800",
-  BLUE: "bg-blue-100 text-blue-800",
-  PURPLE: "bg-purple-100 text-purple-800",
+  GRAY: "bg-label-gray-bg text-label-gray-fg",
+  RED: "bg-label-red-bg text-label-red-fg",
+  ORANGE: "bg-label-orange-bg text-label-orange-fg",
+  YELLOW: "bg-label-yellow-bg text-label-yellow-fg",
+  GREEN: "bg-label-green-bg text-label-green-fg",
+  TEAL: "bg-label-teal-bg text-label-teal-fg",
+  BLUE: "bg-label-blue-bg text-label-blue-fg",
+  PURPLE: "bg-label-purple-bg text-label-purple-fg",
 };
 
 type LabelTagProps = {

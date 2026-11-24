@@ -183,7 +183,7 @@ export function BoardColumns({
         {columns.map(({ id }) => (
           <Skeleton
             key={id}
-            className="h-full w-[312px] shrink-0 rounded-xl bg-zinc-200 sm:w-72"
+            className="h-full w-[312px] shrink-0 rounded-xl bg-muted-strong sm:w-72"
           />
         ))}
       </div>

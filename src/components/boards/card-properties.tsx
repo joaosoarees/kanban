@@ -8,7 +8,7 @@ import type {
 import { cn } from "@/lib/utils";
 
 const PROPERTY_LABEL =
-  "h-[22px] text-[13px]/[22px] font-medium text-zinc-600 sm:h-8 sm:text-[13px]/8";
+  "h-[22px] text-[13px]/[22px] font-medium text-fg-muted sm:h-8 sm:text-[13px]/8";
 
 type CardPropertiesProps = {
   workspaceId: string;

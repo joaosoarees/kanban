@@ -166,7 +166,7 @@ export function LabelEditor({
           aria-label="Voltar para a lista"
           disabled={isSaving}
           onClick={onBack}
-          className="-ml-1 size-11 text-zinc-600 sm:size-7"
+          className="-ml-1 size-11 text-fg-muted sm:size-7"
         >
           <ChevronLeft aria-hidden />
         </Button>
@@ -194,20 +194,20 @@ export function LabelEditor({
         <div id={hintId} className="min-h-[18px] text-[13px]/[18px]">
           <p
             role="alert"
-            className="flex items-start gap-1.5 text-red-700 empty:hidden"
+            className="flex items-start gap-1.5 text-danger-text empty:hidden"
           >
             {error !== undefined && (
               <>
                 <span
                   aria-hidden
-                  className="mt-[5px] size-2 shrink-0 rounded-full bg-red-600"
+                  className="mt-[5px] size-2 shrink-0 rounded-full bg-destructive"
                 />
                 {error}
               </>
             )}
           </p>
           {error === undefined && (
-            <p className="text-zinc-600">
+            <p className="text-fg-muted">
               {name.length} de {LABEL_NAME_MAX_LENGTH}
             </p>
           )}
@@ -232,7 +232,7 @@ export function LabelEditor({
               />
               <span
                 className={cn(
-                  "flex h-11 items-center justify-center rounded-md border-2 border-transparent peer-checked:border-zinc-900 peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 sm:h-8",
+                  "flex h-11 items-center justify-center rounded-md border-2 border-transparent peer-checked:border-foreground peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 sm:h-8",
                   LABEL_COLOR_CLASSES[option.color],
                 )}
               >
@@ -254,7 +254,7 @@ export function LabelEditor({
             onClick={() => {
               onDelete(labelId);
             }}
-            className="h-11 px-2 text-red-700 hover:bg-red-50 hover:text-red-700 sm:h-8"
+            className="h-11 px-2 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-8"
           >
             Excluir
           </Button>
