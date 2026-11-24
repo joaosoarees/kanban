@@ -97,7 +97,7 @@ services:
       migrate:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD-SHELL", "test -s /dumps/kanban.dump"]
+      test: ["CMD-SHELL", "find /dumps/kanban.dump -mmin -130 | grep -q ."]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -111,12 +111,13 @@ services:
       BACKUP_FILENAME: kanban-%Y-%m-%dT%H-%M-%S.tar.gz
       BACKUP_PRUNING_PREFIX: kanban-
       BACKUP_RETENTION_DAYS: "7"
-      AWS_ENDPOINT: ${BACKUP_S3_ENDPOINT}
-      AWS_S3_BUCKET_NAME: ${BACKUP_S3_BUCKET}
-      AWS_S3_PATH: ${BACKUP_S3_PATH}
-      AWS_ACCESS_KEY_ID: ${BACKUP_AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${BACKUP_AWS_SECRET_ACCESS_KEY}
-      NOTIFICATION_URLS: ${BACKUP_NOTIFICATION_URLS}
+      BACKUP_EXCLUDE_REGEXP: \.partial$
+      AWS_ENDPOINT: ${BACKUP_S3_ENDPOINT:?}
+      AWS_S3_BUCKET_NAME: ${BACKUP_S3_BUCKET:?}
+      AWS_S3_PATH: ${BACKUP_S3_PATH:?}
+      AWS_ACCESS_KEY_ID: ${BACKUP_AWS_ACCESS_KEY_ID:?}
+      AWS_SECRET_ACCESS_KEY: ${BACKUP_AWS_SECRET_ACCESS_KEY:?}
+      NOTIFICATION_URLS: ${BACKUP_NOTIFICATION_URLS:?}
       NOTIFICATION_LEVEL: error
     volumes:
       - dumps:/backup/dumps:ro
