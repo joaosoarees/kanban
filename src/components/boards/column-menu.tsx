@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const ITEM = "h-11 cursor-pointer gap-2.5 px-2 sm:h-10";
+const DESTRUCTIVE_ITEM = `${ITEM} data-[variant=destructive]:text-danger-text data-[variant=destructive]:focus:text-danger-text`;
 
 type ColumnMenuProps = {
   name: string;
@@ -107,7 +108,7 @@ export function ColumnMenu({
         <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
         <DropdownMenuItem
           variant="destructive"
-          className={ITEM}
+          className={DESTRUCTIVE_ITEM}
           onClick={onDelete}
         >
           <Trash2 aria-hidden />
