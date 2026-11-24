@@ -24,9 +24,9 @@ export function UserMenu({ name, email }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Conta de ${name}`}
-        className="group flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full outline-none hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="group flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <span className="flex size-8 items-center justify-center rounded-full bg-indigo-100 text-[13px] font-semibold text-brand-strong group-data-popup-open:ring-3 group-data-popup-open:ring-ring/30">
+        <span className="flex size-8 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-brand-strong group-data-popup-open:ring-3 group-data-popup-open:ring-ring/30">
           {initialsOf(name)}
         </span>
       </DropdownMenuTrigger>
@@ -51,10 +51,10 @@ export function UserMenu({ name, email }: UserMenuProps) {
           {isPending ? (
             <Loader2
               aria-hidden
-              className="animate-spin text-zinc-600 motion-reduce:animate-none"
+              className="animate-spin text-fg-muted motion-reduce:animate-none"
             />
           ) : (
-            <LogOut aria-hidden className="text-zinc-600" />
+            <LogOut aria-hidden className="text-fg-muted" />
           )}
           {isPending ? "Saindo…" : "Sair"}
         </DropdownMenuItem>

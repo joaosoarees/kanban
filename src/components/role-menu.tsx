@@ -47,7 +47,7 @@ export function RoleMenu({
         id={id}
         aria-label={`${label}: ${ROLE_LABELS[value]}`}
         className={cn(
-          "inline-flex h-9 w-28 cursor-pointer items-center justify-between gap-2 rounded-lg border bg-white pr-2.5 pl-3 text-[13px] font-medium outline-none hover:bg-zinc-50 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-popup-open:bg-zinc-100",
+          "inline-flex h-9 w-28 cursor-pointer items-center justify-between gap-2 rounded-lg border bg-card pr-2.5 pl-3 text-[13px] font-medium outline-none hover:bg-canvas focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-popup-open:bg-muted",
           className,
         )}
       >

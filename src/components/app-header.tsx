@@ -13,7 +13,7 @@ type HeaderFrameProps = {
 
 function HeaderFrame({ children, actions }: HeaderFrameProps) {
   return (
-    <header className="flex h-14 items-center justify-between gap-3 border-b bg-white px-3 sm:px-6">
+    <header className="flex h-14 items-center justify-between gap-3 border-b bg-card px-3 sm:px-6">
       <nav
         aria-label="Navegação principal"
         className="flex min-w-0 items-center gap-2"

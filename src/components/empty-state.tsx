@@ -17,8 +17,8 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-16 text-center">
-      <span className="mb-2 flex size-12 items-center justify-center rounded-xl bg-indigo-50">
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border-strong bg-card px-6 py-16 text-center">
+      <span className="mb-2 flex size-12 items-center justify-center rounded-xl bg-accent">
         <Icon aria-hidden className="size-[22px] text-brand" />
       </span>
       <Heading className="text-base font-semibold">{title}</Heading>

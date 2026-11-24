@@ -15,7 +15,7 @@ const columns: PreviewColumn[] = [
       {
         title: "Revisar onboarding",
         label: { text: "UX", className: "bg-pink-100 text-pink-800" },
-        assignee: { initials: "MA", className: "bg-sky-700" },
+        assignee: { initials: "MA", className: "bg-identity-sky" },
       },
       {
         title: "Exportar quadro em CSV",
@@ -31,11 +31,11 @@ const columns: PreviewColumn[] = [
       {
         title: "Tela de membros",
         label: { text: "Front", className: "bg-indigo-100 text-indigo-800" },
-        assignee: { initials: "JS", className: "bg-amber-700" },
+        assignee: { initials: "JS", className: "bg-identity-amber" },
       },
       {
         title: "Migrar etiquetas",
-        assignee: { initials: "RL", className: "bg-rose-700" },
+        assignee: { initials: "RL", className: "bg-identity-rose" },
       },
     ],
   },
@@ -52,7 +52,7 @@ const columns: PreviewColumn[] = [
 export function BoardPreview() {
   return (
     <div aria-hidden className="flex flex-col gap-4">
-      <p className="text-sm font-medium text-white">
+      <p className="text-sm font-medium text-on-color">
         Sprint 14 · Time de produto
       </p>
       <div className="flex gap-4">
@@ -61,20 +61,20 @@ export function BoardPreview() {
             key={column.title}
             className="flex w-60 shrink-0 flex-col gap-2 rounded-xl bg-brand-strong p-3"
           >
-            <p className="px-1 text-sm font-medium text-white">
+            <p className="px-1 text-sm font-medium text-on-color">
               {column.title}{" "}
-              <span className="text-indigo-100">{column.count}</span>
+              <span className="text-accent-strong">{column.count}</span>
             </p>
             {column.cards.map((card) => (
               <div
                 key={card.title}
-                className="flex flex-col gap-2 rounded-lg bg-white p-3 text-sm"
+                className="flex flex-col gap-2 rounded-lg bg-card p-3 text-sm"
               >
                 <span
                   className={
                     card.done === true
-                      ? "text-zinc-500 line-through"
-                      : "font-medium text-zinc-900"
+                      ? "text-muted-foreground line-through"
+                      : "font-medium text-foreground"
                   }
                 >
                   {card.title}
@@ -92,7 +92,7 @@ export function BoardPreview() {
                     )}
                     {card.assignee && (
                       <span
-                        className={`flex size-6 items-center justify-center rounded-full text-[10px] font-semibold text-white ${card.assignee.className}`}
+                        className={`flex size-6 items-center justify-center rounded-full text-[10px] font-semibold text-on-color ${card.assignee.className}`}
                       >
                         {card.assignee.initials}
                       </span>

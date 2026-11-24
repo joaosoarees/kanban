@@ -2,13 +2,13 @@ import { firstCharacter } from "@/lib/initials";
 import { cn } from "@/lib/utils";
 
 const TILE_COLORS = [
-  "bg-indigo-600",
-  "bg-teal-700",
-  "bg-amber-700",
-  "bg-rose-700",
-  "bg-sky-700",
-  "bg-violet-700",
-  "bg-emerald-700",
+  "bg-identity-indigo",
+  "bg-identity-teal",
+  "bg-identity-amber",
+  "bg-identity-rose",
+  "bg-identity-sky",
+  "bg-identity-violet",
+  "bg-identity-emerald",
 ];
 
 function colorFor(slug: string): string {
@@ -30,7 +30,7 @@ export function WorkspaceTile({ name, slug, className }: WorkspaceTileProps) {
     <span
       aria-hidden
       className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-md text-[13px] font-semibold text-white",
+        "flex size-7 shrink-0 items-center justify-center rounded-md text-[13px] font-semibold text-on-color",
         colorFor(slug),
         className,
       )}

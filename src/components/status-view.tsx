@@ -24,14 +24,14 @@ export function StatusView({
       <span
         className={cn(
           "mb-2 flex size-12 items-center justify-center rounded-xl",
-          tone === "danger" ? "bg-red-50" : "bg-indigo-50",
+          tone === "danger" ? "bg-danger-bg" : "bg-accent",
         )}
       >
         <Icon
           aria-hidden
           className={cn(
             "size-[22px]",
-            tone === "danger" ? "text-red-600" : "text-brand",
+            tone === "danger" ? "text-destructive" : "text-brand",
           )}
         />
       </span>

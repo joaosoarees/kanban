@@ -25,7 +25,7 @@ export function LeaveWorkspace({
   return (
     <section
       aria-labelledby="leave-title"
-      className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-5"
+      className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card p-5"
     >
       <div className="flex flex-col gap-1">
         <h2 id="leave-title" className="text-[15px] font-semibold">

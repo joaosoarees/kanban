@@ -58,7 +58,7 @@ export function SettingsTabs({
           >
             {label}
             {count !== null && (
-              <span className="rounded-full bg-zinc-100 px-1.5 text-xs text-muted-foreground">
+              <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground">
                 {count}
               </span>
             )}

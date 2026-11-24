@@ -5,13 +5,13 @@ export const primaryButton =
   "enabled:hover:bg-brand-strong enabled:active:bg-brand-deep";
 
 export const dangerButton =
-  "bg-red-600 text-white enabled:hover:bg-red-700 enabled:active:bg-red-800";
+  "bg-destructive text-on-color enabled:hover:bg-destructive-strong enabled:active:bg-destructive-deep";
 
 export const dangerOutlineButton =
-  "border-red-200 text-red-700 enabled:hover:bg-red-50 enabled:hover:text-red-700 enabled:active:bg-red-100";
+  "border-danger-border text-danger-text enabled:hover:bg-danger-bg enabled:hover:text-danger-text enabled:active:bg-danger-bg-strong";
 
 export const rowButton =
-  "h-8 px-2.5 text-[13px] text-zinc-700 enabled:hover:border-red-200 enabled:hover:bg-red-50 enabled:hover:text-red-700";
+  "h-8 px-2.5 text-[13px] text-fg-secondary enabled:hover:border-danger-border enabled:hover:bg-danger-bg enabled:hover:text-danger-text";
 
 export function linkButton(variant: "default" | "outline", className?: string) {
   return cn(
