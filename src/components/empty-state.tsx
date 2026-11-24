@@ -19,7 +19,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border-strong bg-card px-6 py-16 text-center">
       <span className="mb-2 flex size-12 items-center justify-center rounded-xl bg-accent">
-        <Icon aria-hidden className="size-[22px] text-brand" />
+        <Icon aria-hidden className="size-[22px] text-brand-fg" />
       </span>
       <Heading className="text-base font-semibold">{title}</Heading>
       <p className="max-w-sm text-sm/relaxed text-muted-foreground">

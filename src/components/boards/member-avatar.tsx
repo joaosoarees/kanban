@@ -16,7 +16,7 @@ export function MemberAvatar({ name }: { name: string | null }) {
   return (
     <span
       aria-hidden
-      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-strong text-[11px] font-semibold text-brand-strong"
+      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-strong text-[11px] font-semibold text-accent-foreground"
     >
       {initialsOf(name)}
     </span>

@@ -100,7 +100,7 @@ export function WorkspaceSwitcher({
                     </span>
                   </span>
                   {isCurrent && (
-                    <Check aria-hidden className="size-4 text-brand" />
+                    <Check aria-hidden className="size-4 text-brand-fg" />
                   )}
                 </Menu.LinkItem>
               );

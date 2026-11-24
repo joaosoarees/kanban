@@ -26,7 +26,7 @@ export function UserMenu({ name, email }: UserMenuProps) {
         aria-label={`Conta de ${name}`}
         className="group flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <span className="flex size-8 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-brand-strong group-data-popup-open:ring-3 group-data-popup-open:ring-ring/30">
+        <span className="flex size-8 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-accent-foreground group-data-popup-open:ring-3 group-data-popup-open:ring-ring/30">
           {initialsOf(name)}
         </span>
       </DropdownMenuTrigger>

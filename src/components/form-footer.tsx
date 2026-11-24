@@ -34,7 +34,7 @@ export function FormFooter({
         {switchText}{" "}
         <Link
           href={switchHref}
-          className="rounded-sm font-medium text-brand underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           {switchLabel}
         </Link>
