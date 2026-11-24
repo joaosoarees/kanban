@@ -31,6 +31,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - Erros esperados: a action retorna `{ status: "error", message }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados: `error.tsx` por segmento; um bloco secundário da página, como a lista de quadros, pode mostrar a falha no próprio lugar.
 - Membership e papel checados no layout, em toda página e em toda Server Action. O layout do workspace não segura as rotas filhas enquanto verifica, então cada página de `/w/[slug]` precisa chamar `requireMembership`.
 - Zustand só para preferências de UI; dados do servidor nunca vão para o store.
+- Todo campo digitado usa React Hook Form + Zod pelo `useActionForm` (`@/hooks/use-action-form`). Ações de um clique (etiqueta, responsável, mover) chamam a action por `runAction` (`@/lib/run-action`), que repassa o controle do Next e transforma exceção em `ActionError`.
 
 ## Código
 
