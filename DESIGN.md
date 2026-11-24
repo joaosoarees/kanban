@@ -27,7 +27,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - Fonte do design system: `src/app/globals.css` (tokens), `src/components/ui/` (11 componentes shadcn base-nova sobre Base UI) e `src/components/` (22 componentes do app). O guia no canvas https://claude.ai/artifact/QQ4ykQjWJGbJjWLeDCeWu4 espelha o código (registro em `design-sync.json`).
 - Nome: Kanbanary. Logo: marca de barras indigo em `src/components/logo.tsx`.
 - Cor principal: indigo `#4f46e5` (`--brand`), com `--brand-strong` `#4338ca` no hover e `--brand-deep` `#3730a3`. Neutros zinc. Destrutivo `#dc2626`.
-- Cores só por papel: superfícies (`canvas`, `card`, `muted`, `muted-strong`), texto (`foreground`, `fg-secondary`, `fg-muted`, `muted-foreground`, `fg-faint`), bordas (`border`, `border-strong`, `border-control`), marca (`accent*`), perigo (`destructive*`, `danger-*`), texto sobre cor cheia (`on-color`), etiquetas (`label-<cor>-bg/-fg`) e identidade (`identity-<cor>`). Classes de paleta (`zinc-600`, `red-700`) não entram nos componentes; a exceção é a ilustração da tela de entrada.
+- Cores só por papel: superfícies (`canvas`, `card`, `muted`, `muted-strong`), texto (`foreground`, `fg-secondary`, `fg-muted`, `muted-foreground`, `fg-faint`), bordas (`border`, `border-strong`, `border-control`), marca (`brand-fg` para texto e ícones, `accent*`), perigo (`destructive*`, `danger-*`), texto sobre cor cheia (`on-color`), etiquetas (`label-<cor>-bg/-fg`) e identidade (`identity-<cor>`). Classes de paleta (`zinc-600`, `red-700`) não entram nos componentes.
 - Fonte: Geist Sans; Geist Mono só para endereços (`/w/slug`).
 - Raio base 8px (`--radius: 0.5rem`); cards e caixas 12px.
 - Cada workspace tem uma cor de identidade, escolhida pelo slug (`workspace-tile.tsx`).
@@ -87,6 +87,13 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-24 — Com filtro, a coluna mostra "3 de 12", a recolhida mostra só o número filtrado e o desktop avisa "Limpe os filtros para arrastar cards" — o arraste desligado não fica sem explicação.
 - 2026-11-24 — Tokens semânticos de cor substituem as classes de paleta em 52 arquivos, com os mesmos valores no tema claro — o tema escuro troca os valores dos papéis sem mexer nos componentes.
 - 2026-11-24 — Fusões aprovadas: `zinc-800` vira `foreground`, `zinc-500` de borda vira `border-control`, `indigo-200` de borda vira `accent-border`; o vermelho cheio dos botões destrutivos passa a usar o `--destructive` (`#dc2626`) — um valor por papel.
+- 2026-11-24 — Tema escuro desenhado no canvas da fatia 8 (pranchas 8.1 a 8.14) — os componentes não mudam, só os valores dos papéis dentro de `.dark`.
+- 2026-11-24 — Escolha Claro, Escuro ou Sistema no menu da conta, padrão Sistema, guardada no navegador; sem login segue o navegador ou o sistema operacional — sem coluna nova no banco e sem piscar na entrada.
+- 2026-11-24 — Fundo escuro em zinco (`#121214` a `#27272c`), nunca preto puro; a superfície sobe um degrau por camada (página, coluna, card, popover) — profundidade sem sombra pesada.
+- 2026-11-24 — Etiquetas no escuro com fundo tingido escuro e texto claro da mesma cor; cores de identidade dos workspaces não mudam — a etiqueta continua reconhecível nos dois temas.
+- 2026-11-24 — Novo papel `brand-fg` (claro `#4f46e5`, escuro `#a5b4fc`) para links, ícones e checks; texto em `brand-strong` e `brand-deep` passa a `accent-foreground` — o indigo cheio não lê como texto sobre fundo escuro.
+- 2026-11-24 — A prévia do quadro na entrada usa os tokens de etiqueta (UX roxo, API verde, Front azul) e o número das colunas em branco 70% — sem classes de paleta, legível nos dois temas.
+- 2026-11-24 — Hover de item em menu e popover afunda para `muted` também no escuro, e as variantes `dark:` geradas pelo shadcn ficam como vieram — mesma regra nos dois temas, arquivos gerados intocados.
 
 ## Perguntas abertas
 
