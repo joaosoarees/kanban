@@ -7,7 +7,7 @@ Projeto de estudo para treinar as skills. Roda local em Docker Compose e em prod
 - Next.js (App Router), TypeScript, Tailwind v4, shadcn/ui (Base UI, preset nova)
 - Postgres 18 via Docker Compose, Prisma 7, IDs UUID v7
 - Auth própria: e-mail + senha (bcrypt), sessão em JWT HS256 (`jose`) num cookie HttpOnly, `getCurrentUser()` como única checagem. Sem Auth.js: a v5 nunca saiu do beta.
-- React Hook Form + Zod nos formulários
+- React Hook Form + Zod em todo campo digitado, sempre pelo hook `useActionForm`; ações de um clique (etiqueta, responsável, mover, arrastar) chamam a action pelo mesmo executor, sem `useForm`
 - `useOptimistic` + Server Actions em toda interação do board (rollback + toast no erro)
 - Zustand + persist só para preferências de UI (colunas recolhidas, densidade, sidebar)
 - Filtros e card aberto na URL (search params)
@@ -32,7 +32,7 @@ Entra a partir da fatia 3; cada fatia nova ganha seu `error.tsx` e `loading.tsx`
 
 - Workspace → Board → Coluna → Card. O card tem título, descrição, responsável e etiquetas.
 - Papéis fixos no código: OWNER, ADMIN, MEMBER.
-- Membros entram quando um admin adiciona um usuário já cadastrado pelo e-mail.
+- Membros entram quando um admin adiciona um usuário já cadastrado pelo e-mail. Como a resposta revela se o e-mail tem conta, a action fica sob rate limit; convites com aceite ficam para uma fatia futura.
 
 ```
 User (id, name, email @unique, passwordHash)
@@ -76,7 +76,7 @@ Deletes em cascata de Workspace até Card.
 - Postgres no mesmo compose, sem porta publicada. Migrations num serviço `migrate` que roda antes do `app`; elas são sempre compatíveis com a versão anterior do código.
 - Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura no repositório.
 - Backup: `pg_dump` a cada hora e envio diário ao S3 com 7 dias de retenção.
-- Rate limit no Traefik para `POST` de login e cadastro.
+- Rate limit no Traefik para `POST` de login, cadastro e adicionar membro.
 - Rollback por `git revert` em PR.
 
 ## Reorganização (fatias 10 e 11)
@@ -86,7 +86,29 @@ Deletes em cascata de Workspace até Card.
 - Server Actions e queries continuam usando o Prisma direto, sem use cases, repositórios ou DI. A única interface com dois adaptadores é o envio de e-mail.
 - Um PR por feature, sem mudar comportamento. A conferência é feita com lint, typecheck, testes unitários e build, mais uma passada pelo app com Playwright fora do repositório. Sem teste E2E versionado.
 - No fim, `CLAUDE.md` e a seção Arquitetura deste plano descrevem a estrutura nova.
-- Skills: `auditing-code-against-skills`, `codebase-design`, `nextjs-server-actions`, `nextjs-server-data-fetching`, `nextjs-component-composition`, `nextjs-server-and-client-components`.
+- Skills: `auditing-code-against-skills`, `codebase-design`, `nextjs-server-actions`, `nextjs-server-data-fetching`, `nextjs-component-composition`, `nextjs-server-and-client-components`, `react-custom-hooks`, `react-hook-form-zod`, `shadcn-react-hook-form`.
+
+### Resultado da auditoria (fatia 10)
+
+Relatório: https://claude.ai/artifact/GKgUHkBcU9CF3zuHkvFzEq. Bugs confirmados no app: com o `localStorage` bloqueado nenhum workspace abre, e depois de sair a página guarda o conteúdo de quem estava logado. Decisões:
+
+- Features: `auth`, `workspaces` (acesso: `requireMembership`, `loadActorAllowedTo`, `can`), `members`, `boards`, `cards` e `labels`, com `cards` e `labels` dependendo de `boards`. `src/server` tem `db` e o módulo de sessão (`getCurrentUser`, `requireUser`, `startSession`, `endSession`).
+- Os helpers de resultado (`invalidFields`, `FORBIDDEN`, `INVALID`) ficam, apesar de a `nextjs-server-action-results` dispensá-los; erros que o cliente precisa distinguir ganham um `code` em vez de comparar mensagens.
+- `useActionForm({ schema, defaultValues, action, onSuccess })` devolve o `form` do React Hook Form e um `submit`, e cuida de `zodResolver`, erros de campo vindos do servidor, `unstable_rethrow` e o toast de falha. Editores inline salvam com `handleSubmit` no Enter ou no blur e cancelam com `reset()`.
+
+Ordem dos PRs:
+
+1. Bug: armazenamento bloqueado.
+2. Bug: conteúdo depois de sair.
+3. `useActionForm` e o executor de actions.
+4. `src/server`.
+5. `features/auth`.
+6. `features/workspaces` e `features/members`.
+7. `features/boards`.
+8. `features/cards` e `features/labels`, com o route handler da descrição respondendo 401 e 404.
+9. Limites de erro (`w/[slug]/error.tsx`, `(auth)/error.tsx`), corridas devolvendo mensagem, papel conferido dentro da transação, `CLAUDE.md` atualizado.
+
+Cada PR de feature migra os campos da feature para o `useActionForm` e ganha teste para as regras puras que mudam de lugar e ainda não têm.
 
 ## Contas e e-mail (fatias 12 a 14)
 
@@ -151,7 +173,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 7. [x] Etiquetas e responsável, optimistic
 8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
 9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
-10. [ ] Auditoria da arquitetura contra as skills
+10. [x] Auditoria da arquitetura contra as skills
 11. [ ] Módulos por funcionalidade
 12. [ ] Envio de e-mail: Mailpit, SES e templates
 13. [ ] Verificação de e-mail
