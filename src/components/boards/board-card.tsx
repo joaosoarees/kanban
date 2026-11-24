@@ -7,7 +7,7 @@ import type { BoardCard as BoardCardData } from "@/components/boards/use-board-c
 import { cn } from "@/lib/utils";
 
 const CARD =
-  "flex min-h-12 w-full shrink-0 flex-col gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-[13px] text-left text-[15px]/5 shadow-xs sm:min-h-[42px] sm:py-2.5 sm:text-sm/5";
+  "flex min-h-12 w-full shrink-0 flex-col gap-2 rounded-lg border border-border bg-card px-3 py-[13px] text-left text-[15px]/5 shadow-xs sm:min-h-[42px] sm:py-2.5 sm:text-sm/5";
 
 const VISIBLE_LABELS = 3;
 
@@ -24,7 +24,7 @@ function CardContent({ card }: { card: BoardCardData }) {
           {card.title}
         </span>
         {card.hasDescription && (
-          <span className="relative flex h-5 shrink-0 items-center text-zinc-500">
+          <span className="relative flex h-5 shrink-0 items-center text-muted-foreground">
             <AlignLeft aria-hidden className="size-[15px]" />
             <span className="sr-only">Tem descrição</span>
           </span>
@@ -37,7 +37,7 @@ function CardContent({ card }: { card: BoardCardData }) {
               <LabelTag key={id} name={name} color={color} />
             ))}
             {hiddenLabels > 0 && (
-              <span className="relative inline-block h-[22px] rounded-[5px] bg-zinc-100 px-[7px] text-[13px]/[22px] font-medium text-zinc-600">
+              <span className="relative inline-block h-[22px] rounded-[5px] bg-muted px-[7px] text-[13px]/[22px] font-medium text-fg-muted">
                 <span aria-hidden>+{hiddenLabels}</span>
                 <span className="sr-only">
                   {hiddenLabels === 1
@@ -73,7 +73,7 @@ export function BoardCardButton({
       type="button"
       className={cn(
         CARD,
-        "cursor-pointer outline-hidden transition-colors duration-150 hover:border-zinc-400 focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
+        "cursor-pointer outline-hidden transition-colors duration-150 hover:border-border-control focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
         className,
       )}
       {...props}
@@ -88,7 +88,7 @@ export function BoardCardPreview({ card }: { card: BoardCardData }) {
     <div
       className={cn(
         CARD,
-        "rotate-[1.5deg] cursor-grabbing border-zinc-300 shadow-xl motion-reduce:rotate-0",
+        "rotate-[1.5deg] cursor-grabbing border-border-strong shadow-xl motion-reduce:rotate-0",
       )}
     >
       <CardContent card={card} />

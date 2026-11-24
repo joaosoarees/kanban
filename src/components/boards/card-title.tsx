@@ -63,7 +63,7 @@ export function CardTitle({
           onClick={() => {
             setIsEditing(true);
           }}
-          className={`${TITLE_TEXT} cursor-text text-left outline-hidden transition-colors duration-150 hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none`}
+          className={`${TITLE_TEXT} cursor-text text-left outline-hidden transition-colors duration-150 hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none`}
         >
           {title}
         </button>
@@ -172,13 +172,13 @@ function CardTitleEditor({
             close();
           }
         }}
-        className={`${TITLE_TEXT} block field-sizing-content resize-none border border-brand bg-white outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50`}
+        className={`${TITLE_TEXT} block field-sizing-content resize-none border border-brand bg-card outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50`}
       />
       {error !== undefined && (
         <p
           id={messageId}
           role="alert"
-          className="mt-1 flex items-center gap-1.5 text-[13px]/5 text-red-700"
+          className="mt-1 flex items-center gap-1.5 text-[13px]/5 text-danger-text"
         >
           <span
             aria-hidden

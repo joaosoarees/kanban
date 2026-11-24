@@ -74,7 +74,7 @@ export function AddColumn({
           onClick={() => {
             onOpenChange(true);
           }}
-          className="flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-dashed border-zinc-400 text-sm font-medium text-zinc-700 outline-hidden hover:border-zinc-500 hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-10"
+          className="flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-dashed border-border-control text-sm font-medium text-fg-secondary outline-hidden hover:border-border-control hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-10"
         >
           <Plus aria-hidden className="size-4" />
           Adicionar coluna
@@ -147,7 +147,7 @@ function AddColumnForm({
         event.preventDefault();
         submit();
       }}
-      className="flex flex-col rounded-xl bg-zinc-100 p-2"
+      className="flex flex-col rounded-xl bg-muted p-2"
     >
       <Input
         ref={inputRef}
@@ -168,14 +168,14 @@ function AddColumnForm({
             onCancel();
           }
         }}
-        className="h-10 bg-white text-sm font-semibold sm:h-8"
+        className="h-10 bg-card text-sm font-semibold sm:h-8"
       />
       <p
         id="new-column-message"
         aria-live="polite"
         className={cn(
           "mt-1 h-5 truncate text-[13px]/5",
-          error === undefined ? "text-zinc-600" : "text-red-700",
+          error === undefined ? "text-fg-muted" : "text-danger-text",
         )}
       >
         {error ?? `Até ${COLUMN_NAME_MAX_LENGTH} caracteres.`}

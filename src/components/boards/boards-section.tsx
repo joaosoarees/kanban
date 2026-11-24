@@ -31,7 +31,10 @@ export async function BoardsSection({
   return (
     <section aria-labelledby="boards-title" className="mt-7 sm:mt-10">
       <div className="mb-2 flex h-11 items-center justify-between sm:mb-3 sm:h-9">
-        <h2 id="boards-title" className="text-sm font-semibold text-zinc-700">
+        <h2
+          id="boards-title"
+          className="text-sm font-semibold text-fg-secondary"
+        >
           Quadros
         </h2>
         {canManage && boards !== null && boards.length > 0 && (
@@ -44,9 +47,12 @@ export async function BoardsSection({
         )}
       </div>
       {boards === null && (
-        <div className="flex flex-col items-center gap-2 rounded-xl border bg-white px-6 py-14 text-center">
-          <span className="mb-2 flex size-12 items-center justify-center rounded-xl bg-red-50">
-            <TriangleAlert aria-hidden className="size-[22px] text-red-600" />
+        <div className="flex flex-col items-center gap-2 rounded-xl border bg-card px-6 py-14 text-center">
+          <span className="mb-2 flex size-12 items-center justify-center rounded-xl bg-danger-bg">
+            <TriangleAlert
+              aria-hidden
+              className="size-[22px] text-destructive"
+            />
           </span>
           <h3 className="text-base font-semibold">
             Não foi possível carregar os quadros

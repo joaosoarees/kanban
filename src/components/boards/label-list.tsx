@@ -52,7 +52,7 @@ export function LabelList({
 
   return (
     <>
-      <label className="flex h-12 shrink-0 items-center gap-2 border-b px-2.5 text-zinc-600 sm:h-10">
+      <label className="flex h-12 shrink-0 items-center gap-2 border-b px-2.5 text-fg-muted sm:h-10">
         <Search aria-hidden className="size-4 shrink-0" />
         <input
           ref={searchRef}
@@ -71,17 +71,17 @@ export function LabelList({
               }
             }
           }}
-          className="min-w-0 flex-1 bg-transparent text-base text-zinc-900 outline-hidden placeholder:text-zinc-500 sm:text-sm"
+          className="min-w-0 flex-1 bg-transparent text-base text-foreground outline-hidden placeholder:text-muted-foreground sm:text-sm"
         />
       </label>
 
       {labels.length === 0 && search === "" && (
-        <p className="px-3 pt-4 pb-3 text-sm text-zinc-700">
+        <p className="px-3 pt-4 pb-3 text-sm text-fg-secondary">
           Crie a primeira etiqueta deste quadro digitando um nome.
         </p>
       )}
       {labels.length > 0 && matches.length === 0 && (
-        <p className="px-3 pt-4 pb-2 text-sm text-zinc-700">
+        <p className="px-3 pt-4 pb-2 text-sm text-fg-secondary">
           Nenhuma etiqueta com esse nome.
         </p>
       )}
@@ -93,7 +93,7 @@ export function LabelList({
           return (
             <div
               key={label.id}
-              className="flex shrink-0 items-center rounded-md hover:bg-zinc-100"
+              className="flex shrink-0 items-center rounded-md hover:bg-muted"
             >
               <label
                 className={cn(
@@ -113,7 +113,7 @@ export function LabelList({
                 <span
                   aria-hidden
                   className={cn(
-                    "flex size-4 shrink-0 items-center justify-center rounded border border-zinc-400 bg-white text-white",
+                    "flex size-4 shrink-0 items-center justify-center rounded border border-border-control bg-card text-on-color",
                     isApplied && "border-brand bg-brand",
                   )}
                 >
@@ -127,7 +127,7 @@ export function LabelList({
                 onClick={() => {
                   onEdit(label);
                 }}
-                className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[5px] text-zinc-600 outline-hidden hover:bg-zinc-200 focus-visible:ring-3 focus-visible:ring-ring/50 sm:mr-0.5 sm:size-7"
+                className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[5px] text-fg-muted outline-hidden hover:bg-muted-strong focus-visible:ring-3 focus-visible:ring-ring/50 sm:mr-0.5 sm:size-7"
               >
                 <Pencil aria-hidden className="size-3.5" />
               </button>
@@ -141,7 +141,7 @@ export function LabelList({
             onClick={() => {
               onCreate(query.trim());
             }}
-            className="flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-md px-2 text-left text-sm outline-hidden hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default disabled:text-zinc-500 disabled:hover:bg-transparent sm:h-9"
+            className="flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-md px-2 text-left text-sm outline-hidden hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default disabled:text-muted-foreground disabled:hover:bg-transparent sm:h-9"
           >
             <Plus aria-hidden className="size-4 shrink-0" />
             <span className="min-w-0 flex-1 truncate">
@@ -152,13 +152,13 @@ export function LabelList({
       </div>
 
       {isCardFull && (
-        <p className="border-t px-3 py-2 text-[13px]/[18px] text-zinc-600">
+        <p className="border-t px-3 py-2 text-[13px]/[18px] text-fg-muted">
           Este card já tem {MAX_LABELS_PER_CARD} etiquetas. Remova uma para
           aplicar outra.
         </p>
       )}
       {isBoardFull && canOfferCreate && (
-        <p className="border-t px-3 py-2 text-[13px]/[18px] text-zinc-600">
+        <p className="border-t px-3 py-2 text-[13px]/[18px] text-fg-muted">
           Este quadro chegou a {MAX_LABELS_PER_BOARD} etiquetas. Exclua uma para
           criar outra.
         </p>

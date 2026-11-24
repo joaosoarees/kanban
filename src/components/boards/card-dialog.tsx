@@ -110,7 +110,7 @@ export function CardDialog({
                 title={card.title}
               />
             </div>
-            <DialogDescription className="mt-0.5 truncate text-[13px] text-zinc-600">
+            <DialogDescription className="mt-0.5 truncate text-[13px] text-fg-muted">
               Na coluna {column.name}
             </DialogDescription>
           </div>
@@ -120,7 +120,7 @@ export function CardDialog({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-11 shrink-0 text-zinc-600 sm:size-8"
+                className="size-11 shrink-0 text-fg-muted sm:size-8"
               />
             }
           >
@@ -145,7 +145,7 @@ export function CardDialog({
             onClick={() => {
               setIsDeleting(true);
             }}
-            className="h-11 border-red-200 px-3.5 text-red-700 hover:bg-red-50 hover:text-red-700 sm:h-9"
+            className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
           >
             Excluir card
           </Button>

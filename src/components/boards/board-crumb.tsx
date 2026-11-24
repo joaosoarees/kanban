@@ -14,12 +14,12 @@ export function BoardCrumb({ href, name }: BoardCrumbProps) {
 
   return (
     <span className="hidden min-w-0 items-center gap-2 sm:flex">
-      <span aria-hidden className="text-xl font-light text-zinc-300">
+      <span aria-hidden className="text-xl font-light text-fg-faint">
         /
       </span>
       <span
         aria-current="page"
-        className="max-w-[360px] truncate text-sm font-medium text-zinc-700"
+        className="max-w-[360px] truncate text-sm font-medium text-fg-secondary"
       >
         {name}
       </span>
