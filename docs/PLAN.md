@@ -82,5 +82,5 @@ Deletes em cascata de Workspace até Card.
 4. [x] Membros e papéis
 5. [x] Boards e colunas: reorder optimistic, store Zustand de colunas recolhidas
 6. [x] Cards: CRUD, drag optimistic, teste de posição
-7. [ ] Etiquetas e responsável, optimistic
+7. [x] Etiquetas e responsável, optimistic
 8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
