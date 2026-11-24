@@ -41,7 +41,7 @@ export default async function WorkspacePage({
               <span className="flex shrink-0 items-center gap-3">
                 <Link
                   href={`/w/${workspace.slug}/settings/members`}
-                  className="rounded-sm font-medium text-brand underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 [&>span]:text-inherit"
+                  className="rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 [&>span]:text-inherit"
                 >
                   <MemberCount count={workspace.memberCount} />
                 </Link>

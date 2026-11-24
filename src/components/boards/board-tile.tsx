@@ -20,7 +20,7 @@ export function BoardTile({ href, name, createdAt }: BoardTileProps) {
       className="flex h-[76px] min-w-0 items-center gap-3 rounded-xl border bg-card p-5 shadow-xs outline-hidden transition-[border-color,box-shadow] duration-150 hover:border-border-strong hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-[84px]"
     >
       <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent">
-        <SquareKanban aria-hidden className="size-5 text-brand" />
+        <SquareKanban aria-hidden className="size-5 text-brand-fg" />
       </span>
       <span className="flex min-w-0 flex-col gap-0.5">
         <span className="truncate text-[15px] font-semibold">{name}</span>

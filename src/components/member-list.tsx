@@ -122,7 +122,7 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <span
                   aria-hidden
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-brand-strong"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-accent-foreground"
                 >
                   {initialsOf(member.name)}
                 </span>

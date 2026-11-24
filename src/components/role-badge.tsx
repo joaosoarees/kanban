@@ -8,7 +8,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 };
 
 const ROLE_STYLES: Record<Role, string> = {
-  OWNER: "border-accent-border bg-accent text-brand-strong",
+  OWNER: "border-accent-border bg-accent text-accent-foreground",
   ADMIN: "border-border bg-muted text-fg-secondary",
   MEMBER: "border-border bg-card text-fg-muted",
 };

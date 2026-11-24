@@ -102,7 +102,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
               {selected === person.value && (
                 <Check
                   aria-hidden
-                  className="size-4 shrink-0 text-brand"
+                  className="size-4 shrink-0 text-brand-fg"
                   strokeWidth={2.5}
                 />
               )}
