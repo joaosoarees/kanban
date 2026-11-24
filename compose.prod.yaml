@@ -121,6 +121,11 @@ services:
       NOTIFICATION_LEVEL: error
     volumes:
       - dumps:/backup/dumps:ro
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "backup -foreground"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
 
 volumes:
   pgdata:
