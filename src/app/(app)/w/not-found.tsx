@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SearchX } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -5,10 +6,11 @@ import { AppHeader, AppHeaderFallback } from "@/components/app-header";
 import { linkButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
 
+export const metadata: Metadata = { title: "Workspace não encontrado" };
+
 export default function WorkspaceNotFound() {
   return (
     <>
-      <title>Workspace não encontrado · Kanbanary</title>
       <Suspense fallback={<AppHeaderFallback />}>
         <AppHeader />
       </Suspense>
