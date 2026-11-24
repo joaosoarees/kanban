@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 const COUNTER_FROM = COLUMN_NAME_MAX_LENGTH - 5;
 const RENAME_FAILED = "Não foi possível renomear a coluna. Tente de novo.";
-const UNCHANGED = { status: "success", data: undefined } as const;
 
 type ColumnNameEditorProps = {
   workspaceId: string;
@@ -40,6 +39,7 @@ export function ColumnNameEditor({
     form: {
       register,
       control,
+      getValues,
       formState: { errors },
     },
     submit,
@@ -48,13 +48,11 @@ export function ColumnNameEditor({
     schema: columnNameSchema,
     defaultValues: { name },
     action: async (values) =>
-      values.name === name
-        ? UNCHANGED
-        : renameColumnAction(workspaceId, boardId, columnId, values),
+      renameColumnAction(workspaceId, boardId, columnId, values),
     failure: RENAME_FAILED,
     onSuccess: close,
     onError: (error) => {
-      if (error.fieldErrors === undefined) {
+      if (error.fieldErrors?.name?.at(0) === undefined) {
         toast.error(error.message);
         close();
       }
@@ -70,9 +68,15 @@ export function ColumnNameEditor({
   }, []);
 
   const save = () => {
-    if (!isCancelled.current && !isPending) {
-      submit();
+    if (isCancelled.current || isPending) {
+      return;
     }
+    const parsed = columnNameSchema.safeParse(getValues());
+    if (parsed.success && parsed.data.name === name) {
+      close();
+      return;
+    }
+    submit();
   };
 
   const message =
