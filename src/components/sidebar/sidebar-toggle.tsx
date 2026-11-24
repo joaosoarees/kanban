@@ -16,12 +16,18 @@ function ShortcutHint() {
   );
 }
 
+function focusButton(button: HTMLButtonElement | null) {
+  button?.focus();
+}
+
 export function ToggleButton({
   collapsed,
   onToggle,
+  takeFocus,
 }: {
   collapsed: boolean;
   onToggle: () => void;
+  takeFocus: boolean;
 }) {
   const label = collapsed ? "Abrir barra lateral" : "Recolher barra lateral";
   return (
@@ -33,6 +39,7 @@ export function ToggleButton({
             aria-label={label}
             aria-expanded={!collapsed}
             aria-keyshortcuts="["
+            ref={takeFocus ? focusButton : undefined}
             onClick={onToggle}
             className={ICON_BUTTON}
           />
