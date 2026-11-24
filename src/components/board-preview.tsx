@@ -14,12 +14,18 @@ const columns: PreviewColumn[] = [
     cards: [
       {
         title: "Revisar onboarding",
-        label: { text: "UX", className: "bg-pink-100 text-pink-800" },
+        label: {
+          text: "UX",
+          className: "bg-label-purple-bg text-label-purple-fg",
+        },
         assignee: { initials: "MA", className: "bg-identity-sky" },
       },
       {
         title: "Exportar quadro em CSV",
-        label: { text: "API", className: "bg-emerald-100 text-emerald-800" },
+        label: {
+          text: "API",
+          className: "bg-label-green-bg text-label-green-fg",
+        },
       },
       { title: "Atalhos de teclado" },
     ],
@@ -30,7 +36,10 @@ const columns: PreviewColumn[] = [
     cards: [
       {
         title: "Tela de membros",
-        label: { text: "Front", className: "bg-indigo-100 text-indigo-800" },
+        label: {
+          text: "Front",
+          className: "bg-label-blue-bg text-label-blue-fg",
+        },
         assignee: { initials: "JS", className: "bg-identity-amber" },
       },
       {
@@ -63,7 +72,7 @@ export function BoardPreview() {
           >
             <p className="px-1 text-sm font-medium text-on-color">
               {column.title}{" "}
-              <span className="text-accent-strong">{column.count}</span>
+              <span className="text-on-color/70">{column.count}</span>
             </p>
             {column.cards.map((card) => (
               <div
