@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { initialsOf } from "@/lib/initials";
+import { revealTheme } from "@/lib/reveal-theme";
 
 const THEME_OPTIONS = [
   { value: "light", label: "Claro", Icon: Sun },
@@ -25,6 +26,30 @@ const THEME_OPTIONS = [
 const ITEM_CLASS =
   "flex h-10 cursor-pointer items-center gap-2.5 rounded-md px-2 text-sm outline-hidden select-none data-highlighted:bg-muted";
 
+function revealOrigin(event: Event) {
+  if (event instanceof MouseEvent && event.detail > 0) {
+    return { x: event.clientX, y: event.clientY };
+  }
+  const item =
+    event.target instanceof Element
+      ? event.target.closest('[role="menuitemradio"]')
+      : null;
+  if (item === null) {
+    return { x: window.innerWidth, y: 0 };
+  }
+  const rect = item.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+
+function resolveTheme(choice: string) {
+  if (choice !== "system") {
+    return choice;
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 type UserMenuProps = {
   name: string;
   email: string;
@@ -32,7 +57,7 @@ type UserMenuProps = {
 
 export function UserMenu({ name, email }: UserMenuProps) {
   const [isPending, startTransition] = useTransition();
-  const { theme = "system", setTheme } = useTheme();
+  const { theme = "system", resolvedTheme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -58,8 +83,14 @@ export function UserMenu({ name, email }: UserMenuProps) {
           </DropdownMenuLabel>
           <Menu.RadioGroup
             value={theme}
-            onValueChange={(value: string) => {
-              setTheme(value);
+            onValueChange={(value: string, details) => {
+              if (resolveTheme(value) === resolvedTheme) {
+                setTheme(value);
+                return;
+              }
+              revealTheme(() => {
+                setTheme(value);
+              }, revealOrigin(details.event));
             }}
           >
             {THEME_OPTIONS.map(({ value, label, Icon }) => (
