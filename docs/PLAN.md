@@ -79,6 +79,61 @@ Deletes em cascata de Workspace até Card.
 - Rate limit no Traefik para `POST` de login e cadastro.
 - Rollback por `git revert` em PR.
 
+## Reorganização (fatias 10 e 11)
+
+- Antes de mover qualquer arquivo, uma auditoria só de leitura com a skill `auditing-code-against-skills` e o vocabulário da `codebase-design` (módulo, interface, profundidade, costura). Os achados viram a lista de PRs da fatia 11.
+- Módulos por funcionalidade, mantendo a convenção do Next: `src/features/<feature>/` com `schemas.ts`, `queries.ts` (leituras dos Server Components), `actions.ts` (Server Actions), regras puras com teste e `components/`. A infraestrutura (`db`, sessão, e-mail) vai para `src/server/`, e `src/app` só monta as rotas.
+- Server Actions e queries continuam usando o Prisma direto, sem use cases, repositórios ou DI. A única interface com dois adaptadores é o envio de e-mail.
+- Um PR por feature, sem mudar comportamento. A conferência é feita com lint, typecheck, testes unitários e build, mais uma passada pelo app com Playwright fora do repositório. Sem teste E2E versionado.
+- No fim, `CLAUDE.md` e a seção Arquitetura deste plano descrevem a estrutura nova.
+- Skills: `auditing-code-against-skills`, `codebase-design`, `nextjs-server-actions`, `nextjs-server-data-fetching`, `nextjs-component-composition`, `nextjs-server-and-client-components`.
+
+## Contas e e-mail (fatias 12 a 14)
+
+### Envio (fatia 12)
+
+- Nodemailer com uma função `sendMail({ to, subject, html, text })` e dois transportes: SES (`@aws-sdk/client-sesv2`) em produção e SMTP para um Mailpit no `compose.yaml` em desenvolvimento, que mostra os e-mails em `localhost:8025`.
+- Remetente em `MAIL_FROM`. Antes de configurar, conferir se o domínio está verificado no SES e se a conta saiu do sandbox.
+- Usuário IAM `kanban-mailer`, criado pelo João no console, com só `ses:SendRawEmail` a partir da identidade do domínio. A chave vai para o Coolify como segredo.
+- O e-mail é enviado dentro da Server Action, sem fila. Se o envio falhar, a conta continua pendente e a tela oferece reenviar.
+- Templates em React Email com o ícone e a marca, mais uma versão em texto puro. O visual passa pelo `craft`.
+- Skills: `choosing-email-sending-service`, `nodemailer-ses-transport`, `ses-domain-identity`, `ses-sandbox-and-production-access`, `craft`.
+
+### Verificação de e-mail (fatia 13)
+
+- Código de 6 dígitos por e-mail, válido por 15 minutos e guardado como HMAC-SHA256 com `EMAIL_CODE_SECRET`, separado do `SESSION_SECRET`. A comparação é em tempo constante.
+- Depois de 5 tentativas erradas, o código é apagado. O reenvio fica liberado a cada 60 s e substitui o código anterior.
+- Código errado e código vencido recebem a mesma mensagem: "Código inválido ou vencido. Peça um novo."
+- Uma conta pendente não acessa nada:
+  - o cadastro não abre sessão e leva para `/verify-email`;
+  - o login de uma conta pendente com a senha certa leva à mesma tela e envia um código novo;
+  - confirmar o código abre a sessão.
+- A tela sabe de quem é o código por um cookie `pending_verification`, com JWT de 30 minutos e `aud` próprio, que o `verifySessionToken` recusa. O e-mail não vai na URL.
+- `getCurrentUser` exige `email_verified_at`. Todos os usuários atuais ficam pendentes na migration, e o João verifica a conta logo depois do deploy.
+- Cadastro com um e-mail já verificado recebe a mesma resposta de um cadastro novo e leva à mesma tela, sem criar código. O dono do endereço recebe um aviso ("alguém tentou criar uma conta com este e-mail"). O caminho calcula o hash da senha mesmo assim, para levar o mesmo tempo.
+- Uma conta pendente expira 3 dias depois de `created_at`, sem cron. Um novo cadastro com o mesmo e-mail substitui a conta pendente, vencida ou não.
+- O rate limit do Traefik passa a cobrir também o `POST` de `/verify-email`.
+- A tela `/verify-email` (campo de 6 dígitos, reenviar com contagem regressiva, trocar de conta) passa pelo `craft` antes de ser implementada.
+- Skills: `designing-data-models`, `modeling-entity-relationships`, `normalizing-relational-schemas`, `relational-keys-and-column-types`, `postgres-constraints-and-keys`, `defining-access-patterns`, `prisma-schema-and-migrations`, `prisma-transactions`, `nextjs-jwt-session`, `nextjs-auth-cookies`, `nextjs-credentials-auth-routes`, `cognito-sign-up-and-confirmation` (fluxo e mensagens), `nextjs-server-action-results`, `shadcn-react-hook-form`, `react-hook-form-zod`, `craft`.
+
+```
+User + emailVerifiedAt?, passwordChangedAt?        CHECK (email = lower(email))
+EmailCode (userId, purpose: VERIFY_EMAIL | RESET_PASSWORD, codeHash, sentAt, expiresAt, attempts)
+  @@id([userId, purpose]), onDelete: Cascade
+  CHECK (attempts BETWEEN 0 AND 5), CHECK (expiresAt > sentAt)
+```
+
+As leituras usam a chave primária de `email_codes` e o `email` único de `users`. Não há índice novo; conferir com `EXPLAIN` depois da migration.
+
+### Esqueci a senha (fatia 14)
+
+- A resposta é a mesma para qualquer e-mail: "se houver conta, enviamos um código". Só existe código para conta que existe.
+- O código `RESET_PASSWORD` usa a mesma tabela, a mesma tela de código e as mesmas regras. O código certo leva à tela de nova senha.
+- Redefinir a senha também verifica o e-mail de uma conta pendente.
+- `password_changed_at`: o `getCurrentUser` recusa token com `iat` anterior a essa data, o que derruba as outras sessões. Quem redefiniu a senha recebe uma sessão nova.
+- As telas passam pelo `craft`.
+- Skills: `cognito-password-reset` (fluxo), `nextjs-jwt-session`, `password-hashing`, `craft`.
+
 ## Processo
 
 - Commits pequenos, um assunto por commit.
@@ -96,3 +151,8 @@ Deletes em cascata de Workspace até Card.
 7. [x] Etiquetas e responsável, optimistic
 8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
 9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
+10. [ ] Auditoria da arquitetura contra as skills
+11. [ ] Módulos por funcionalidade
+12. [ ] Envio de e-mail: Mailpit, SES e templates
+13. [ ] Verificação de e-mail
+14. [ ] Esqueci a senha
