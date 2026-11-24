@@ -100,6 +100,11 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-24 — Abaixo de 1024px, uma faixa de 56px com botão de menu e workspace abre a barra como gaveta; o nome do quadro fica só no título logo abaixo — uma barra fixa roubaria espaço das colunas, e o nome repetido gastaria a largura do celular.
 - 2026-11-24 — Recolhida, o popover de quadros mostra a lista, o erro e o vazio, mas não cria quadro; criar fica na barra aberta e na página do workspace — o diálogo de criar não pode viver dentro de um popover que fecha ao clicar fora.
 - 2026-11-24 — Membro não vê "+ Novo quadro" nem Configurações na barra; Membros leva à aba Membros — a barra só mostra o que o papel pode usar.
+- 2026-11-24 — Ícone do app desenhado em https://claude.ai/artifact/FXRbLd6CJcp1tRU7tUGZ4Q, aprovado — `icon.svg`, `favicon.ico` (16, 32, 48) e `apple-icon.png` (180) saem da marca de barras, sem logo novo.
+- 2026-11-24 — Ícone numa grade de 32 com barras de 4, espaço de 2, alturas 16/10/6 e margem de 8 — toda borda cai em pixel inteiro em 16, 32 e 48px; a marca fica um pouco menor que no logo de 28px (50% contra 57%).
+- 2026-11-24 — Barras sem arredondamento no favicon; o `apple-icon` mantém o raio do logo — meio pixel de raio borrava o topo das barras em 16px.
+- 2026-11-24 — Uma versão do ícone para navegador claro e escuro; `apple-icon` com cantos retos e fundo cheio — o quadrado indigo separa o ícone dos dois cromos, e o iOS aplica a própria máscara.
+- 2026-11-24 — Sem manifest de PWA e sem imagem Open Graph por enquanto — o uso é no navegador de desktop; a prévia de link fica para uma rodada própria.
 
 ## Perguntas abertas
 
