@@ -13,6 +13,8 @@ import type {
   BoardColumn,
   CardUpdate,
 } from "@/components/boards/use-board-columns";
+import { useBoardFilter } from "@/components/boards/use-board-filter";
+import { isFilterActive } from "@/lib/board-filter";
 import { locateCard } from "@/lib/card-moves";
 
 const CARD_NOT_FOUND =
@@ -39,6 +41,7 @@ export function CardDialogHost({
   onUpdateCard,
 }: CardDialogHostProps) {
   const requestedId = readCardParam(useSearchParams());
+  const canReorder = !isFilterActive(useBoardFilter());
   const [dirtyCardId, setDirtyCardId] = useState<string | null>(null);
   const heldId =
     dirtyCardId !== null && locateCard(columns, dirtyCardId)
@@ -99,6 +102,7 @@ export function CardDialogHost({
       column={location.column}
       index={location.index}
       columns={columns}
+      canReorder={canReorder}
       isLeaving={heldId !== null && requestedId !== heldId}
       onDirtyChange={(isDirty) => {
         setDirtyCardId(isDirty ? cardId : null);

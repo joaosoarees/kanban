@@ -37,6 +37,7 @@ type CardDialogProps = {
   column: BoardColumn;
   index: number;
   columns: BoardColumn[];
+  canReorder: boolean;
   isLeaving: boolean;
   onDirtyChange: (isDirty: boolean) => void;
   onKeepEditing: () => void;
@@ -54,6 +55,7 @@ export function CardDialog({
   column,
   index,
   columns,
+  canReorder,
   isLeaving,
   onDirtyChange,
   onKeepEditing,
@@ -155,6 +157,7 @@ export function CardDialog({
               column={column}
               index={index}
               columns={columns}
+              canReorder={canReorder}
               onMove={onMoveCard}
             />
           )}
