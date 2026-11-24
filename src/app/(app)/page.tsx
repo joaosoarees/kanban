@@ -77,7 +77,7 @@ function WorkspaceCard({ workspace }: { workspace: WorkspaceSummary }) {
   return (
     <Link
       href={`/w/${workspace.slug}`}
-      className="flex flex-col gap-5 rounded-xl border bg-white p-5 shadow-xs transition-[border-color,box-shadow] outline-none hover:border-zinc-300 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none"
+      className="flex flex-col gap-5 rounded-xl border bg-card p-5 shadow-xs transition-[border-color,box-shadow] outline-none hover:border-border-strong hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none"
     >
       <span className="flex min-w-0 items-center gap-3">
         <WorkspaceTile
@@ -109,27 +109,27 @@ function WorkspacesSkeleton() {
       <div aria-hidden>
         <div className="flex items-end justify-between gap-4">
           <div className="flex flex-col gap-2.5">
-            <Skeleton className="h-[26px] w-60 bg-zinc-200" />
-            <Skeleton className="h-3.5 w-72 bg-zinc-200" />
+            <Skeleton className="h-[26px] w-60 bg-muted-strong" />
+            <Skeleton className="h-3.5 w-72 bg-muted-strong" />
           </div>
-          <Skeleton className="hidden h-10 w-40 rounded-lg bg-zinc-200 sm:block" />
+          <Skeleton className="hidden h-10 w-40 rounded-lg bg-muted-strong sm:block" />
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
           {[0, 1, 2].map((index) => (
             <div
               key={index}
-              className="flex flex-col gap-5 rounded-xl border bg-white p-5"
+              className="flex flex-col gap-5 rounded-xl border bg-card p-5"
             >
               <div className="flex items-center gap-3">
-                <Skeleton className="size-10 rounded-lg bg-zinc-200" />
+                <Skeleton className="size-10 rounded-lg bg-muted-strong" />
                 <div className="flex flex-1 flex-col gap-2">
-                  <Skeleton className="h-3.5 w-3/5 bg-zinc-200" />
-                  <Skeleton className="h-3 w-2/5 bg-zinc-200" />
+                  <Skeleton className="h-3.5 w-3/5 bg-muted-strong" />
+                  <Skeleton className="h-3 w-2/5 bg-muted-strong" />
                 </div>
               </div>
               <div className="flex justify-between">
-                <Skeleton className="h-3.5 w-24 bg-zinc-200" />
-                <Skeleton className="h-[22px] w-14 rounded-full bg-zinc-200" />
+                <Skeleton className="h-3.5 w-24 bg-muted-strong" />
+                <Skeleton className="h-[22px] w-14 rounded-full bg-muted-strong" />
               </div>
             </div>
           ))}

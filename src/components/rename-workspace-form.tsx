@@ -55,7 +55,7 @@ export function RenameWorkspaceForm({
   });
 
   return (
-    <div className="rounded-xl border bg-white p-5">
+    <div className="rounded-xl border bg-card p-5">
       <form
         onSubmit={(event) => {
           void onSubmit(event);

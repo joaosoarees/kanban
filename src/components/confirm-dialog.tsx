@@ -84,7 +84,7 @@ export function ConfirmDialog({
         {children}
         <div role="alert" className="empty:hidden">
           {error !== undefined && (
-            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="mt-4 rounded-lg border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text">
               {error}
             </p>
           )}

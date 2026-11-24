@@ -41,7 +41,7 @@ export function TextField({
           aria-invalid={hasError ? true : undefined}
           aria-describedby={messageId}
           className={cn(
-            "h-10 enabled:hover:border-zinc-300 aria-invalid:enabled:hover:border-destructive",
+            "h-10 enabled:hover:border-border-strong aria-invalid:enabled:hover:border-destructive",
             isPassword && "pr-11",
           )}
           {...props}
@@ -70,7 +70,7 @@ export function TextField({
         aria-live="polite"
         className={cn(
           "min-h-5 text-[13px]/5 text-pretty",
-          hasError ? "text-red-700" : "text-muted-foreground",
+          hasError ? "text-danger-text" : "text-muted-foreground",
         )}
       >
         {error ?? hint}

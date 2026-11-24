@@ -48,7 +48,7 @@ export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
   return (
     <section
       aria-labelledby="add-member-title"
-      className="rounded-xl border bg-white p-5"
+      className="rounded-xl border bg-card p-5"
     >
       <h2 id="add-member-title" className="text-[15px] font-semibold">
         Adicionar membro

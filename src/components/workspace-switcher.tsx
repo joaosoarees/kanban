@@ -45,13 +45,13 @@ export function WorkspaceSwitcher({
 
   return (
     <>
-      <span aria-hidden className="text-xl font-light text-zinc-300">
+      <span aria-hidden className="text-xl font-light text-fg-faint">
         /
       </span>
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={`Workspace atual: ${current.name}. Trocar de workspace`}
-          className="flex h-9 min-w-0 cursor-pointer items-center gap-2 rounded-lg pr-2 pl-1.5 text-sm font-medium outline-none hover:bg-zinc-100 focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-zinc-100"
+          className="flex h-9 min-w-0 cursor-pointer items-center gap-2 rounded-lg pr-2 pl-1.5 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted"
         >
           <WorkspaceTile
             name={current.name}
@@ -80,8 +80,8 @@ export function WorkspaceSwitcher({
                     ITEM_CLASS,
                     "h-12",
                     isCurrent
-                      ? "bg-indigo-50 focus:bg-indigo-50 data-highlighted:bg-indigo-50"
-                      : "focus:bg-zinc-100 data-highlighted:bg-zinc-100",
+                      ? "bg-accent focus:bg-accent data-highlighted:bg-accent"
+                      : "focus:bg-muted data-highlighted:bg-muted",
                   )}
                 >
                   <WorkspaceTile
@@ -112,7 +112,7 @@ export function WorkspaceSwitcher({
             className={ITEM_CLASS}
           >
             <span className="flex w-[22px] justify-center">
-              <Settings aria-hidden className="size-4 text-zinc-600" />
+              <Settings aria-hidden className="size-4 text-fg-muted" />
             </span>
             Configurações
           </Menu.LinkItem>
@@ -123,14 +123,14 @@ export function WorkspaceSwitcher({
             }}
             className={ITEM_CLASS}
           >
-            <span className="flex size-[22px] items-center justify-center rounded-[5px] border border-dashed border-zinc-400">
-              <Plus aria-hidden className="size-3.5 text-zinc-600" />
+            <span className="flex size-[22px] items-center justify-center rounded-[5px] border border-dashed border-border-control">
+              <Plus aria-hidden className="size-3.5 text-fg-muted" />
             </span>
             Novo workspace
           </DropdownMenuItem>
           <Menu.LinkItem render={<Link href="/" />} className={ITEM_CLASS}>
             <span className="flex w-[22px] justify-center">
-              <LayoutGrid aria-hidden className="size-4 text-zinc-600" />
+              <LayoutGrid aria-hidden className="size-4 text-fg-muted" />
             </span>
             Todos os workspaces
           </Menu.LinkItem>

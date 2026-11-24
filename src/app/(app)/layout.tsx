@@ -9,7 +9,7 @@ export default function AppLayout({
   crumb: ReactNode;
 }) {
   return (
-    <div className="flex min-h-svh flex-col bg-zinc-50">
+    <div className="flex min-h-svh flex-col bg-canvas">
       <Suspense fallback={<AppHeaderFallback />}>
         <AppHeader crumb={<Suspense>{crumb}</Suspense>} />
       </Suspense>

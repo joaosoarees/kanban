@@ -8,9 +8,9 @@ export const ROLE_LABELS: Record<Role, string> = {
 };
 
 const ROLE_STYLES: Record<Role, string> = {
-  OWNER: "border-indigo-200 bg-indigo-50 text-brand-strong",
-  ADMIN: "border-zinc-200 bg-zinc-100 text-zinc-700",
-  MEMBER: "border-zinc-200 bg-white text-zinc-600",
+  OWNER: "border-accent-border bg-accent text-brand-strong",
+  ADMIN: "border-border bg-muted text-fg-secondary",
+  MEMBER: "border-border bg-card text-fg-muted",
 };
 
 export function RoleBadge({ role }: { role: Role }) {
