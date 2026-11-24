@@ -2,16 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/logo";
 import { UserMenu } from "@/components/user-menu";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { requireUser } from "@/lib/auth";
-import { getMyWorkspaces } from "@/lib/workspaces";
 
-type HeaderFrameProps = {
-  children?: ReactNode;
-  actions?: ReactNode;
-};
-
-function HeaderFrame({ children, actions }: HeaderFrameProps) {
+function HeaderFrame({ actions }: { actions?: ReactNode }) {
   return (
     <header className="flex h-14 items-center justify-between gap-3 border-b bg-card px-3 sm:px-6">
       <nav
@@ -28,30 +21,17 @@ function HeaderFrame({ children, actions }: HeaderFrameProps) {
             Kanbanary
           </span>
         </Link>
-        {children}
       </nav>
       {actions ?? <span aria-hidden className="size-10 shrink-0" />}
     </header>
   );
 }
 
-export async function AppHeader({ crumb }: { crumb: ReactNode }) {
-  const [user, workspaces] = await Promise.all([
-    requireUser(),
-    getMyWorkspaces(),
-  ]);
+export async function AppHeader() {
+  const user = await requireUser();
 
   return (
-    <HeaderFrame actions={<UserMenu name={user.name} email={user.email} />}>
-      <WorkspaceSwitcher
-        workspaces={workspaces.map(({ id, name, slug }) => ({
-          id,
-          name,
-          slug,
-        }))}
-      />
-      {crumb}
-    </HeaderFrame>
+    <HeaderFrame actions={<UserMenu name={user.name} email={user.email} />} />
   );
 }
 

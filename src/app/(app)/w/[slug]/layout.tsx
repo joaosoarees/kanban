@@ -1,22 +1,17 @@
 import { Suspense } from "react";
-import { requireMembership } from "@/lib/workspaces";
+import { SidebarSkeleton } from "@/components/sidebar/sidebar-shell";
+import { WorkspaceSidebar } from "@/components/sidebar/workspace-sidebar";
 
 export default function WorkspaceLayout({
   children,
   params,
 }: LayoutProps<"/w/[slug]">) {
   return (
-    <>
-      <Suspense fallback={null}>
-        <MembersOnly params={params} />
+    <div className="flex min-h-svh flex-1 flex-col lg:flex-row">
+      <Suspense fallback={<SidebarSkeleton />}>
+        <WorkspaceSidebar params={params} />
       </Suspense>
-      {children}
-    </>
+      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+    </div>
   );
-}
-
-async function MembersOnly({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  await requireMembership(slug);
-  return null;
 }
