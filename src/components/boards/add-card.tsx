@@ -15,7 +15,7 @@ type AddCardProps = {
   workspaceId: string;
   boardId: string;
   columnId: string;
-  onCreated: () => void;
+  onCreated: (cardId: string) => void;
 };
 
 export function AddCard({
@@ -107,7 +107,7 @@ function AddCardForm({
         if (result.status === "success") {
           startTransition(() => {
             setValue("");
-            onCreated();
+            onCreated(result.data.id);
           });
           return;
         }

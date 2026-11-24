@@ -11,12 +11,14 @@ import { cn } from "@/lib/utils";
 type SortableCardProps = {
   card: BoardCard;
   columnId: string;
+  isDragDisabled: boolean;
   isDropDisabled: boolean;
 };
 
 export function SortableCard({
   card,
   columnId,
+  isDragDisabled,
   isDropDisabled,
 }: SortableCardProps) {
   const {
@@ -29,7 +31,7 @@ export function SortableCard({
   } = useSortable({
     id: card.id,
     data: { type: "card", columnId },
-    disabled: { droppable: isDropDisabled },
+    disabled: { draggable: isDragDisabled, droppable: isDropDisabled },
   });
 
   return (
@@ -43,9 +45,13 @@ export function SortableCard({
         isDragging &&
           "border-2 border-dashed border-brand bg-indigo-50 shadow-none *:invisible",
       )}
-      {...attributes}
-      {...listeners}
-      aria-roledescription="card arrastável"
+      {...(isDragDisabled
+        ? {}
+        : {
+            ...attributes,
+            ...listeners,
+            "aria-roledescription": "card arrastável",
+          })}
       onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
         if (event.pointerType !== "touch") {
           listeners?.onPointerDown(event);

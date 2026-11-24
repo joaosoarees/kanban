@@ -17,6 +17,10 @@ import {
   type BoardColumn,
 } from "@/components/boards/use-board-columns";
 import {
+  useBoardFilter,
+  useVisibleCards,
+} from "@/components/boards/use-board-filter";
+import {
   screenReaderInstructions,
   useBoardDrag,
 } from "@/components/boards/use-board-drag";
@@ -63,6 +67,7 @@ export function BoardColumns({
     onMoveColumn: move,
     onCommitCard: commitCardMove,
   });
+  const visibleCards = useVisibleCards(columns, useBoardFilter());
   const [isAdding, setIsAdding] = useState(false);
   const hasLoadedCollapsed = useCollapsedColumns((state) => state.hasLoaded);
   const addAnchorRef = useRef<HTMLDivElement>(null);
@@ -211,6 +216,8 @@ export function BoardColumns({
               workspaceId={workspaceId}
               boardId={boardId}
               column={column}
+              visibleCards={visibleCards.cardsOf?.(column) ?? null}
+              onCardCreated={visibleCards.reveal}
               index={index}
               total={columns.length}
               dragKind={activeDrag?.kind ?? null}

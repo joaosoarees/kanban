@@ -5,8 +5,19 @@ import { cn } from "@/lib/utils";
 export const COLUMN_SHELL =
   "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-zinc-100 p-2 sm:w-72";
 
-export function cardCountLabel(count: number) {
+export function cardCountLabel(count: number, visible: number | null = null) {
+  if (visible !== null) {
+    return `${visible} de ${cardsLabel(count)}`;
+  }
   return count === 0 ? "Sem cards" : cardsLabel(count);
+}
+
+export function deleteColumnDescription(cardCount: number) {
+  if (cardCount === 0) {
+    return "A coluna será apagada para todo o workspace. Isso não pode ser desfeito.";
+  }
+  const cards = cardCount === 1 ? "seu card" : `seus ${cardCount} cards`;
+  return `A coluna e ${cards} serão apagados para todo o workspace. Isso não pode ser desfeito.`;
 }
 
 export function ColumnPreview({
