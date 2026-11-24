@@ -86,7 +86,7 @@ jobs:
       - name: Trigger the Coolify deployment
         id: trigger
         run: |
-          response=$(curl -fsS -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" \
+          response=$(curl -fsS --max-time 30 -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" \
             "$COOLIFY_URL/api/v1/deploy?uuid=$COOLIFY_APP_UUID")
           echo "$response" | jq .
           echo "uuid=$(echo "$response" | jq -er '.deployments[0].deployment_uuid')" >> "$GITHUB_OUTPUT"
@@ -94,15 +94,21 @@ jobs:
         env:
           DEPLOYMENT_UUID: ${{ steps.trigger.outputs.uuid }}
         run: |
+          failures=0
           while true; do
-            status=$(curl -fsS -H "Authorization: Bearer $COOLIFY_TOKEN" \
-              "$COOLIFY_URL/api/v1/deployments/$DEPLOYMENT_UUID" | jq -r '.status')
-            echo "deployment $DEPLOYMENT_UUID: $status"
+            status=$(curl -fsS --max-time 15 -H "Authorization: Bearer $COOLIFY_TOKEN" \
+              "$COOLIFY_URL/api/v1/deployments/$DEPLOYMENT_UUID" | jq -r '.status') || status=""
+            echo "deployment $DEPLOYMENT_UUID: ${status:-unreachable}"
             case "$status" in
               finished) exit 0 ;;
-              queued|in_progress) sleep 10 ;;
+              queued|in_progress) failures=0; sleep 10 ;;
+              "")
+                failures=$((failures + 1))
+                [ "$failures" -lt 6 ] || exit 1
+                sleep 10
+                ;;
               *) exit 1 ;;
             esac
           done
       - name: Check the live health endpoint
-        run: curl -fsS --retry 5 --retry-delay 5 --retry-all-errors "$APP_URL/api/health"
+        run: curl -fsS --max-time 10 --retry 5 --retry-delay 5 --retry-all-errors "$APP_URL/api/health"
