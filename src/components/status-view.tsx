@@ -31,7 +31,7 @@ export function StatusView({
           aria-hidden
           className={cn(
             "size-[22px]",
-            tone === "danger" ? "text-destructive" : "text-brand-fg",
+            tone === "danger" ? "text-danger-text" : "text-brand-fg",
           )}
         />
       </span>

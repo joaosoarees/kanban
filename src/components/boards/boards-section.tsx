@@ -51,7 +51,7 @@ export async function BoardsSection({
           <span className="mb-2 flex size-12 items-center justify-center rounded-xl bg-danger-bg">
             <TriangleAlert
               aria-hidden
-              className="size-[22px] text-destructive"
+              className="size-[22px] text-danger-text"
             />
           </span>
           <h3 className="text-base font-semibold">
