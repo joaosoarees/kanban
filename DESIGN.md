@@ -97,7 +97,8 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-24 — Barra lateral desenhada no canvas da fatia 8 (pranchas 8.15 a 8.24), opção C da rodada de opções — escolha do João entre três direções.
 - 2026-11-24 — Dentro do workspace não há cabeçalho: a barra ocupa a altura toda com logo, seletor de workspace, quadros, Membros, Configurações e a conta no rodapé; o início mantém o cabeçalho — o quadro ganha 56px de altura e tudo do workspace fica num lugar só.
 - 2026-11-24 — Recolhida (botão de painel ou tecla `[`), a barra vira um trilho de 56px; o ícone Quadros abre a lista num popover — trocar de quadro continua a um clique sem reabrir a barra.
-- 2026-11-24 — Abaixo de 1024px, uma faixa de 56px com botão de menu, workspace e quadro atual abre a barra como gaveta — uma barra fixa roubaria espaço das colunas.
+- 2026-11-24 — Abaixo de 1024px, uma faixa de 56px com botão de menu e workspace abre a barra como gaveta; o nome do quadro fica só no título logo abaixo — uma barra fixa roubaria espaço das colunas, e o nome repetido gastaria a largura do celular.
+- 2026-11-24 — Recolhida, o popover de quadros mostra a lista, o erro e o vazio, mas não cria quadro; criar fica na barra aberta e na página do workspace — o diálogo de criar não pode viver dentro de um popover que fecha ao clicar fora.
 - 2026-11-24 — Membro não vê "+ Novo quadro" nem Configurações na barra; Membros leva à aba Membros — a barra só mostra o que o papel pode usar.
 
 ## Perguntas abertas
