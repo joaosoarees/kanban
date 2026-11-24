@@ -81,6 +81,13 @@ describe("cardDescriptionSchema", () => {
     expect(parsed.description).toBeNull();
   });
 
+  it("accepts its own empty output when parsed again", () => {
+    const first = cardDescriptionSchema.parse({ description: "" });
+    const second = cardDescriptionSchema.safeParse(first);
+    expect(second.success).toBe(true);
+    expect(second.data?.description).toBeNull();
+  });
+
   it("refuses a NUL character", () => {
     const parsed = cardDescriptionSchema.safeParse({
       description: `a${NUL}b`,

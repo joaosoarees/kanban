@@ -22,14 +22,20 @@ const cardTitle = z
 
 const cardDescription = z
   .string()
-  .trim()
-  .max(
-    CARD_DESCRIPTION_MAX_LENGTH,
-    `Use no máximo ${CARD_DESCRIPTION_MAX_LENGTH} caracteres.`,
-  )
-  .refine(hasNoNul, INVALID_CHARACTER)
-  .transform((description) =>
-    hasVisibleText(description) ? description : null,
+  .nullable()
+  .transform((description) => description ?? "")
+  .pipe(
+    z
+      .string()
+      .trim()
+      .max(
+        CARD_DESCRIPTION_MAX_LENGTH,
+        `Use no máximo ${CARD_DESCRIPTION_MAX_LENGTH} caracteres.`,
+      )
+      .refine(hasNoNul, INVALID_CHARACTER)
+      .transform((description) =>
+        hasVisibleText(description) ? description : null,
+      ),
   );
 
 export const createCardSchema = z.object({
