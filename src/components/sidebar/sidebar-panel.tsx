@@ -3,7 +3,7 @@
 import { LayoutGrid, Settings, SquareKanban, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { NewBoardButton } from "@/components/boards/new-board-button";
 import { RetryButton } from "@/components/boards/retry-button";
 import { LogoMark } from "@/components/logo";
@@ -42,21 +42,6 @@ export function useIsCurrentPath() {
     const target = href.toLowerCase();
     return pathname === target || (nested && pathname.startsWith(`${target}/`));
   };
-}
-
-export function revealCurrentLink(scrollArea: HTMLElement | null) {
-  const currentLink = scrollArea?.querySelector<HTMLElement>(
-    '[aria-current="page"]',
-  );
-  if (!scrollArea || !currentLink) {
-    return;
-  }
-  const area = scrollArea.getBoundingClientRect();
-  const link = currentLink.getBoundingClientRect();
-  if (link.top < area.top || link.bottom > area.bottom) {
-    scrollArea.scrollTop +=
-      link.top - area.top - (area.height - link.height) / 2;
-  }
 }
 
 export function SidebarHome() {
@@ -156,11 +141,6 @@ export function SidebarPanel({ data, headerAction }: SidebarPanelProps) {
   const { user, workspace, workspaces, boards } = data;
   const isCurrent = useIsCurrentPath();
   const paths = sidebarPaths(workspace.slug);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    revealCurrentLink(scrollRef.current);
-  }, []);
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -200,7 +180,7 @@ export function SidebarPanel({ data, headerAction }: SidebarPanelProps) {
         </div>
         <div aria-hidden className="mx-4 my-1.5 h-px shrink-0 bg-border" />
         <div
-          ref={scrollRef}
+          data-sidebar-scroll=""
           className="relative min-h-0 flex-1 overflow-y-auto px-2 pb-2"
         >
           <BoardsBody data={data} allowCreate />

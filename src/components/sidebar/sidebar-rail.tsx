@@ -7,10 +7,10 @@ import { LogoMark } from "@/components/logo";
 import {
   ICON_BUTTON,
   ICON_BUTTON_CURRENT,
+  revealCurrentLink,
 } from "@/components/sidebar/sidebar-links";
 import {
   BoardsBody,
-  revealCurrentLink,
   sidebarPaths,
   useIsCurrentPath,
   type SidebarData,
@@ -101,6 +101,7 @@ function RailBoards({ data }: { data: SidebarData }) {
       </Tooltip>
       <PopoverContent
         ref={scrollRef}
+        data-sidebar-scroll=""
         side="right"
         align="start"
         sideOffset={8}
