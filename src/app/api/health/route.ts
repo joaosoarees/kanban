@@ -8,7 +8,8 @@ export async function GET() {
   try {
     await db.$queryRaw`SELECT 1`;
     return Response.json({ status: "ok" }, { headers: NO_STORE });
-  } catch {
+  } catch (error) {
+    console.error("health check failed", error);
     return Response.json(
       { status: "unavailable" },
       { status: 503, headers: NO_STORE },
