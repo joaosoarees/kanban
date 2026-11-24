@@ -1,0 +1,86 @@
+"use client";
+
+import { ListFilter } from "lucide-react";
+import { FilterOptions } from "@/components/boards/filter-options";
+import {
+  replaceBoardFilter,
+  useBoardFilter,
+} from "@/components/boards/use-board-filter";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { activeFilterCount, NO_FILTER } from "@/lib/board-filter";
+import { cn } from "@/lib/utils";
+
+function clearFilter() {
+  replaceBoardFilter(NO_FILTER);
+}
+
+export function FilterMenu() {
+  const filter = useBoardFilter();
+  const count = activeFilterCount(filter);
+
+  return (
+    <div className="flex shrink-0 items-center gap-2 max-sm:order-1 sm:ml-auto">
+      {count > 0 && (
+        <>
+          <p className="hidden text-[13px] text-zinc-600 lg:block">
+            Limpe os filtros para arrastar cards.
+          </p>
+          <Button
+            variant="ghost"
+            onClick={clearFilter}
+            className="hidden h-8 px-2.5 sm:inline-flex"
+          >
+            Limpar filtros
+          </Button>
+        </>
+      )}
+      <Popover>
+        <PopoverTrigger
+          aria-label={
+            count === 0
+              ? undefined
+              : `Filtrar, ${count} ${count === 1 ? "filtro ativo" : "filtros ativos"}`
+          }
+          className={cn(
+            "inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-hidden transition-colors duration-150 hover:border-zinc-400 focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-8 sm:px-2.5",
+            count > 0 &&
+              "border-indigo-300 bg-indigo-50 text-brand-deep hover:border-indigo-400",
+          )}
+        >
+          <ListFilter aria-hidden className="size-4" />
+          Filtrar
+          {count > 0 && (
+            <span
+              aria-hidden
+              className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[13px] font-semibold text-white"
+            >
+              {count}
+            </span>
+          )}
+        </PopoverTrigger>
+        <PopoverContent
+          align="end"
+          aria-label="Filtrar cards"
+          className="w-[min(20rem,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0"
+        >
+          <FilterOptions filter={filter} />
+          <div className="flex justify-end border-t p-1.5">
+            <Button
+              variant="ghost"
+              disabled={count === 0}
+              onClick={clearFilter}
+              className="h-11 px-3 sm:h-8"
+            >
+              Limpar filtros
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
