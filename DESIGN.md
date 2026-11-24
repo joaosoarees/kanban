@@ -94,6 +94,11 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-24 — Novo papel `brand-fg` (claro `#4f46e5`, escuro `#a5b4fc`) para links, ícones e checks; texto em `brand-strong` e `brand-deep` passa a `accent-foreground` — o indigo cheio não lê como texto sobre fundo escuro.
 - 2026-11-24 — A prévia do quadro na entrada usa os tokens de etiqueta (UX roxo, API verde, Front azul) e o número das colunas em branco 70% — sem classes de paleta, legível nos dois temas.
 - 2026-11-24 — Hover de item em menu e popover afunda para `muted` também no escuro, e as variantes `dark:` geradas pelo shadcn ficam como vieram — mesma regra nos dois temas, arquivos gerados intocados.
+- 2026-11-24 — Barra lateral desenhada no canvas da fatia 8 (pranchas 8.15 a 8.24), opção C da rodada de opções — escolha do João entre três direções.
+- 2026-11-24 — Dentro do workspace não há cabeçalho: a barra ocupa a altura toda com logo, seletor de workspace, quadros, Membros, Configurações e a conta no rodapé; o início mantém o cabeçalho — o quadro ganha 56px de altura e tudo do workspace fica num lugar só.
+- 2026-11-24 — Recolhida (botão de painel ou tecla `[`), a barra vira um trilho de 56px; o ícone Quadros abre a lista num popover — trocar de quadro continua a um clique sem reabrir a barra.
+- 2026-11-24 — Abaixo de 1024px, uma faixa de 56px com botão de menu, workspace e quadro atual abre a barra como gaveta — uma barra fixa roubaria espaço das colunas.
+- 2026-11-24 — Membro não vê "+ Novo quadro" nem Configurações na barra; Membros leva à aba Membros — a barra só mostra o que o papel pode usar.
 
 ## Perguntas abertas
 
