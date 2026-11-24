@@ -149,9 +149,11 @@ function RailBoardsBody({ data }: { data: SidebarData }) {
 export function SidebarRail({
   data,
   onToggle,
+  focusToggle,
 }: {
   data: SidebarData;
   onToggle: () => void;
+  focusToggle: boolean;
 }) {
   const { user, workspace, workspaces } = data;
   const paths = sidebarPaths(workspace.slug);
@@ -167,7 +169,7 @@ export function SidebarRail({
         <LogoMark />
       </Link>
       <div className="mt-2.5">
-        <ToggleButton collapsed onToggle={onToggle} />
+        <ToggleButton collapsed onToggle={onToggle} takeFocus={focusToggle} />
       </div>
       <div className="my-1.5">
         <WorkspaceSwitcher

@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useLayoutEffect, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { LogoMark } from "@/components/logo";
 import { CloseDrawerButton, MobileBar } from "@/components/sidebar/mobile-bar";
 import { DESKTOP_QUERY } from "@/components/sidebar/sidebar-links";
@@ -71,17 +79,34 @@ function useToggleShortcut(toggle: () => void) {
   }, [toggle]);
 }
 
+function useToggleKeepingFocus(
+  toggle: () => void,
+  frameRef: RefObject<HTMLElement | null>,
+) {
+  const [focusToggle, setFocusToggle] = useState(false);
+
+  const toggleKeepingFocus = useCallback(() => {
+    setFocusToggle(frameRef.current?.contains(document.activeElement) ?? false);
+    toggle();
+  }, [toggle, frameRef]);
+
+  return { focusToggle, toggleKeepingFocus };
+}
+
 function DesktopFrame({
+  frameRef,
   collapsed,
   animate,
   children,
 }: {
+  frameRef?: RefObject<HTMLElement | null>;
   collapsed: boolean;
   animate: boolean;
   children: ReactNode;
 }) {
   return (
     <aside
+      ref={frameRef}
       aria-label="Navegação do workspace"
       className={cn(
         "sticky top-0 hidden h-svh shrink-0 overflow-hidden border-r bg-card lg:block",
@@ -101,7 +126,12 @@ function DesktopFrame({
 
 export function SidebarShell({ data }: { data: SidebarData }) {
   const { collapsed, hasToggled, toggle } = useSidebarPreference();
-  useToggleShortcut(toggle);
+  const frameRef = useRef<HTMLElement>(null);
+  const { focusToggle, toggleKeepingFocus } = useToggleKeepingFocus(
+    toggle,
+    frameRef,
+  );
+  useToggleShortcut(toggleKeepingFocus);
 
   return (
     <TooltipProvider delay={300}>
@@ -111,13 +141,27 @@ export function SidebarShell({ data }: { data: SidebarData }) {
           <SidebarPanel data={data} headerAction={<CloseDrawerButton />} />
         }
       />
-      <DesktopFrame collapsed={collapsed} animate={hasToggled}>
+      <DesktopFrame
+        frameRef={frameRef}
+        collapsed={collapsed}
+        animate={hasToggled}
+      >
         {collapsed ? (
-          <SidebarRail data={data} onToggle={toggle} />
+          <SidebarRail
+            data={data}
+            onToggle={toggleKeepingFocus}
+            focusToggle={focusToggle}
+          />
         ) : (
           <SidebarPanel
             data={data}
-            headerAction={<ToggleButton collapsed={false} onToggle={toggle} />}
+            headerAction={
+              <ToggleButton
+                collapsed={false}
+                onToggle={toggleKeepingFocus}
+                takeFocus={focusToggle}
+              />
+            }
           />
         )}
       </DesktopFrame>
