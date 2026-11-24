@@ -85,7 +85,7 @@ jobs:
       - name: Trigger the Coolify deployment
         id: trigger
         run: |
-          response=$(curl -fsS -H "Authorization: Bearer $COOLIFY_TOKEN" \
+          response=$(curl -fsS -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" \
             "$COOLIFY_URL/api/v1/deploy?uuid=$COOLIFY_APP_UUID")
           echo "$response" | jq .
           echo "uuid=$(echo "$response" | jq -er '.deployments[0].deployment_uuid')" >> "$GITHUB_OUTPUT"
