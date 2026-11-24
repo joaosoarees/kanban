@@ -35,7 +35,7 @@ export default async function BoardPage({
   }));
 
   return (
-    <main className="flex h-[calc(100svh-3.5rem)] min-h-0 flex-col">
+    <main className="flex h-[calc(100svh-3.5rem)] min-h-0 flex-col lg:h-svh">
       <BoardMetaProvider labels={board.labels} members={members}>
         <div className="flex h-14 shrink-0 items-center gap-2 px-3 sm:h-16 sm:px-6">
           <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight max-sm:flex-1 sm:text-xl">

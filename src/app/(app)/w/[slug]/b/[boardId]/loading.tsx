@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BoardLoading() {
   return (
-    <main className="flex h-[calc(100svh-3.5rem)] min-h-0 flex-col">
+    <main className="flex h-[calc(100svh-3.5rem)] min-h-0 flex-col lg:h-svh">
       <output className="flex min-h-0 flex-1 flex-col">
         <span className="sr-only">Carregando o quadro…</span>
         <div aria-hidden className="flex min-h-0 flex-1 flex-col">

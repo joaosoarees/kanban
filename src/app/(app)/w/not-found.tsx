@@ -1,5 +1,7 @@
 import { SearchX } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
+import { AppHeader, AppHeaderFallback } from "@/components/app-header";
 import { linkButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
 
@@ -7,6 +9,9 @@ export default function WorkspaceNotFound() {
   return (
     <>
       <title>Workspace não encontrado · Kanbanary</title>
+      <Suspense fallback={<AppHeaderFallback />}>
+        <AppHeader />
+      </Suspense>
       <StatusView
         icon={SearchX}
         eyebrow="404"
