@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SearchX } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -5,22 +6,21 @@ import { linkButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
 import { getCurrentUser } from "@/lib/auth";
 
+export const metadata: Metadata = { title: "Página não encontrada" };
+
 export default function NotFound() {
   return (
-    <>
-      <title>Página não encontrada · Kanbanary</title>
-      <StatusView
-        icon={SearchX}
-        eyebrow="404"
-        title="Página não encontrada"
-        description="O endereço pode estar errado ou a página foi removida."
-        actions={
-          <Suspense fallback={<span aria-hidden className="h-10" />}>
-            <NotFoundAction />
-          </Suspense>
-        }
-      />
-    </>
+    <StatusView
+      icon={SearchX}
+      eyebrow="404"
+      title="Página não encontrada"
+      description="O endereço pode estar errado ou a página foi removida."
+      actions={
+        <Suspense fallback={<span aria-hidden className="h-10" />}>
+          <NotFoundAction />
+        </Suspense>
+      }
+    />
   );
 }
 
