@@ -1,16 +1,29 @@
 "use client";
 
-import { Loader2, LogOut } from "lucide-react";
+import { Menu } from "@base-ui/react/menu";
+import { Check, Loader2, LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useTransition } from "react";
 import { signOutAction } from "@/app/(auth)/actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { initialsOf } from "@/lib/initials";
+
+const THEME_OPTIONS = [
+  { value: "light", label: "Claro", Icon: Sun },
+  { value: "dark", label: "Escuro", Icon: Moon },
+  { value: "system", label: "Sistema", Icon: Monitor },
+] as const;
+
+const ITEM_CLASS =
+  "flex h-10 cursor-pointer items-center gap-2.5 rounded-md px-2 text-sm outline-hidden select-none data-highlighted:bg-muted";
 
 type UserMenuProps = {
   name: string;
@@ -19,6 +32,7 @@ type UserMenuProps = {
 
 export function UserMenu({ name, email }: UserMenuProps) {
   const [isPending, startTransition] = useTransition();
+  const { theme = "system", setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -38,6 +52,33 @@ export function UserMenu({ name, email }: UserMenuProps) {
           </span>
         </div>
         <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="px-2 pt-1.5 pb-1 text-xs text-fg-muted">
+            Tema
+          </DropdownMenuLabel>
+          <Menu.RadioGroup
+            value={theme}
+            onValueChange={(value: string) => {
+              setTheme(value);
+            }}
+          >
+            {THEME_OPTIONS.map(({ value, label, Icon }) => (
+              <Menu.RadioItem
+                key={value}
+                value={value}
+                closeOnClick={false}
+                className={ITEM_CLASS}
+              >
+                <Icon aria-hidden className="size-4 text-fg-muted" />
+                {label}
+                <Menu.RadioItemIndicator className="ml-auto flex">
+                  <Check aria-hidden className="size-4 text-brand-fg" />
+                </Menu.RadioItemIndicator>
+              </Menu.RadioItem>
+            ))}
+          </Menu.RadioGroup>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
         <DropdownMenuItem
           closeOnClick={false}
           disabled={isPending}
@@ -46,7 +87,7 @@ export function UserMenu({ name, email }: UserMenuProps) {
               await signOutAction();
             });
           }}
-          className="h-10 cursor-pointer gap-2.5 px-2 data-disabled:cursor-wait"
+          className="h-10 cursor-pointer gap-2.5 px-2 focus:bg-muted focus:text-foreground not-data-[variant=destructive]:focus:**:text-foreground data-disabled:cursor-wait"
         >
           {isPending ? (
             <Loader2
