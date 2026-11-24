@@ -47,7 +47,7 @@ export function FilterMenu() {
               : `Filtrar, ${count} ${count === 1 ? "filtro ativo" : "filtros ativos"}`
           }
           className={cn(
-            "inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground outline-hidden transition-colors duration-150 hover:border-border-control focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-8 sm:px-2.5",
+            "inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground outline-hidden transition-colors duration-150 hover:border-border-control focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:h-8 sm:px-2.5",
             count > 0 &&
               "border-accent-border bg-accent text-accent-foreground hover:border-accent-border-hover",
           )}

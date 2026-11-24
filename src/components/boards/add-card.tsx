@@ -164,7 +164,7 @@ function AddCardForm({
         className={cn(
           "block w-full resize-none rounded-lg border bg-card px-2.5 py-2 text-[15px]/5 outline-hidden placeholder:text-muted-foreground focus-visible:ring-3 sm:text-sm/5",
           error === undefined
-            ? "border-brand focus-visible:ring-ring/50"
+            ? "border-ring focus-visible:ring-ring/50"
             : "border-destructive focus-visible:ring-destructive/20",
         )}
       />

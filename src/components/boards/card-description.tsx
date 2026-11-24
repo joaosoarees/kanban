@@ -63,7 +63,7 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
               BOX,
               "resize-none",
               error === undefined
-                ? "border-brand focus-visible:ring-ring/50"
+                ? "border-ring focus-visible:ring-ring/50"
                 : "border-destructive focus-visible:ring-destructive/20",
             )}
           />
@@ -96,7 +96,7 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
           onClick={state.startEditing}
           className={cn(
             BOX,
-            "flex cursor-text items-start overflow-y-auto border-border text-left transition-colors duration-150 hover:border-border-control focus-visible:border-brand focus-visible:ring-ring/50 motion-reduce:transition-none",
+            "flex cursor-text items-start overflow-y-auto border-border text-left transition-colors duration-150 hover:border-border-control focus-visible:border-ring focus-visible:ring-ring/50 motion-reduce:transition-none",
             saved === null && "text-fg-muted",
           )}
         >

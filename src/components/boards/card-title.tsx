@@ -172,7 +172,7 @@ function CardTitleEditor({
             close();
           }
         }}
-        className={`${TITLE_TEXT} block field-sizing-content resize-none border border-brand bg-card outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50`}
+        className={`${TITLE_TEXT} block field-sizing-content resize-none border border-ring bg-card outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50`}
       />
       {error !== undefined && (
         <p

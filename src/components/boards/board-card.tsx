@@ -73,7 +73,7 @@ export function BoardCardButton({
       type="button"
       className={cn(
         CARD,
-        "cursor-pointer outline-hidden transition-colors duration-150 hover:border-border-control focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
+        "cursor-pointer outline-hidden transition-colors duration-150 hover:border-border-control focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
         className,
       )}
       {...props}

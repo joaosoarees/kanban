@@ -112,7 +112,7 @@ export function LabelPicker({
           }
         }}
       >
-        <PopoverTrigger className="inline-flex h-11 w-full cursor-pointer items-center justify-center gap-1 rounded-[5px] border border-dashed border-border-control bg-card px-3 text-sm font-medium text-fg-secondary outline-hidden hover:bg-muted focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-6 sm:w-auto sm:px-[7px] sm:text-[13px]">
+        <PopoverTrigger className="inline-flex h-11 w-full cursor-pointer items-center justify-center gap-1 rounded-[5px] border border-dashed border-border-control bg-card px-3 text-sm font-medium text-fg-secondary outline-hidden hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-6 sm:w-auto sm:px-[7px] sm:text-[13px]">
           <Plus aria-hidden className="size-3.5" />
           Etiqueta
         </PopoverTrigger>
