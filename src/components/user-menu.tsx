@@ -1,7 +1,15 @@
 "use client";
 
 import { Menu } from "@base-ui/react/menu";
-import { Check, Loader2, LogOut, Monitor, Moon, Sun } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  LogOut,
+  Monitor,
+  Moon,
+  Sun,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTransition } from "react";
 import { signOutAction } from "@/app/(auth)/actions";
@@ -16,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { initialsOf } from "@/lib/initials";
 import { revealTheme } from "@/lib/reveal-theme";
+import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS = [
   { value: "light", label: "Claro", Icon: Sun },
@@ -53,9 +62,16 @@ function resolveTheme(choice: string) {
 type UserMenuProps = {
   name: string;
   email: string;
+  trigger?: "avatar" | "row";
+  side?: "bottom" | "top" | "right";
 };
 
-export function UserMenu({ name, email }: UserMenuProps) {
+export function UserMenu({
+  name,
+  email,
+  trigger = "avatar",
+  side = "bottom",
+}: UserMenuProps) {
   const [isPending, startTransition] = useTransition();
   const { theme = "system", resolvedTheme, setTheme } = useTheme();
 
@@ -63,13 +79,42 @@ export function UserMenu({ name, email }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Conta de ${name}`}
-        className="group flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+        className={cn(
+          "group flex shrink-0 cursor-pointer items-center outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
+          trigger === "avatar"
+            ? "size-10 justify-center rounded-full"
+            : "h-12 w-full gap-2.5 rounded-lg px-2 text-left data-popup-open:bg-muted",
+        )}
       >
-        <span className="flex size-8 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-accent-foreground group-data-popup-open:ring-3 group-data-popup-open:ring-ring/30">
+        <span
+          className={cn(
+            "flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-strong text-[13px] font-semibold text-accent-foreground",
+            trigger === "avatar" &&
+              "group-data-popup-open:ring-3 group-data-popup-open:ring-ring/30",
+          )}
+        >
           {initialsOf(name)}
         </span>
+        {trigger === "row" && (
+          <>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-medium">{name}</span>
+              <span className="truncate text-xs text-muted-foreground">
+                {email}
+              </span>
+            </span>
+            <ChevronsUpDown
+              aria-hidden
+              className="size-3.5 shrink-0 text-muted-foreground"
+            />
+          </>
+        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60 p-1.5">
+      <DropdownMenuContent
+        side={side}
+        align={side === "top" ? "start" : "end"}
+        className="w-60 p-1.5"
+      >
         <div className="flex flex-col p-2">
           <span className="truncate text-sm font-medium">{name}</span>
           <span className="truncate text-[13px] text-muted-foreground">

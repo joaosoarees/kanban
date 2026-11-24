@@ -264,6 +264,27 @@
   }
 }
 
+:is([data-slot="tooltip-content"], [data-slot="popover-content"]) {
+  &[data-open] {
+    --tw-duration: 140ms;
+    --tw-ease: ease-out;
+  }
+  &[data-closed] {
+    --tw-duration: 90ms;
+    --tw-exit-scale: 1;
+  }
+}
+
+[data-slot="sidebar-drawer"] {
+  &[data-open] {
+    --tw-duration: 160ms;
+    --tw-ease: ease-out;
+  }
+  &[data-closed] {
+    --tw-duration: 100ms;
+  }
+}
+
 :is([data-slot="dialog-overlay"], [data-slot="alert-dialog-overlay"]) {
   &[data-open] {
     --tw-duration: 160ms;
@@ -295,7 +316,10 @@
     [data-slot="alert-dialog-content"],
     [data-slot="alert-dialog-overlay"],
     [data-slot="dropdown-menu-content"],
-    [data-slot="dropdown-menu-sub-content"]
+    [data-slot="dropdown-menu-sub-content"],
+    [data-slot="tooltip-content"],
+    [data-slot="popover-content"],
+    [data-slot="sidebar-drawer"]
   ) {
     animation: none;
   }
