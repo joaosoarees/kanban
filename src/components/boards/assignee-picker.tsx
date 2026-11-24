@@ -55,7 +55,7 @@ export function AssigneePicker({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Responsável: ${assignee?.name ?? "ninguém"}. Alterar`}
-        className="inline-flex h-11 w-full max-w-full cursor-pointer items-center gap-1.5 rounded-md border border-border pr-2.5 pl-2 text-sm font-[450] outline-hidden transition-colors duration-150 hover:bg-muted focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:border-accent-border data-popup-open:bg-accent motion-reduce:transition-none sm:h-8 sm:w-fit sm:border-transparent sm:pr-2 sm:pl-1"
+        className="inline-flex h-11 w-full max-w-full cursor-pointer items-center gap-1.5 rounded-md border border-border pr-2.5 pl-2 text-sm font-[450] outline-hidden transition-colors duration-150 hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:border-accent-border data-popup-open:bg-accent motion-reduce:transition-none sm:h-8 sm:w-fit sm:border-transparent sm:pr-2 sm:pl-1"
       >
         <MemberAvatar name={assignee?.name ?? null} />
         <span
