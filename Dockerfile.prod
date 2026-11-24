@@ -27,7 +27,7 @@ FROM deps AS build
 
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN bun run build
+RUN mkdir -p public && bun run build
 
 FROM gcr.io/distroless/nodejs24-debian13:nonroot AS runner
 
