@@ -1,23 +1,18 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import type * as z from "zod";
 import { renameWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
-import { applyActionErrors } from "@/lib/form-errors";
+import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 import {
   renameWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
 } from "@/lib/workspace-schemas";
 
-type RenameInput = z.input<typeof renameWorkspaceSchema>;
-type RenameOutput = z.output<typeof renameWorkspaceSchema>;
+const RENAME_FAILED = "Não foi possível renomear o workspace. Tente de novo.";
 
 type RenameWorkspaceFormProps = {
   workspaceId: string;
@@ -30,36 +25,29 @@ export function RenameWorkspaceForm({
   name,
   slug,
 }: RenameWorkspaceFormProps) {
-  const [isPending, startTransition] = useTransition();
   const {
-    register,
-    handleSubmit,
-    setError,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<RenameInput, unknown, RenameOutput>({
-    resolver: zodResolver(renameWorkspaceSchema),
+    form: {
+      register,
+      reset,
+      formState: { errors, isDirty },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: renameWorkspaceSchema,
     defaultValues: { name },
-  });
-
-  const onSubmit = handleSubmit((values) => {
-    startTransition(async () => {
-      const result = await renameWorkspaceAction(workspaceId, values);
-      if (result.status === "error") {
-        applyActionErrors(result, setError);
-        return;
-      }
+    action: async (values) => renameWorkspaceAction(workspaceId, values),
+    failure: RENAME_FAILED,
+    onSuccess: (_, values) => {
       reset({ name: values.name });
       toast.success("Nome do workspace atualizado.");
-    });
+    },
   });
 
   return (
     <div className="rounded-xl border bg-card p-5">
       <form
-        onSubmit={(event) => {
-          void onSubmit(event);
-        }}
+        onSubmit={submit}
         noValidate
         aria-busy={isPending}
         className="max-w-[480px]"
