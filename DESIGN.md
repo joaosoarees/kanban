@@ -78,6 +78,12 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-23 — Responsável e etiquetas ficam numa faixa abaixo do título do diálogo — ficam perto do que identifica o card e a descrição mantém o espaço.
 - 2026-11-23 — Popover entra no sistema para o seletor de etiquetas — busca, lista e edição precisam de um painel que não feche ao marcar.
 - 2026-11-23 — Excluir etiqueta, remover membro e sair do workspace informam quantos cards serão afetados — a pessoa decide sabendo o impacto.
+- 2026-11-24 — Filtros desenhados no canvas da fatia 7 (pranchas 7.11 a 7.14), aprovados — mesma fatia, mesmo canvas.
+- 2026-11-24 — Um só botão "Filtrar" com popover de Responsável e Etiquetas, igual no desktop e no celular — cabe no cabeçalho de 390px e segue o padrão de Linear e Trello.
+- 2026-11-24 — Responsável no filtro é escolha única, com "Qualquer responsável" como padrão e "Sem responsável" — espelha `assignee=id|none` da URL.
+- 2026-11-24 — O botão mostra quantos filtros estão ativos, somando cada etiqueta e o responsável — a pessoa vê de longe que o quadro está filtrado.
+- 2026-11-24 — Card que deixa de bater com o filtro não ganha marca e só some quando o filtro muda — simplicidade antes de recurso.
+- 2026-11-24 — Com filtro, a coluna mostra "3 de 12", a recolhida mostra só o número filtrado e o desktop avisa "Limpe os filtros para arrastar cards" — o arraste desligado não fica sem explicação.
 
 ## Perguntas abertas
 
