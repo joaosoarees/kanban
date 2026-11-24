@@ -16,6 +16,25 @@ export const SIDEBAR_ITEM =
 export const SIDEBAR_ITEM_CURRENT =
   "bg-accent text-accent-foreground hover:bg-accent [&>svg]:text-brand-fg";
 
+export function revealInScrollArea(link: HTMLElement | null) {
+  const scrollArea = link?.closest<HTMLElement>("[data-sidebar-scroll]");
+  if (!link || !scrollArea) {
+    return;
+  }
+  const area = scrollArea.getBoundingClientRect();
+  const linkBox = link.getBoundingClientRect();
+  if (linkBox.top < area.top || linkBox.bottom > area.bottom) {
+    scrollArea.scrollTop +=
+      linkBox.top - area.top - (area.height - linkBox.height) / 2;
+  }
+}
+
+export function revealCurrentLink(scrollArea: HTMLElement | null) {
+  revealInScrollArea(
+    scrollArea?.querySelector<HTMLElement>('[aria-current="page"]') ?? null,
+  );
+}
+
 type SidebarLinkProps = {
   href: string;
   icon: LucideIcon;
@@ -47,6 +66,7 @@ export function SidebarLink({
       <TooltipTrigger
         render={
           <Link
+            ref={current ? revealInScrollArea : undefined}
             href={href}
             aria-current={current ? "page" : undefined}
             className={cn(SIDEBAR_ITEM, current && SIDEBAR_ITEM_CURRENT)}
