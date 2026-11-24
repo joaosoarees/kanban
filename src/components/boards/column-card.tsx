@@ -160,7 +160,7 @@ export function ColumnCard({
       className={cn(
         COLUMN_SHELL,
         "motion-reduce:transition-none!",
-        isDragging && "border-2 border-dashed border-brand bg-accent p-1.5",
+        isDragging && "border-2 border-dashed border-brand-fg bg-accent p-1.5",
         isOver && "bg-accent",
       )}
     >
