@@ -8,10 +8,17 @@ import { primaryButton } from "@/components/button-styles";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const BUTTON_VARIANT = {
+  primary: "default",
+  outline: "outline",
+  icon: "ghost",
+} as const;
+
 type NewBoardButtonProps = {
   workspaceId: string;
   boardsHref: string;
   label: string;
+  appearance?: "primary" | "outline" | "icon";
   className?: string;
 };
 
@@ -19,6 +26,7 @@ export function NewBoardButton({
   workspaceId,
   boardsHref,
   label,
+  appearance = "primary",
   className,
 }: NewBoardButtonProps) {
   const [open, setOpen] = useState(false);
@@ -26,13 +34,21 @@ export function NewBoardButton({
   return (
     <>
       <Button
+        variant={BUTTON_VARIANT[appearance]}
+        size={appearance === "icon" ? "icon-sm" : "default"}
+        aria-label={appearance === "icon" ? label : undefined}
         onClick={() => {
           setOpen(true);
         }}
-        className={cn("px-3.5", primaryButton, className)}
+        className={cn(
+          appearance === "primary" && ["px-3.5", primaryButton],
+          appearance === "outline" && "px-3",
+          appearance === "icon" && "text-fg-muted",
+          className,
+        )}
       >
         <Plus aria-hidden />
-        {label}
+        {appearance !== "icon" && label}
       </Button>
       <BoardNameDialog
         open={open}
