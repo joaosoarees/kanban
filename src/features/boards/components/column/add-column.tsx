@@ -49,7 +49,7 @@ export function AddColumn({
   return (
     <div
       ref={anchorRef}
-      className="w-[312px] shrink-0 snap-center self-start sm:w-72"
+      className="w-[312px] shrink-0 snap-center self-start sm:w-68"
     >
       {isOpen ? (
         <AddColumnForm

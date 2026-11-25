@@ -13,10 +13,10 @@ export default function BoardLoading() {
             {[1, 2, 3].map((item) => (
               <Skeleton
                 key={item}
-                className="h-full w-[312px] shrink-0 rounded-xl bg-muted-strong sm:w-72"
+                className="h-full w-[312px] shrink-0 rounded-xl bg-muted-strong sm:w-68"
               />
             ))}
-            <Skeleton className="h-11 w-[312px] shrink-0 rounded-xl bg-muted-strong sm:h-10 sm:w-72" />
+            <Skeleton className="h-11 w-[312px] shrink-0 rounded-xl bg-muted-strong sm:h-10 sm:w-68" />
           </div>
         </div>
       </output>
