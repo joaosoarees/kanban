@@ -25,14 +25,16 @@ O auto-deploy por webhook do GitHub App fica desligado: quem decide o deploy é 
 
 No Coolify, no recurso `kanban`:
 
-| Variável                                                   | Origem                                                       |
-| ---------------------------------------------------------- | ------------------------------------------------------------ |
-| `SERVICE_PASSWORD_POSTGRES`                                | gerada pelo Coolify                                          |
-| `SERVICE_BASE64_64_SESSION`                                | gerada pelo Coolify; trocar derruba todas as sessões         |
-| `SERVICE_FQDN_APP`                                         | preenchida pelo Coolify a partir do domínio do serviço `app` |
-| `BACKUP_S3_ENDPOINT`, `BACKUP_S3_BUCKET`, `BACKUP_S3_PATH` | destino do backup                                            |
-| `BACKUP_AWS_ACCESS_KEY_ID`, `BACKUP_AWS_SECRET_ACCESS_KEY` | credencial com acesso ao prefixo do backup                   |
-| `BACKUP_NOTIFICATION_URLS`                                 | URL SMTP para avisar quando o backup falha                   |
+| Variável                                                   | Origem                                                                                                  |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `SERVICE_PASSWORD_POSTGRES`                                | gerada pelo Coolify                                                                                     |
+| `SERVICE_BASE64_64_SESSION`                                | gerada pelo Coolify; trocar derruba todas as sessões                                                    |
+| `SERVICE_FQDN_APP`                                         | preenchida pelo Coolify a partir do domínio do serviço `app`                                            |
+| `BACKUP_S3_ENDPOINT`, `BACKUP_S3_BUCKET`, `BACKUP_S3_PATH` | destino do backup                                                                                       |
+| `BACKUP_AWS_ACCESS_KEY_ID`, `BACKUP_AWS_SECRET_ACCESS_KEY` | credencial com acesso ao prefixo do backup                                                              |
+| `BACKUP_NOTIFICATION_URLS`                                 | URL SMTP para avisar quando o backup falha                                                              |
+| `MAIL_FROM`                                                | remetente dos e-mails do app, num endereço do domínio verificado no SES                                 |
+| `MAIL_AWS_ACCESS_KEY_ID`, `MAIL_AWS_SECRET_ACCESS_KEY`     | chave do usuário IAM `kanban-mailer`, só com `ses:SendRawEmail` na identidade do domínio em `sa-east-1` |
 
 Os segredos ficam marcados como só de runtime, para não virarem build args.
 
