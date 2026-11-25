@@ -7,11 +7,29 @@ import {
   signInSchema,
   signUpSchema,
 } from "@/features/auth/lib/schemas";
+import {
+  INVALID_CODE_MESSAGE,
+  MAIL_FAILED_MESSAGE,
+  PENDING_EXPIRED_MESSAGE,
+  verifyCodeSchema,
+} from "@/features/auth/lib/email-code";
 import { hashPassword, verifyPassword } from "@/features/auth/server/password";
-import type { ActionResult } from "@/lib/action-result";
+import {
+  resendVerification,
+  verifyEmail,
+} from "@/features/auth/server/verification";
+import {
+  type ActionError,
+  type ActionResult,
+  invalidFields,
+} from "@/lib/action-result";
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
-import { endSession, startSession } from "@/server/session";
+import {
+  endSession,
+  getPendingVerification,
+  startSession,
+} from "@/server/session";
 
 const AFTER_SIGN_IN = "/";
 
@@ -83,4 +101,58 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 export async function signOutAction(): Promise<void> {
   await endSession();
   return redirect("/sign-in");
+}
+
+const PENDING_EXPIRED: ActionError = {
+  status: "error",
+  message: PENDING_EXPIRED_MESSAGE,
+  gone: true,
+};
+
+export async function verifyEmailAction(input: unknown): Promise<ActionResult> {
+  const parsed = verifyCodeSchema.safeParse(input);
+  if (!parsed.success) {
+    return invalidFields(parsed.error);
+  }
+
+  const pending = await getPendingVerification();
+  if (pending === null) {
+    return PENDING_EXPIRED;
+  }
+
+  const outcome = await verifyEmail(pending, parsed.data.code, new Date());
+  if (outcome === "expired") {
+    return PENDING_EXPIRED;
+  }
+  if (outcome === "invalid") {
+    return {
+      status: "error",
+      message: INVALID_CODE_MESSAGE,
+      fieldErrors: { code: [INVALID_CODE_MESSAGE] },
+    };
+  }
+
+  await startSession(pending.userId);
+  return redirect(AFTER_SIGN_IN);
+}
+
+export async function resendCodeAction(): Promise<
+  ActionResult<{ sent: boolean; waitSeconds: number }>
+> {
+  const pending = await getPendingVerification();
+  if (pending === null) {
+    return PENDING_EXPIRED;
+  }
+
+  const resend = await resendVerification(pending, new Date());
+  if (resend.status === "expired") {
+    return PENDING_EXPIRED;
+  }
+  if (resend.status === "failed") {
+    return { status: "error", message: MAIL_FAILED_MESSAGE };
+  }
+  return {
+    status: "success",
+    data: { sent: resend.status === "sent", waitSeconds: resend.waitSeconds },
+  };
 }
