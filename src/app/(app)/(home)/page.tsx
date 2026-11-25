@@ -92,7 +92,7 @@ function WorkspaceCard({ workspace }: { workspace: WorkspaceSummary }) {
           <span className="truncate text-[15px] font-semibold">
             {workspace.name}
           </span>
-          <span className="truncate font-mono text-xs text-muted-foreground">
+          <span className="truncate font-mono text-[13px]/5 text-muted-foreground">
             /w/{workspace.slug}
           </span>
         </span>

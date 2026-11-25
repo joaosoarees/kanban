@@ -72,7 +72,7 @@ export function RoleMenu({
             >
               <span className="flex flex-col gap-0.5">
                 <span className="text-sm font-medium">{ROLE_LABELS[role]}</span>
-                <span className="text-xs/snug text-muted-foreground">
+                <span className="text-[13px]/snug text-muted-foreground">
                   {description}
                 </span>
               </span>

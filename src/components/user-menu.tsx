@@ -99,7 +99,7 @@ export function UserMenu({
           <>
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-sm font-medium">{name}</span>
-              <span className="truncate text-xs text-muted-foreground">
+              <span className="truncate text-[13px]/5 text-muted-foreground">
                 {email}
               </span>
             </span>
@@ -123,7 +123,7 @@ export function UserMenu({
         </div>
         <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="px-2 pt-1.5 pb-1 text-xs text-fg-muted">
+          <DropdownMenuLabel className="px-2 pt-1.5 pb-1 text-[13px]/5 text-fg-muted">
             Tema
           </DropdownMenuLabel>
           <Menu.RadioGroup

@@ -125,7 +125,7 @@ function RailBoardsBody({ data }: { data: SidebarData }) {
 
   return (
     <>
-      <p className="px-2.5 pt-1 pb-1.5 text-xs font-semibold text-fg-muted">
+      <p className="px-2.5 pt-1 pb-1.5 text-[13px]/5 font-semibold text-fg-muted">
         Quadros
       </p>
       <Link
