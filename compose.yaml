@@ -6,6 +6,8 @@ services:
     command: ./scripts/dev-start.sh
     environment:
       DATABASE_URL: postgresql://kanban:kanban@postgres:5432/kanban?schema=public
+      SMTP_URL: smtp://mailpit:1025
+      MAIL_FROM: Kanbanary <nao-responda@kanbanary.local>
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
@@ -13,6 +15,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  mailpit:
+    image: axllent/mailpit:v1.34.0
+    ports:
+      - "127.0.0.1:8025:8025"
 
   postgres:
     image: postgres:18
