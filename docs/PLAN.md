@@ -131,11 +131,16 @@ Cada PR de feature migra os campos da feature para o `useActionForm` e ganha tes
   - o login de uma conta pendente com a senha certa leva à mesma tela e envia um código novo;
   - confirmar o código abre a sessão.
 - A tela sabe de quem é o código por um cookie `pending_verification`, com JWT de 30 minutos e `aud` próprio, que o `verifySessionToken` recusa. O e-mail não vai na URL.
+- O cookie guarda também o `created_at` do cadastro que o emitiu e só vale enquanto ele for igual ao da linha. Um cadastro novo com o mesmo e-mail invalida os cookies anteriores: quem recebe o código no e-mail não consegue verificar a conta com a senha de outra pessoa que se cadastrou depois. O cookie vencido leva a "Esta tela expirou. Cadastre-se de novo."
+- O novo cadastro de uma conta pendente e o login dela seguem o intervalo de 60 s do reenvio: dentro dele, os dados mudam e a tela abre, mas nenhum código novo sai. Sem isso, cadastrar de novo daria 5 chutes novos a cada vez.
+- O e-mail sai depois do commit. Se o envio falhar, a action devolve "Não conseguimos enviar o e-mail. Tente de novo em instantes." no próprio formulário; o código fica salvo e pode ser reenviado depois do intervalo. O aviso de cadastro repetido falha com a mesma mensagem.
+- Verificar e reenviar recusam conta já verificada, com a mesma resposta de um código errado e de um reenvio feito, para não revelar a conta.
+- O aviso de cadastro repetido não tem limite próprio além do rate limit do Traefik por IP.
 - `getCurrentUser` exige `email_verified_at`. Todos os usuários atuais ficam pendentes na migration, e o João verifica a conta logo depois do deploy.
 - Cadastro com um e-mail já verificado recebe a mesma resposta de um cadastro novo e leva à mesma tela, sem criar código. O dono do endereço recebe um aviso ("alguém tentou criar uma conta com este e-mail"). O caminho calcula o hash da senha mesmo assim, para levar o mesmo tempo.
 - Uma conta pendente não expira. Um novo cadastro com o mesmo e-mail substitui a conta pendente na mesma linha: nome, senha e `created_at` novos e um código novo no lugar do anterior. O id e os vínculos com workspaces ficam, e só quem recebe o código no e-mail entra. Apagar e recriar levaria os vínculos de uma conta antiga, como as que a migration deixa pendentes.
 - O rate limit do Traefik passa a cobrir também o `POST` de `/verify-email`.
-- A tela `/verify-email` (campo de 6 dígitos, reenviar com contagem regressiva, trocar de conta) passa pelo `craft` antes de ser implementada.
+- A tela `/verify-email` (campo de 8 dígitos, reenviar com contagem regressiva, trocar de conta) passa pelo `craft` antes de ser implementada.
 - As fatias 13 e 14 vão juntas para produção, porque o aviso de cadastro repetido aponta para o "Esqueci a senha". O que não muda o comportamento (schema, regras, código, cookie, actions e templates sem uso) entra em PRs normais; a virada (`getCurrentUser` exigindo a verificação, o cadastro e o login novos e as telas) fica num PR final, depois das telas das duas fatias aprovadas.
 - Skills: `designing-data-models`, `modeling-entity-relationships`, `normalizing-relational-schemas`, `relational-keys-and-column-types`, `postgres-constraints-and-keys`, `defining-access-patterns`, `prisma-schema-and-migrations`, `prisma-transactions`, `nextjs-jwt-session`, `nextjs-auth-cookies`, `nextjs-credentials-auth-routes`, `cognito-sign-up-and-confirmation` (fluxo e mensagens), `nextjs-server-action-results`, `shadcn-react-hook-form`, `react-hook-form-zod`, `craft`.
 
