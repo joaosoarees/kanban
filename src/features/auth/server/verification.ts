@@ -230,7 +230,6 @@ export async function resendVerification(
 
 export async function loadPendingVerification(
   pending: PendingToken,
-  now: Date,
 ): Promise<{ email: string; waitSeconds: number } | null> {
   const account = await db.user.findUnique({
     where: { id: pending.userId },
@@ -256,6 +255,7 @@ export async function loadPendingVerification(
       : pending.issuedAt;
   return {
     email: account.email,
-    waitSeconds: sentAt === undefined ? 0 : secondsUntilResend(sentAt, now),
+    waitSeconds:
+      sentAt === undefined ? 0 : secondsUntilResend(sentAt, new Date()),
   };
 }
