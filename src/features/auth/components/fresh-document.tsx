@@ -2,7 +2,13 @@
 
 import { useEffect } from "react";
 
-const AUTH_PATHS = new Set(["/sign-in", "/sign-up", "/verify-email"]);
+const AUTH_PATHS = new Set([
+  "/sign-in",
+  "/sign-up",
+  "/verify-email",
+  "/forgot-password",
+  "/reset-password",
+]);
 
 export function FreshDocument() {
   useEffect(() => {
