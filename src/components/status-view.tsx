@@ -39,7 +39,7 @@ export function StatusView({
         <p className="font-mono text-[13px] text-muted-foreground">{eyebrow}</p>
       )}
       <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      <p className="max-w-md text-sm/relaxed text-muted-foreground">
+      <p className="max-w-md text-sm/relaxed text-balance text-muted-foreground">
         {description}
       </p>
       <div className="mt-4 flex flex-wrap justify-center gap-2">{actions}</div>
