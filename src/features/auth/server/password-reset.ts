@@ -58,24 +58,12 @@ export async function resendPasswordReset(
   reset: ResetToken,
   now: Date,
 ): Promise<ResetResend> {
-  return db.$transaction(async (tx) => {
-    const user = await lockUserByEmail(tx, reset.email);
-    if (user === undefined) {
-      const waitSeconds = resetWaitSeconds(reset, now);
-      return waitSeconds > 0
-        ? { status: "wait", waitSeconds }
-        : { status: "sent", waitSeconds: RESEND_SECONDS, mail: null };
-    }
-    const resent = await resendCode(tx, resetOwner(user.id), now);
-    if ("waitSeconds" in resent) {
-      return { status: "wait", waitSeconds: resent.waitSeconds };
-    }
-    return {
-      status: "sent",
-      waitSeconds: RESEND_SECONDS,
-      mail: { to: reset.email, name: user.name, code: resent.code },
-    };
-  });
+  const waitSeconds = resetWaitSeconds(reset, now);
+  if (waitSeconds > 0) {
+    return { status: "wait", waitSeconds };
+  }
+  const mail = await requestPasswordReset(reset.email, now);
+  return { status: "sent", waitSeconds: RESEND_SECONDS, mail };
 }
 
 export async function checkResetCode(
