@@ -1,10 +1,11 @@
 "use client";
 
-import { unstable_rethrow } from "next/navigation";
-import { useEffect, useEffectEvent, useState, useTransition } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
+import { useWatch } from "react-hook-form";
 import * as z from "zod";
 import { cardDescriptionSchema } from "@/features/boards/lib/card-schemas";
 import { updateCardDescriptionAction } from "@/features/boards/server/card-actions";
+import { useActionForm } from "@/hooks/use-action-form";
 
 const LOAD_FAILED = "Não foi possível abrir o card. Tente de novo.";
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";
@@ -37,12 +38,38 @@ export function useCardDescription({
   onLoadFailed,
 }: UseCardDescriptionOptions) {
   const [saved, setSaved] = useState<string | null>();
-  const [draft, setDraft] = useState<string | null>(null);
-  const [error, setError] = useState<string>();
-  const [isSaving, startSaving] = useTransition();
+  const [isEditing, setIsEditing] = useState(false);
+  const {
+    form: {
+      register,
+      control,
+      reset,
+      clearErrors,
+      formState: { errors },
+    },
+    submit,
+    isPending: isSaving,
+  } = useActionForm({
+    schema: cardDescriptionSchema,
+    defaultValues: { description: "" },
+    action: async (values) =>
+      updateCardDescriptionAction(workspaceId, boardId, cardId, values),
+    failure: SAVE_FAILED,
+    onSuccess: (_, values) => {
+      setSaved(values.description);
+      setIsEditing(false);
+    },
+    onError: (failure) => {
+      if (failure.gone === true) {
+        setIsEditing(false);
+      }
+    },
+  });
+  const value = useWatch({ control, name: "description" }) ?? "";
+  const draft = isEditing ? value : null;
+  const error = errors.description?.message ?? errors.root?.message;
   const isLoading = saved === undefined;
-  const isEditing = draft !== null;
-  const isDirty = isEditing && draft !== (saved ?? "");
+  const isDirty = isEditing && value !== (saved ?? "");
 
   const reportLoadFailure = useEffectEvent(onLoadFailed);
   const reportDirty = useEffectEvent(onDirtyChange);
@@ -95,48 +122,6 @@ export function useCardDescription({
     };
   }, [isDirty]);
 
-  const cancel = () => {
-    setDraft(null);
-    setError(undefined);
-  };
-
-  const save = () => {
-    const parsed = cardDescriptionSchema.safeParse({ description: draft });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0].message);
-      return;
-    }
-
-    startSaving(async () => {
-      try {
-        const result = await updateCardDescriptionAction(
-          workspaceId,
-          boardId,
-          cardId,
-          parsed.data,
-        );
-        if (result.status === "success") {
-          startSaving(() => {
-            setSaved(parsed.data.description);
-            cancel();
-          });
-          return;
-        }
-        if (result.gone === true) {
-          startSaving(() => {
-            setDraft(null);
-          });
-          return;
-        }
-        setError(result.fieldErrors?.description?.at(0) ?? result.message);
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        setError(SAVE_FAILED);
-      }
-    });
-  };
-
   return {
     saved,
     draft,
@@ -145,15 +130,18 @@ export function useCardDescription({
     isEditing,
     isDirty,
     isSaving,
+    field: register("description"),
     startEditing: () => {
-      setDraft(saved ?? "");
+      reset({ description: saved ?? "" });
+      setIsEditing(true);
     },
-    change: (value: string) => {
-      setDraft(value);
-      setError(undefined);
+    cancel: () => {
+      clearErrors();
+      setIsEditing(false);
     },
-    cancel,
-    save,
+    save: () => {
+      submit();
+    },
   };
 }
 

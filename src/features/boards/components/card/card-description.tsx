@@ -21,8 +21,8 @@ type CardDescriptionProps = {
 export function CardDescription({ cardId, state }: CardDescriptionProps) {
   const labelId = `${cardId}-description-label`;
   const messageId = `${cardId}-description-message`;
-  const { draft, error, saved, isEditing } = state;
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { draft, error, saved, isEditing, field } = state;
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const viewRef = useRef<HTMLButtonElement>(null);
   const wasEditing = useRef(false);
 
@@ -49,16 +49,16 @@ export function CardDescription({ cardId, state }: CardDescriptionProps) {
       {!state.isLoading && draft !== null && (
         <>
           <textarea
-            ref={textareaRef}
+            {...field}
+            ref={(element) => {
+              field.ref(element);
+              textareaRef.current = element;
+            }}
             aria-labelledby={labelId}
             aria-invalid={error === undefined ? undefined : true}
             aria-describedby={messageId}
-            value={draft}
             readOnly={state.isSaving}
             maxLength={CARD_DESCRIPTION_MAX_LENGTH}
-            onChange={(event) => {
-              state.change(event.target.value);
-            }}
             className={cn(
               BOX,
               "resize-none",
