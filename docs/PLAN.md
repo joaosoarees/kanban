@@ -9,7 +9,7 @@ Projeto de estudo para treinar as skills. Roda local em Docker Compose e em prod
 - Auth própria: e-mail + senha (bcrypt), sessão em JWT HS256 (`jose`) num cookie HttpOnly, `getCurrentUser()` como única checagem. Sem Auth.js: a v5 nunca saiu do beta.
 - React Hook Form + Zod em todo campo digitado, sempre pelo hook `useActionForm`; ações de um clique (etiqueta, responsável, mover, arrastar) chamam a action pelo mesmo executor, sem `useForm`
 - `useOptimistic` + Server Actions em toda interação do board (rollback + toast no erro)
-- Zustand + persist só para preferências de UI (colunas recolhidas, densidade, sidebar)
+- Zustand + persist só para preferências de UI (colunas recolhidas, sidebar)
 - Filtros e card aberto na URL (search params)
 - `fractional-indexing` para ordenar colunas e cards
 
@@ -180,7 +180,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 5. [x] Boards e colunas: reorder optimistic, store Zustand de colunas recolhidas
 6. [x] Cards: CRUD, drag optimistic, teste de posição
 7. [x] Etiquetas e responsável, optimistic
-8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
+8. [ ] Polimento: visual de loading/erro, dark mode, sidebar, revisão com `craft-critique`. A densidade saiu do escopo: os quadros de times pequenos têm poucos cards por coluna, e um modo compacto pediria duas versões do card nos dois temas. Volta como fatia própria se um quadro cheio pedir.
 9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
 10. [x] Auditoria da arquitetura contra as skills
 11. [x] Módulos por funcionalidade

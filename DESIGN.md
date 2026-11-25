@@ -45,7 +45,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - WCAG AA; axe sem violações. Todo controle com os estados: repouso, hover, foco pelo teclado, pressionado, desabilitado, carregando, erro.
 - Nada muda de tamanho ao carregar, trocar texto ou mostrar erro.
 - Cursor de mãozinha em botões e itens clicáveis (convenção do projeto).
-- Tema claro agora; tema escuro na fatia 8.
+- Tema claro e escuro, com a escolha Claro, Escuro ou Sistema no menu da conta.
 - Ícones Lucide, contorno, um só conjunto.
 - Movimento curto e frequente: microinterações em quase tudo, entre 100 e 200ms, fechando mais rápido que abrindo, e desligadas com "reduzir movimento".
 
@@ -122,7 +122,9 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — "Esqueci a senha" fica na linha do rótulo Senha e leva o e-mail digitado — o `TextField` ganhou um espaço opcional à direita do rótulo, só usado no login por enquanto.
 - 2026-11-25 — `/reset-password` mostra o código ou a senha nova conforme o cookie, e o texto do código diz "Se houver uma conta" — uma rota a menos, e a tela não revela se a conta existe.
 - 2026-11-25 — A senha nova avisa que as outras sessões serão encerradas — explica por que outro aparelho pede login de novo.
+- 2026-11-25 — Texto tem no mínimo 13px; só etiquetas e contadores podem ter 12px — a referência pede evitar texto pequeno, e etiquetas e contadores precisam caber no card e na coluna.
+- 2026-11-25 — Sem preferência de densidade por enquanto — quadros de times pequenos têm poucos cards, e um modo compacto dobraria as versões do card nos dois temas.
 
 ## Perguntas abertas
 
-- Texto secundário em 12–13px aparece em vários lugares, e a referência pede evitar texto pequeno. Subir o mínimo para 13px? (assumido: 13px mínimo)
+Nenhuma no momento.
