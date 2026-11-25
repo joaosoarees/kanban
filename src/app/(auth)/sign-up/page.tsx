@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { AuthHeading } from "@/components/auth-heading";
-import { SignUpForm } from "@/components/sign-up-form";
+import { AuthHeading } from "@/features/auth/components/auth-heading";
+import { SignUpForm } from "@/features/auth/components/sign-up-form";
 
 export const metadata: Metadata = { title: "Criar conta" };
 

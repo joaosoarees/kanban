@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
-import { BoardPreview } from "@/components/board-preview";
-import { FreshDocument } from "@/components/fresh-document";
 import { Logo } from "@/components/logo";
+import { BoardPreview } from "@/features/auth/components/board-preview";
+import { FreshDocument } from "@/features/auth/components/fresh-document";
 import { getCurrentUser } from "@/server/session";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {

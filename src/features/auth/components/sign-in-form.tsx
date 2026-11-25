@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
-import { signInAction } from "@/app/(auth)/actions";
-import { FormFooter } from "@/components/form-footer";
 import { TextField } from "@/components/text-field";
-import { signInSchema } from "@/lib/auth-schemas";
+import { signInAction } from "@/features/auth/actions";
+import { FormFooter } from "@/features/auth/components/form-footer";
+import { signInSchema } from "@/features/auth/schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 
 type SignInInput = z.input<typeof signInSchema>;

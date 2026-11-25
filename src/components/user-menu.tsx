@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTransition } from "react";
-import { signOutAction } from "@/app/(auth)/actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { signOutAction } from "@/features/auth/actions";
 import { initialsOf } from "@/lib/initials";
 import { revealTheme } from "@/lib/reveal-theme";
 import { cn } from "@/lib/utils";

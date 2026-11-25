@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { AuthHeading } from "@/components/auth-heading";
-import { SignInForm } from "@/components/sign-in-form";
+import { AuthHeading } from "@/features/auth/components/auth-heading";
+import { SignInForm } from "@/features/auth/components/sign-in-form";
 
 export const metadata: Metadata = { title: "Entrar" };
 

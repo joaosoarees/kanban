@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
-import { signUpAction } from "@/app/(auth)/actions";
-import { FormFooter } from "@/components/form-footer";
 import { TextField } from "@/components/text-field";
-import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/lib/auth-schemas";
+import { signUpAction } from "@/features/auth/actions";
+import { FormFooter } from "@/features/auth/components/form-footer";
+import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/features/auth/schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 
 type SignUpInput = z.input<typeof signUpSchema>;
