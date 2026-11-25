@@ -87,3 +87,24 @@ export const requireBoard = cache(
     };
   },
 );
+
+export async function getCardDescription(
+  workspaceId: string,
+  boardId: string,
+  cardId: string,
+) {
+  const ref = z
+    .object({ boardId: z.uuid(), cardId: z.uuid() })
+    .safeParse({ boardId, cardId });
+  if (!ref.success) {
+    return null;
+  }
+
+  return db.card.findFirst({
+    where: {
+      id: ref.data.cardId,
+      column: { boardId: ref.data.boardId, board: { workspaceId } },
+    },
+    select: { description: true },
+  });
+}

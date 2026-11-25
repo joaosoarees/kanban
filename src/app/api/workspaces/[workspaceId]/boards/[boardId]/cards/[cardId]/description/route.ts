@@ -1,15 +1,15 @@
-import * as z from "zod";
 import { CARD_GONE } from "@/features/boards/server/access";
+import { getCardDescription } from "@/features/boards/server/queries";
 import { loadActorAllowedTo } from "@/features/workspaces/server/access";
-import { FORBIDDEN, type ActionResult } from "@/lib/action-result";
-import { db } from "@/server/db";
+import type { ActionError, ActionResult } from "@/lib/action-result";
+import { getCurrentUser } from "@/server/session";
 
 const NO_STORE = { "Cache-Control": "private, no-store" };
 
-const cardRefSchema = z.object({
-  boardId: z.uuid(),
-  cardId: z.uuid(),
-});
+const SIGNED_OUT: ActionError = {
+  status: "error",
+  message: "Sua sessão terminou. Entre de novo para abrir o card.",
+};
 
 function reply(
   body: ActionResult<{ description: string | null }>,
@@ -24,27 +24,17 @@ export async function GET(
     params,
   }: RouteContext<"/api/workspaces/[workspaceId]/boards/[boardId]/cards/[cardId]/description">,
 ) {
-  const { workspaceId, ...ref } = await params;
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
-  if (!actor) {
-    return reply(FORBIDDEN, 403);
+  if ((await getCurrentUser()) === null) {
+    return reply(SIGNED_OUT, 401);
   }
 
-  const parsed = cardRefSchema.safeParse(ref);
-  if (!parsed.success) {
+  const { workspaceId, boardId, cardId } = await params;
+  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
+  if (!actor) {
     return reply(CARD_GONE, 404);
   }
 
-  const card = await db.card.findFirst({
-    where: {
-      id: parsed.data.cardId,
-      column: {
-        boardId: parsed.data.boardId,
-        board: { workspaceId: actor.workspaceId },
-      },
-    },
-    select: { description: true },
-  });
+  const card = await getCardDescription(actor.workspaceId, boardId, cardId);
   return card
     ? reply({ status: "success", data: card }, 200)
     : reply(CARD_GONE, 404);
