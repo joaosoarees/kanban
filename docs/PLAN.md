@@ -105,8 +105,8 @@ Ordem dos PRs:
 5. [x] `features/auth`.
 6. [x] `features/workspaces` e `features/members`.
 7. [x] `features/boards`.
-8. Cards e etiquetas dentro de `features/boards`, com o route handler da descrição respondendo 401 e 404.
-9. Limites de erro (`w/[slug]/error.tsx`, `(auth)/error.tsx`), corridas devolvendo mensagem, papel conferido dentro da transação, `CLAUDE.md` atualizado.
+8. [x] Cards e etiquetas dentro de `features/boards`, com o route handler da descrição respondendo 401 e 404.
+9. [x] Limites de erro (`w/[slug]/error.tsx` e `src/app/error.tsx`: a checagem de sessão de `(auth)` fica no próprio layout, que um `(auth)/error.tsx` não cobre), corridas devolvendo mensagem, papel conferido dentro da transação, `CLAUDE.md` atualizado.
 
 Cada PR de feature migra os campos da feature para o `useActionForm` e ganha teste para as regras puras que mudam de lugar e ainda não têm.
 
@@ -174,7 +174,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 8. [ ] Polimento: visual de loading/erro, dark mode, densidade, sidebar, revisão com `craft-critique`
 9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
 10. [x] Auditoria da arquitetura contra as skills
-11. [ ] Módulos por funcionalidade
+11. [x] Módulos por funcionalidade
 12. [ ] Envio de e-mail: Mailpit, SES e templates
 13. [ ] Verificação de e-mail
 14. [ ] Esqueci a senha

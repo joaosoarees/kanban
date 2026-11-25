@@ -105,6 +105,10 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-24 — Barras sem arredondamento no favicon; o `apple-icon` mantém o raio do logo — meio pixel de raio borrava o topo das barras em 16px.
 - 2026-11-24 — Uma versão do ícone para navegador claro e escuro; `apple-icon` com cantos retos e fundo cheio — o quadrado indigo separa o ícone dos dois cromos, e o iOS aplica a própria máscara.
 - 2026-11-24 — Sem manifest de PWA e sem imagem Open Graph por enquanto — o uso é no navegador de desktop; a prévia de link fica para uma rodada própria.
+- 2026-11-25 — Erros de carregamento desenhados em https://claude.ai/artifact/Gm9kyW7aUhwRfRsHiurtcY (pranchas 11.1 a 11.3), aprovados — canvas próprio da fatia 11.
+- 2026-11-25 — Falha numa página do workspace mostra o erro ao lado da barra lateral, só com "Tentar de novo" — a barra já leva aos quadros e às configurações, e um "Voltar aos quadros" apontaria para a própria página quando é ela que falha.
+- 2026-11-25 — Falha fora do workspace (o layout da entrada, por exemplo) vira "Algo deu errado" em tela cheia, com fontes e tema, sem o logo nem o painel da entrada — o `error.tsx` não cobre o layout do próprio segmento, e mover a checagem de sessão para cada página custaria mais que o caso raro.
+- 2026-11-25 — "Tentar de novo" das telas de erro novas tem 44px no celular e 40px a partir de `sm` — alvo de toque mínimo; as telas de erro antigas seguem com 40px.
 
 ## Perguntas abertas
 
