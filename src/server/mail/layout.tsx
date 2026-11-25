@@ -28,7 +28,6 @@ const fontFamily =
 const phoneStyles = `
 @media only screen and (max-width: 480px) {
   .mail-card > tbody > tr > td { padding: 24px 20px !important; }
-  .code-box { display: block !important; text-align: center !important; }
 }
 `;
 
