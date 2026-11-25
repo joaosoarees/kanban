@@ -12,7 +12,3 @@ function hasCode(error: unknown, code: string): boolean {
 export function isUniqueViolation(error: unknown): boolean {
   return hasCode(error, "P2002");
 }
-
-export function isForeignKeyViolation(error: unknown): boolean {
-  return hasCode(error, "P2003");
-}
