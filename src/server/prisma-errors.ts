@@ -1,3 +1,5 @@
+import "server-only";
+
 function hasCode(error: unknown, code: string): boolean {
   return (
     typeof error === "object" &&

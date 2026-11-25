@@ -1,3 +1,4 @@
+import "server-only";
 import { jwtVerify, SignJWT } from "jose";
 
 const ALGORITHM = "HS256";
