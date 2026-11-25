@@ -3,12 +3,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { EmptyState } from "@/components/empty-state";
-import { MemberCount } from "@/components/member-count";
-import { NewWorkspaceButton } from "@/components/new-workspace-button";
-import { RoleBadge } from "@/components/role-badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { WorkspaceTile } from "@/components/workspace-tile";
-import { getMyWorkspaces, type WorkspaceSummary } from "@/lib/workspaces";
+import { MemberCount } from "@/features/workspaces/components/member-count";
+import { NewWorkspaceButton } from "@/features/workspaces/components/new-workspace-button";
+import { RoleBadge } from "@/features/workspaces/components/role-badge";
+import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
+import {
+  getMyWorkspaces,
+  type WorkspaceSummary,
+} from "@/features/workspaces/queries";
 
 export const metadata: Metadata = { title: "Seus workspaces" };
 

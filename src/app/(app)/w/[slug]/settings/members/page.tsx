@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { AddMemberForm } from "@/components/add-member-form";
-import { LeaveWorkspace } from "@/components/leave-workspace";
-import { MemberList } from "@/components/member-list";
-import { can } from "@/lib/permissions";
-import { getMembers, requireMembership } from "@/lib/workspaces";
+import { AddMemberForm } from "@/features/members/components/add-member-form";
+import { LeaveWorkspace } from "@/features/members/components/leave-workspace";
+import { MemberList } from "@/features/members/components/member-list";
+import { getMembers } from "@/features/members/queries";
+import { requireMembership } from "@/features/workspaces/access";
+import { can } from "@/features/workspaces/permissions";
 import { requireUser } from "@/server/session";
 
 export async function generateMetadata({

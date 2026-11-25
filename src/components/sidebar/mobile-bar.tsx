@@ -10,7 +10,7 @@ import {
   type SidebarData,
 } from "@/components/sidebar/sidebar-panel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { WorkspaceTile } from "@/components/workspace-tile";
+import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
 import { cn } from "@/lib/utils";
 
 export function MobileBar({

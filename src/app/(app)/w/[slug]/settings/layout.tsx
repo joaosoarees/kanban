@@ -1,8 +1,8 @@
-import { SettingsTabs } from "@/components/settings-tabs";
-import { WorkspaceTile } from "@/components/workspace-tile";
-import { can } from "@/lib/permissions";
+import { requireMembership } from "@/features/workspaces/access";
+import { SettingsTabs } from "@/features/workspaces/components/settings-tabs";
+import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
+import { can } from "@/features/workspaces/permissions";
 import { cn } from "@/lib/utils";
-import { requireMembership } from "@/lib/workspaces";
 
 export default async function SettingsLayout({
   children,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { signInSchema, signUpSchema } from "@/features/auth/schemas";
 import { boardNameSchema, columnNameSchema } from "./board-schemas";
-import { createWorkspaceSchema } from "./workspace-schemas";
+import { createWorkspaceSchema } from "@/features/workspaces/schemas";
 
 const NUL = String.fromCodePoint(0);
 const ZERO_WIDTH = String.fromCodePoint(0x200b);

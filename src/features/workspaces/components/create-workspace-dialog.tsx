@@ -5,7 +5,6 @@ import { X } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
-import { createWorkspaceAction } from "@/app/(app)/actions";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
@@ -18,11 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { applyActionErrors } from "@/lib/form-errors";
+import { createWorkspaceAction } from "@/features/workspaces/actions";
 import {
   createWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
-} from "@/lib/workspace-schemas";
+} from "@/features/workspaces/schemas";
+import { applyActionErrors } from "@/lib/form-errors";
 import { cn } from "@/lib/utils";
 
 type CreateWorkspaceInput = z.input<typeof createWorkspaceSchema>;

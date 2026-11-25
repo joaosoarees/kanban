@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UserMenu } from "@/components/user-menu";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { WorkspaceSwitcher } from "@/features/workspaces/components/workspace-switcher";
 import { cn } from "@/lib/utils";
 
 function RailLink({

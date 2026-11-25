@@ -3,8 +3,8 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { primaryButton } from "@/components/button-styles";
-import { CreateWorkspaceDialog } from "@/components/create-workspace-dialog";
 import { Button } from "@/components/ui/button";
+import { CreateWorkspaceDialog } from "@/features/workspaces/components/create-workspace-dialog";
 import { cn } from "@/lib/utils";
 
 type NewWorkspaceButtonProps = {

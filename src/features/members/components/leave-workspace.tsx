@@ -2,10 +2,10 @@
 
 import { LogOut } from "lucide-react";
 import { useState } from "react";
-import { leaveWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { dangerOutlineButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { leaveWorkspaceAction } from "@/features/members/actions";
 import { cardsLabel } from "@/lib/card-count";
 import { cn } from "@/lib/utils";
 

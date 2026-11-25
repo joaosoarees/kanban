@@ -3,25 +3,24 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  addMemberSchema,
+  changeRoleSchema,
+  removeMemberSchema,
+} from "@/features/members/schemas";
+import {
+  loadActor,
+  loadActorAllowedTo,
+  revalidateWorkspace,
+} from "@/features/workspaces/access";
+import { can } from "@/features/workspaces/permissions";
+import type { Role } from "@/generated/prisma/client";
+import {
   FORBIDDEN,
   INVALID,
   invalidFields,
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { can } from "@/lib/permissions";
-import {
-  addMemberSchema,
-  changeRoleSchema,
-  removeMemberSchema,
-  renameWorkspaceSchema,
-} from "@/lib/workspace-schemas";
-import {
-  loadActor,
-  loadActorAllowedTo,
-  removeMembership,
-  revalidateWorkspace,
-} from "@/lib/workspaces";
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 
@@ -29,6 +28,33 @@ const MEMBER_CHANGED: ActionError = {
   status: "error",
   message: "Os dados dessa pessoa mudaram. Confira e tente de novo.",
 };
+
+async function removeMembership(target: {
+  workspaceId: string;
+  userId: string;
+  role?: Role;
+}) {
+  const { workspaceId, userId } = target;
+  return db.$transaction(async (tx) => {
+    await tx.$queryRaw`
+      SELECT id FROM boards
+      WHERE "workspaceId" = ${workspaceId}::uuid
+      ORDER BY id
+      FOR UPDATE
+    `;
+
+    const { count } = await tx.membership.deleteMany({ where: target });
+    if (count === 0) {
+      return false;
+    }
+
+    await tx.card.updateMany({
+      where: { assigneeId: userId, column: { board: { workspaceId } } },
+      data: { assigneeId: null },
+    });
+    return true;
+  });
+}
 
 async function loadTarget(workspaceId: string, userId: string) {
   return db.membership.findUnique({
@@ -170,50 +196,6 @@ export async function leaveWorkspaceAction(
     workspaceId: actor.workspaceId,
     userId: actor.userId,
   });
-
-  revalidatePath("/", "layout");
-  return redirect("/");
-}
-
-export async function renameWorkspaceAction(
-  workspaceId: unknown,
-  input: unknown,
-): Promise<ActionResult> {
-  const actor = await loadActorAllowedTo(workspaceId, "renameWorkspace");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-
-  const parsed = renameWorkspaceSchema.safeParse(input);
-  if (!parsed.success) {
-    return invalidFields(parsed.error);
-  }
-
-  await db.workspace.update({
-    where: { id: actor.workspaceId },
-    data: { name: parsed.data.name },
-  });
-
-  revalidatePath("/", "layout");
-  return { status: "success", data: undefined };
-}
-
-export async function deleteWorkspaceAction(
-  workspaceId: unknown,
-  confirmation: unknown,
-): Promise<ActionResult> {
-  const actor = await loadActorAllowedTo(workspaceId, "deleteWorkspace");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-  if (confirmation !== actor.name) {
-    return {
-      status: "error",
-      message: "Digite o nome do workspace exatamente como aparece.",
-    };
-  }
-
-  await db.workspace.delete({ where: { id: actor.workspaceId } });
 
   revalidatePath("/", "layout");
   return redirect("/");

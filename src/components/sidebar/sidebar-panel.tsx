@@ -12,7 +12,7 @@ import { UserMenu } from "@/components/user-menu";
 import {
   WorkspaceSwitcher,
   type SwitcherWorkspace,
-} from "@/components/workspace-switcher";
+} from "@/features/workspaces/components/workspace-switcher";
 
 export type SidebarBoard = { id: string; name: string };
 

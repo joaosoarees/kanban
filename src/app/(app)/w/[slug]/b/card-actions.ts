@@ -2,6 +2,10 @@
 
 import * as z from "zod";
 import {
+  loadActorAllowedTo,
+  revalidateWorkspace,
+} from "@/features/workspaces/access";
+import {
   FORBIDDEN,
   INVALID,
   invalidFields,
@@ -17,7 +21,6 @@ import {
 } from "@/lib/card-schemas";
 import { cardAssigneeSchema } from "@/lib/label-schemas";
 import { positionAtEnd, positionInColumn } from "@/lib/position";
-import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 import { db } from "@/server/db";
 
 const BOARD_CHANGED: ActionError = {

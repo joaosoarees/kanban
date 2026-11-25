@@ -2,6 +2,10 @@
 
 import * as z from "zod";
 import {
+  loadActorAllowedTo,
+  revalidateWorkspace,
+} from "@/features/workspaces/access";
+import {
   FORBIDDEN,
   invalidFields,
   type ActionError,
@@ -14,7 +18,6 @@ import {
   MAX_LABELS_PER_BOARD,
   MAX_LABELS_PER_CARD,
 } from "@/lib/label-schemas";
-import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 
