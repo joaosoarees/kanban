@@ -1,14 +1,13 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { unstable_rethrow } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { useEffect, useRef, useState } from "react";
 import {
   CARD_TITLE_MAX_LENGTH,
   createCardSchema,
 } from "@/features/boards/lib/card-schemas";
 import { createCardAction } from "@/features/boards/server/card-actions";
+import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 
 const CREATE_FAILED = "Não foi possível criar o card. Tente de novo.";
@@ -80,48 +79,33 @@ function AddCardForm({
   onCreated,
   onClose,
 }: AddCardFormProps) {
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [value, setValue] = useState("");
-  const [error, setError] = useState<string>();
-  const [isPending, startTransition] = useTransition();
   const messageId = `${columnId}-new-card-message`;
+  const {
+    form: {
+      register,
+      reset,
+      getValues,
+      setFocus,
+      clearErrors,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: createCardSchema,
+    defaultValues: { columnId, title: "" },
+    action: async (values) => createCardAction(workspaceId, boardId, values),
+    failure: CREATE_FAILED,
+    onSuccess: ({ id }) => {
+      reset({ columnId, title: "" });
+      onCreated(id);
+    },
+  });
+  const error = errors.title?.message ?? errors.root?.message;
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  const submit = () => {
-    if (isPending) {
-      return;
-    }
-    const parsed = createCardSchema.safeParse({ columnId, title: value });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0].message);
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const result = await createCardAction(
-          workspaceId,
-          boardId,
-          parsed.data,
-        );
-        if (result.status === "success") {
-          startTransition(() => {
-            setValue("");
-            onCreated(result.data.id);
-          });
-          return;
-        }
-        setError(result.fieldErrors?.title?.at(0) ?? result.message);
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        toast.error(CREATE_FAILED);
-      }
-    });
-  };
+    setFocus("title");
+  }, [setFocus]);
 
   const hint = isPending ? "Criando card…" : IDLE_HINT;
 
@@ -129,31 +113,27 @@ function AddCardForm({
     <form
       noValidate
       aria-busy={isPending}
-      onSubmit={(event) => {
-        event.preventDefault();
-        submit();
-      }}
+      onSubmit={submit}
       className="mt-1.5 shrink-0"
     >
       <textarea
-        ref={inputRef}
+        {...register("title", {
+          onChange: () => {
+            clearErrors("root");
+          },
+          onBlur: () => {
+            if (getValues("title").trim() === "" && !isPending) {
+              onClose(false);
+            }
+          },
+        })}
         rows={2}
         aria-label="Título do novo card"
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby={messageId}
         placeholder="Título do card"
-        value={value}
         readOnly={isPending}
         maxLength={CARD_TITLE_MAX_LENGTH}
-        onChange={(event) => {
-          setValue(event.target.value);
-          setError(undefined);
-        }}
-        onBlur={() => {
-          if (value.trim() === "" && !isPending) {
-            onClose(false);
-          }
-        }}
         onKeyDown={(event) => {
           if (event.key === "Enter" && !event.nativeEvent.isComposing) {
             event.preventDefault();
