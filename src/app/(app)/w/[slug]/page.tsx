@@ -1,9 +1,5 @@
-import { Settings } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { linkButton } from "@/components/button-styles";
 import { BoardsSection } from "@/features/boards/components/board/boards-section";
-import { MemberCount } from "@/features/workspaces/components/member-count";
 import { RoleBadge } from "@/features/workspaces/components/role-badge";
 import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
 import { can } from "@/features/workspaces/lib/permissions";
@@ -38,29 +34,12 @@ export default async function WorkspacePage({
             </h1>
             <div className="flex min-w-0 flex-col gap-1.5 text-[13px] text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
               <span className="truncate font-mono">/w/{workspace.slug}</span>
-              <span className="flex shrink-0 items-center gap-3">
-                <Link
-                  href={`/w/${workspace.slug}/settings/members`}
-                  className="rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 [&>span]:text-inherit"
-                >
-                  <MemberCount count={workspace.memberCount} />
-                </Link>
+              <span className="flex shrink-0">
                 <RoleBadge role={workspace.role} />
               </span>
             </div>
           </div>
         </div>
-        <Link
-          href={
-            can(workspace.role, "renameWorkspace")
-              ? `/w/${workspace.slug}/settings`
-              : `/w/${workspace.slug}/settings/members`
-          }
-          className={linkButton("outline", "h-11 w-full px-3 sm:h-9 sm:w-auto")}
-        >
-          <Settings aria-hidden />
-          Configurações
-        </Link>
       </div>
       <BoardsSection
         workspaceId={workspace.id}
