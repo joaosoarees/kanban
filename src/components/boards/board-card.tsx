@@ -1,9 +1,9 @@
 import { AlignLeft } from "lucide-react";
 import type { ComponentProps } from "react";
-import { useBoardMeta } from "@/components/boards/board-meta";
 import { LabelTag } from "@/components/boards/label-tag";
 import { MemberAvatar } from "@/components/boards/member-avatar";
-import type { BoardCard as BoardCardData } from "@/components/boards/use-board-columns";
+import { useBoardMeta } from "@/features/boards/components/board-meta";
+import type { BoardCard as BoardCardData } from "@/features/boards/components/use-board-columns";
 import { cn } from "@/lib/utils";
 
 const CARD =

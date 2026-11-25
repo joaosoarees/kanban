@@ -5,7 +5,7 @@ import { unstable_rethrow } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 import { moveCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
-import { moveColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
+import { moveColumnAction } from "@/features/boards/column-actions";
 import type { ActionResult } from "@/lib/action-result";
 import { moveCardTo, previousCardIdOf } from "@/lib/card-moves";
 

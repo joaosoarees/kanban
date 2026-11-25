@@ -7,27 +7,27 @@ import {
 } from "@dnd-kit/sortable";
 import { Plus, SquareKanban } from "lucide-react";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { AddColumn } from "@/components/boards/add-column";
 import { BoardCardPreview } from "@/components/boards/board-card";
 import { CardDialogHost } from "@/components/boards/card-dialog-host";
-import { ColumnCard } from "@/components/boards/column-card";
-import { ColumnPreview } from "@/components/boards/column-preview";
-import {
-  useBoardColumns,
-  type BoardColumn,
-} from "@/components/boards/use-board-columns";
-import {
-  useBoardFilter,
-  useVisibleCards,
-} from "@/components/boards/use-board-filter";
-import {
-  screenReaderInstructions,
-  useBoardDrag,
-} from "@/components/boards/use-board-drag";
 import { primaryButton } from "@/components/button-styles";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AddColumn } from "@/features/boards/components/add-column";
+import { ColumnCard } from "@/features/boards/components/column-card";
+import { ColumnPreview } from "@/features/boards/components/column-preview";
+import {
+  useBoardColumns,
+  type BoardColumn,
+} from "@/features/boards/components/use-board-columns";
+import {
+  screenReaderInstructions,
+  useBoardDrag,
+} from "@/features/boards/components/use-board-drag";
+import {
+  useBoardFilter,
+  useVisibleCards,
+} from "@/features/boards/components/use-board-filter";
 import { locateCard } from "@/lib/card-moves";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";

@@ -2,6 +2,14 @@
 
 import * as z from "zod";
 import {
+  BOARD_GONE,
+  COLUMN_GONE,
+  COLUMN_ORDER,
+  lockBoard,
+} from "@/features/boards/access";
+import { planMove, positionAtEnd } from "@/features/boards/position";
+import { columnNameSchema, moveColumnSchema } from "@/features/boards/schemas";
+import {
   loadActorAllowedTo,
   revalidateWorkspace,
 } from "@/features/workspaces/access";
@@ -12,9 +20,6 @@ import {
   invalidFields,
   type ActionResult,
 } from "@/lib/action-result";
-import { columnNameSchema, moveColumnSchema } from "@/lib/board-schemas";
-import { BOARD_GONE, COLUMN_GONE, COLUMN_ORDER, lockBoard } from "@/lib/boards";
-import { planMove, positionAtEnd } from "@/lib/position";
 import { db } from "@/server/db";
 
 async function lockBoardColumns(

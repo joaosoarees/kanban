@@ -4,10 +4,13 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { renameColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { Input } from "@/components/ui/input";
+import { renameColumnAction } from "@/features/boards/column-actions";
+import {
+  COLUMN_NAME_MAX_LENGTH,
+  columnNameSchema,
+} from "@/features/boards/schemas";
 import { useActionForm } from "@/hooks/use-action-form";
-import { COLUMN_NAME_MAX_LENGTH, columnNameSchema } from "@/lib/board-schemas";
 import { cn } from "@/lib/utils";
 
 const COUNTER_FROM = COLUMN_NAME_MAX_LENGTH - 5;

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BoardColumns } from "@/components/boards/board-columns";
-import { BoardMenu } from "@/components/boards/board-menu";
-import { BoardMetaProvider } from "@/components/boards/board-meta";
-import { FilterMenu } from "@/components/boards/filter-menu";
+import { BoardColumns } from "@/features/boards/components/board-columns";
+import { BoardMenu } from "@/features/boards/components/board-menu";
+import { BoardMetaProvider } from "@/features/boards/components/board-meta";
+import { FilterMenu } from "@/features/boards/components/filter-menu";
+import { requireBoard } from "@/features/boards/queries";
 import { getAssignableMembers } from "@/features/members/queries";
 import { requireMembership } from "@/features/workspaces/access";
 import { can } from "@/features/workspaces/permissions";
-import { requireBoard } from "@/lib/boards";
 import { requireUser } from "@/server/session";
 
 export async function generateMetadata({

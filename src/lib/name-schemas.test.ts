@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { signInSchema, signUpSchema } from "@/features/auth/schemas";
-import { boardNameSchema, columnNameSchema } from "./board-schemas";
+import { boardNameSchema, columnNameSchema } from "@/features/boards/schemas";
 import { createWorkspaceSchema } from "@/features/workspaces/schemas";
 
 const NUL = String.fromCodePoint(0);

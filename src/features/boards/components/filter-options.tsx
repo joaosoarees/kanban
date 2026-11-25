@@ -2,12 +2,12 @@
 
 import { Check, Search, UsersRound } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
-import { useBoardMeta } from "@/components/boards/board-meta";
 import { comparable } from "@/components/boards/label-list";
 import { LabelTag } from "@/components/boards/label-tag";
 import { MemberAvatar } from "@/components/boards/member-avatar";
-import { replaceBoardFilter } from "@/components/boards/use-board-filter";
-import { NO_ASSIGNEE, type BoardFilter } from "@/lib/board-filter";
+import { NO_ASSIGNEE, type BoardFilter } from "@/features/boards/board-filter";
+import { useBoardMeta } from "@/features/boards/components/board-meta";
+import { replaceBoardFilter } from "@/features/boards/components/use-board-filter";
 import { cn } from "@/lib/utils";
 
 const ANY_ASSIGNEE = "any";

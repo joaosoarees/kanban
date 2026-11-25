@@ -2,12 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { setCardAssigneeAction } from "@/app/(app)/w/[slug]/b/card-actions";
-import { useBoardMeta } from "@/components/boards/board-meta";
 import { MemberAvatar } from "@/components/boards/member-avatar";
-import type {
-  BoardCard,
-  CardUpdate,
-} from "@/components/boards/use-board-columns";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +10,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useBoardMeta } from "@/features/boards/components/board-meta";
+import type {
+  BoardCard,
+  CardUpdate,
+} from "@/features/boards/components/use-board-columns";
 import { cn } from "@/lib/utils";
 
 const NO_ASSIGNEE = "none";

@@ -2,6 +2,9 @@
 
 import { redirect } from "next/navigation";
 import * as z from "zod";
+import { BOARD_GONE } from "@/features/boards/access";
+import { initialPositions } from "@/features/boards/position";
+import { boardNameSchema } from "@/features/boards/schemas";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
@@ -12,9 +15,6 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { boardNameSchema } from "@/lib/board-schemas";
-import { BOARD_GONE } from "@/lib/boards";
-import { initialPositions } from "@/lib/position";
 import { db } from "@/server/db";
 import { isForeignKeyViolation } from "@/server/prisma-errors";
 

@@ -2,11 +2,6 @@
 
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
-import {
-  deleteBoardAction,
-  renameBoardAction,
-} from "@/app/(app)/w/[slug]/b/actions";
-import { BoardNameDialog } from "@/components/boards/board-name-dialog";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  deleteBoardAction,
+  renameBoardAction,
+} from "@/features/boards/actions";
+import { BoardNameDialog } from "@/features/boards/components/board-name-dialog";
 
 const ITEM = "h-11 cursor-pointer gap-2.5 px-2 sm:h-10";
 const DESTRUCTIVE_ITEM = `${ITEM} data-[variant=destructive]:text-danger-text data-[variant=destructive]:focus:text-danger-text`;

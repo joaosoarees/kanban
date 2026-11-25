@@ -16,12 +16,12 @@ import {
   createLabelAction,
   updateLabelAction,
 } from "@/app/(app)/w/[slug]/b/label-actions";
-import type { BoardLabel } from "@/components/boards/board-meta";
 import { LABEL_COLOR_CLASSES } from "@/components/boards/label-tag";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { BoardLabel } from "@/features/boards/components/board-meta";
 import type { LabelColor } from "@/generated/prisma/enums";
 import {
   LABEL_GONE_MESSAGE,

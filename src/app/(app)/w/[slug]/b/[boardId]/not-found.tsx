@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SquareKanban } from "lucide-react";
-import { BackToBoardsLink } from "@/components/boards/back-to-boards-link";
 import { StatusView } from "@/components/status-view";
+import { BackToBoardsLink } from "@/features/boards/components/back-to-boards-link";
 
 export const metadata: Metadata = { title: "Quadro não encontrado" };
 

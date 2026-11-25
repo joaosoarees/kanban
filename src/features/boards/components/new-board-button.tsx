@@ -2,10 +2,10 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { createBoardAction } from "@/app/(app)/w/[slug]/b/actions";
-import { BoardNameDialog } from "@/components/boards/board-name-dialog";
 import { primaryButton } from "@/components/button-styles";
 import { Button } from "@/components/ui/button";
+import { createBoardAction } from "@/features/boards/actions";
+import { BoardNameDialog } from "@/features/boards/components/board-name-dialog";
 import { cn } from "@/lib/utils";
 
 const BUTTON_VARIANT = {

@@ -2,6 +2,13 @@
 
 import * as z from "zod";
 import {
+  BOARD_GONE,
+  CARD_GONE,
+  COLUMN_GONE,
+  lockBoard,
+} from "@/features/boards/access";
+import { positionAtEnd, positionInColumn } from "@/features/boards/position";
+import {
   loadActorAllowedTo,
   revalidateWorkspace,
 } from "@/features/workspaces/access";
@@ -12,7 +19,6 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { BOARD_GONE, CARD_GONE, COLUMN_GONE, lockBoard } from "@/lib/boards";
 import {
   cardDescriptionSchema,
   cardTitleSchema,
@@ -20,7 +26,6 @@ import {
   moveCardSchema,
 } from "@/lib/card-schemas";
 import { cardAssigneeSchema } from "@/lib/label-schemas";
-import { positionAtEnd, positionInColumn } from "@/lib/position";
 import { db } from "@/server/db";
 
 const BOARD_CHANGED: ActionError = {

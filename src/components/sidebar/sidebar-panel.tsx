@@ -4,11 +4,11 @@ import { LayoutGrid, Settings, SquareKanban, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { NewBoardButton } from "@/components/boards/new-board-button";
-import { RetryButton } from "@/components/boards/retry-button";
 import { LogoMark } from "@/components/logo";
 import { SidebarLink } from "@/components/sidebar/sidebar-links";
 import { UserMenu } from "@/components/user-menu";
+import { NewBoardButton } from "@/features/boards/components/new-board-button";
+import { RetryButton } from "@/features/boards/components/retry-button";
 import {
   WorkspaceSwitcher,
   type SwitcherWorkspace,
