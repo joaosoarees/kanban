@@ -7,6 +7,23 @@ export const EMAIL_TAKEN_MESSAGE = "Já existe uma conta com esse e-mail.";
 
 const byteLength = (text: string) => new TextEncoder().encode(text).length;
 
+const emailField = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(
+    z
+      .email("Digite um e-mail como nome@empresa.com.")
+      .max(254, "E-mail longo demais."),
+  );
+
+const newPasswordField = z
+  .string()
+  .min(8, "Use pelo menos 8 caracteres.")
+  .refine((password) => byteLength(password) <= PASSWORD_MAX_BYTES, {
+    error: "Senha longa demais.",
+  });
+
 export const signUpSchema = z.object({
   name: z
     .string()
@@ -14,21 +31,8 @@ export const signUpSchema = z.object({
     .max(120, "Use no máximo 120 caracteres.")
     .refine(hasVisibleText, "Digite seu nome.")
     .refine(hasNoNul, INVALID_CHARACTER),
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .pipe(
-      z
-        .email("Digite um e-mail como nome@empresa.com.")
-        .max(254, "E-mail longo demais."),
-    ),
-  password: z
-    .string()
-    .min(8, "Use pelo menos 8 caracteres.")
-    .refine((password) => byteLength(password) <= PASSWORD_MAX_BYTES, {
-      error: "Senha longa demais.",
-    }),
+  email: emailField,
+  password: newPasswordField,
 });
 
 export const signInSchema = z.object({
@@ -40,3 +44,7 @@ export const signInSchema = z.object({
     .refine(hasNoNul, INVALID_CHARACTER),
   password: z.string().min(1, "Digite sua senha."),
 });
+
+export const resetRequestSchema = z.object({ email: emailField });
+
+export const newPasswordSchema = z.object({ password: newPasswordField });
