@@ -12,7 +12,7 @@ import { FilterOptions } from "@/features/boards/components/filter-options";
 import {
   replaceBoardFilter,
   useBoardFilter,
-} from "@/features/boards/components/use-board-filter";
+} from "@/features/boards/hooks/use-board-filter";
 import { cn } from "@/lib/utils";
 
 function clearFilter() {

@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { PointerEvent } from "react";
 import { BoardCardButton } from "@/components/boards/board-card";
 import { pushCardUrl } from "@/components/boards/card-url";
-import type { BoardCard } from "@/features/boards/components/use-board-columns";
+import type { BoardCard } from "@/features/boards/hooks/use-board-columns";
 import { cn } from "@/lib/utils";
 
 type SortableCardProps = {

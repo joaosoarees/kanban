@@ -25,8 +25,8 @@ import {
 import type {
   BoardCard,
   BoardColumn,
-} from "@/features/boards/components/use-board-columns";
-import type { DragKind } from "@/features/boards/components/use-board-drag";
+} from "@/features/boards/hooks/use-board-columns";
+import type { DragKind } from "@/features/boards/hooks/use-board-drag";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";
 
