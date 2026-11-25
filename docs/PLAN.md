@@ -185,5 +185,5 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 10. [x] Auditoria da arquitetura contra as skills
 11. [x] Módulos por funcionalidade
 12. [x] Envio de e-mail: Mailpit, SES e templates
-13. [ ] Verificação de e-mail
-14. [ ] Esqueci a senha
+13. [x] Verificação de e-mail
+14. [x] Esqueci a senha
