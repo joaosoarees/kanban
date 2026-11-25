@@ -1,14 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { unstable_rethrow } from "next/navigation";
-import {
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-  type RefObject,
-} from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
@@ -19,6 +12,7 @@ import {
   COLUMN_NAME_MAX_LENGTH,
   columnNameSchema,
 } from "@/features/boards/schemas";
+import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 
 const CREATE_FAILED = "Não foi possível criar a coluna. Tente de novo.";
@@ -100,72 +94,48 @@ function AddColumnForm({
   onCancel,
   onCreated,
 }: AddColumnFormProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [value, setValue] = useState("");
-  const [error, setError] = useState<string>();
-  const [isPending, startTransition] = useTransition();
+  const {
+    form: {
+      register,
+      setFocus,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: columnNameSchema,
+    defaultValues: { name: "" },
+    action: async (values) => createColumnAction(workspaceId, boardId, values),
+    failure: CREATE_FAILED,
+    onSuccess: onCreated,
+    onError: (error) => {
+      if (error.fieldErrors?.name?.at(0) === undefined) {
+        toast.error(error.message);
+      }
+    },
+  });
+  const error = errors.name?.message;
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  const submit = () => {
-    const parsed = columnNameSchema.safeParse({ name: value });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0].message);
-      inputRef.current?.focus();
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const result = await createColumnAction(
-          workspaceId,
-          boardId,
-          parsed.data,
-        );
-        if (result.status === "success") {
-          startTransition(onCreated);
-          return;
-        }
-        const fieldError = result.fieldErrors?.name?.at(0);
-        if (fieldError !== undefined) {
-          setError(fieldError);
-          return;
-        }
-        toast.error(result.message);
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        toast.error(CREATE_FAILED);
-      }
-    });
-  };
+    setFocus("name");
+  }, [setFocus]);
 
   return (
     <form
       noValidate
       aria-busy={isPending}
-      onSubmit={(event) => {
-        event.preventDefault();
-        submit();
-      }}
+      onSubmit={submit}
       className="flex flex-col rounded-xl bg-muted p-2"
     >
       <Input
-        ref={inputRef}
+        {...register("name")}
         aria-label="Nome da nova coluna"
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby="new-column-message"
         placeholder="Nome da coluna"
-        value={value}
         readOnly={isPending}
         maxLength={COLUMN_NAME_MAX_LENGTH}
         autoComplete="off"
-        onChange={(event) => {
-          setValue(event.target.value);
-          setError(undefined);
-        }}
         onKeyDown={(event) => {
           if (event.key === "Escape" && !isPending) {
             onCancel();
