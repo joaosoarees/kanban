@@ -4,7 +4,7 @@ import type {
   BoardCard,
   BoardColumn,
   CardUpdate,
-} from "@/components/boards/use-board-columns";
+} from "@/features/boards/components/use-board-columns";
 import { cn } from "@/lib/utils";
 
 const PROPERTY_LABEL =

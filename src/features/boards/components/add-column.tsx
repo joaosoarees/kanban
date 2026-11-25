@@ -10,12 +10,15 @@ import {
   type RefObject,
 } from "react";
 import { toast } from "sonner";
-import { createColumnAction } from "@/app/(app)/w/[slug]/b/column-actions";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { COLUMN_NAME_MAX_LENGTH, columnNameSchema } from "@/lib/board-schemas";
+import { createColumnAction } from "@/features/boards/column-actions";
+import {
+  COLUMN_NAME_MAX_LENGTH,
+  columnNameSchema,
+} from "@/features/boards/schemas";
 import { cn } from "@/lib/utils";
 
 const CREATE_FAILED = "Não foi possível criar a coluna. Tente de novo.";

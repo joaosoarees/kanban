@@ -19,8 +19,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  BOARD_NAME_MAX_LENGTH,
+  boardNameSchema,
+} from "@/features/boards/schemas";
 import type { ActionResult } from "@/lib/action-result";
-import { BOARD_NAME_MAX_LENGTH, boardNameSchema } from "@/lib/board-schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 import { cn } from "@/lib/utils";
 

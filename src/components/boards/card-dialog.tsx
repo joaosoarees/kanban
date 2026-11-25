@@ -12,11 +12,6 @@ import {
 import { CardMoveMenu } from "@/components/boards/card-move-menu";
 import { CardProperties } from "@/components/boards/card-properties";
 import { CardTitle } from "@/components/boards/card-title";
-import type {
-  BoardCard,
-  BoardColumn,
-  CardUpdate,
-} from "@/components/boards/use-board-columns";
 import { useCardDescription } from "@/components/boards/use-card-description";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
@@ -26,6 +21,11 @@ import {
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialog";
+import type {
+  BoardCard,
+  BoardColumn,
+  CardUpdate,
+} from "@/features/boards/components/use-board-columns";
 import type { ActionResult } from "@/lib/action-result";
 
 const DISCARDED: ActionResult = { status: "success", data: undefined };

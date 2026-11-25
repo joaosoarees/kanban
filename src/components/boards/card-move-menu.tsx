@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
-import type { BoardColumn } from "@/components/boards/use-board-columns";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { BoardColumn } from "@/features/boards/components/use-board-columns";
 
 const ITEM = "h-11 cursor-pointer gap-2.5 px-2";
 

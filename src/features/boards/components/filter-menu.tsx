@@ -1,18 +1,18 @@
 "use client";
 
 import { ListFilter } from "lucide-react";
-import { FilterOptions } from "@/components/boards/filter-options";
-import {
-  replaceBoardFilter,
-  useBoardFilter,
-} from "@/components/boards/use-board-filter";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { activeFilterCount, NO_FILTER } from "@/lib/board-filter";
+import { activeFilterCount, NO_FILTER } from "@/features/boards/board-filter";
+import { FilterOptions } from "@/features/boards/components/filter-options";
+import {
+  replaceBoardFilter,
+  useBoardFilter,
+} from "@/features/boards/components/use-board-filter";
 import { cn } from "@/lib/utils";
 
 function clearFilter() {

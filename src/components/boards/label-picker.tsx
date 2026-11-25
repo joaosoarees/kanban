@@ -7,7 +7,6 @@ import {
   deleteLabelAction,
   removeCardLabelAction,
 } from "@/app/(app)/w/[slug]/b/label-actions";
-import { useBoardMeta } from "@/components/boards/board-meta";
 import {
   LABEL_COLORS,
   LabelEditor,
@@ -15,17 +14,18 @@ import {
 } from "@/components/boards/label-editor";
 import { LabelList } from "@/components/boards/label-list";
 import { LabelTag } from "@/components/boards/label-tag";
-import type {
-  BoardCard,
-  BoardColumn,
-  CardUpdate,
-} from "@/components/boards/use-board-columns";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useBoardMeta } from "@/features/boards/components/board-meta";
+import type {
+  BoardCard,
+  BoardColumn,
+  CardUpdate,
+} from "@/features/boards/components/use-board-columns";
 import { cardsLabel } from "@/lib/card-count";
 import { MAX_LABELS_PER_CARD } from "@/lib/label-schemas";
 

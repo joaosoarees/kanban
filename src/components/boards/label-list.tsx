@@ -2,8 +2,8 @@
 
 import { Check, Pencil, Plus, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { BoardLabel } from "@/components/boards/board-meta";
 import { LabelTag } from "@/components/boards/label-tag";
+import type { BoardLabel } from "@/features/boards/components/board-meta";
 import {
   LABEL_NAME_MAX_LENGTH,
   MAX_LABELS_PER_BOARD,
