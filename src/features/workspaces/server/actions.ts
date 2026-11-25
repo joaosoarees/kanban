@@ -10,7 +10,7 @@ import {
 import { slugify, withRandomSuffix } from "@/features/workspaces/lib/slug";
 import {
   loadActorAllowedTo,
-  WORKSPACE_GONE,
+  recheckActor,
 } from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
@@ -95,16 +95,20 @@ export async function renameWorkspaceAction(
     return invalidFields(parsed.error);
   }
 
-  const { count } = await db.workspace.updateMany({
-    where: { id: actor.workspaceId },
-    data: { name: parsed.data.name },
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "renameWorkspace");
+    if (denied) {
+      return denied;
+    }
+    await tx.workspace.update({
+      where: { id: actor.workspaceId },
+      data: { name: parsed.data.name },
+    });
+    return null;
   });
-  if (count === 0) {
-    return WORKSPACE_GONE;
-  }
 
   revalidatePath("/", "layout");
-  return { status: "success", data: undefined };
+  return refused ?? { status: "success", data: undefined };
 }
 
 export async function deleteWorkspaceAction(
@@ -122,7 +126,17 @@ export async function deleteWorkspaceAction(
     };
   }
 
-  await db.workspace.deleteMany({ where: { id: actor.workspaceId } });
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "deleteWorkspace");
+    if (denied) {
+      return denied;
+    }
+    await tx.workspace.delete({ where: { id: actor.workspaceId } });
+    return null;
+  });
+  if (refused === FORBIDDEN) {
+    return FORBIDDEN;
+  }
 
   revalidatePath("/", "layout");
   return redirect("/");
