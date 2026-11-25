@@ -14,7 +14,7 @@ import { useBoardMeta } from "@/features/boards/components/board-meta";
 import type {
   BoardCard,
   CardUpdate,
-} from "@/features/boards/components/use-board-columns";
+} from "@/features/boards/hooks/use-board-columns";
 import { cn } from "@/lib/utils";
 
 const NO_ASSIGNEE = "none";

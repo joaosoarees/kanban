@@ -25,7 +25,7 @@ import type {
   BoardCard,
   BoardColumn,
   CardUpdate,
-} from "@/features/boards/components/use-board-columns";
+} from "@/features/boards/hooks/use-board-columns";
 import type { ActionResult } from "@/lib/action-result";
 
 const DISCARDED: ActionResult = { status: "success", data: undefined };

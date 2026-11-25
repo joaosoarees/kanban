@@ -82,7 +82,7 @@ Deletes em cascata de Workspace até Card.
 ## Reorganização (fatias 10 e 11)
 
 - Antes de mover qualquer arquivo, uma auditoria só de leitura com a skill `auditing-code-against-skills` e o vocabulário da `codebase-design` (módulo, interface, profundidade, costura). Os achados viram a lista de PRs da fatia 11.
-- Módulos por funcionalidade, mantendo a convenção do Next: `src/features/<feature>/` com `schemas.ts`, `queries.ts` (leituras dos Server Components), `actions.ts` (Server Actions), regras puras com teste e `components/`. A infraestrutura (`db`, sessão, e-mail) vai para `src/server/`, e `src/app` só monta as rotas.
+- Módulos por funcionalidade, mantendo a convenção do Next: `src/features/<feature>/` com `schemas.ts`, `queries.ts` (leituras dos Server Components), `actions.ts` (Server Actions), regras puras com teste, `components/` e `hooks/` (hooks de cliente da feature; os compartilhados ficam em `src/hooks`). A infraestrutura (`db`, sessão, e-mail) vai para `src/server/`, e `src/app` só monta as rotas.
 - Server Actions e queries continuam usando o Prisma direto, sem use cases, repositórios ou DI. A única interface com dois adaptadores é o envio de e-mail.
 - Um PR por feature, sem mudar comportamento. A conferência é feita com lint, typecheck, testes unitários e build, mais uma passada pelo app com Playwright fora do repositório. Sem teste E2E versionado.
 - No fim, `CLAUDE.md` e a seção Arquitetura deste plano descrevem a estrutura nova.

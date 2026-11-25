@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { BoardColumn } from "@/features/boards/components/use-board-columns";
+import type { BoardColumn } from "@/features/boards/hooks/use-board-columns";
 
 const ITEM = "h-11 cursor-pointer gap-2.5 px-2";
 

@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { LabelTag } from "@/components/boards/label-tag";
 import { MemberAvatar } from "@/components/boards/member-avatar";
 import { useBoardMeta } from "@/features/boards/components/board-meta";
-import type { BoardCard as BoardCardData } from "@/features/boards/components/use-board-columns";
+import type { BoardCard as BoardCardData } from "@/features/boards/hooks/use-board-columns";
 import { cn } from "@/lib/utils";
 
 const CARD =

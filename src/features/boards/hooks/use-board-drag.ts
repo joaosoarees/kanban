@@ -22,7 +22,7 @@ import {
   boardKeyboardCoordinates,
   COLUMN_DROP,
 } from "@/components/boards/card-keyboard";
-import type { BoardColumn } from "@/features/boards/components/use-board-columns";
+import type { BoardColumn } from "@/features/boards/hooks/use-board-columns";
 import { locateCard, moveCardTo } from "@/lib/card-moves";
 
 export type DragKind = "column" | "card";

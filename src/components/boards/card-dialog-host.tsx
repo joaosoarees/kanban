@@ -13,8 +13,8 @@ import { isFilterActive } from "@/features/boards/board-filter";
 import type {
   BoardColumn,
   CardUpdate,
-} from "@/features/boards/components/use-board-columns";
-import { useBoardFilter } from "@/features/boards/components/use-board-filter";
+} from "@/features/boards/hooks/use-board-columns";
+import { useBoardFilter } from "@/features/boards/hooks/use-board-filter";
 import { locateCard } from "@/lib/card-moves";
 
 const CARD_NOT_FOUND =

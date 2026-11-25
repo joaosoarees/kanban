@@ -25,7 +25,7 @@ import type {
   BoardCard,
   BoardColumn,
   CardUpdate,
-} from "@/features/boards/components/use-board-columns";
+} from "@/features/boards/hooks/use-board-columns";
 import { cardsLabel } from "@/lib/card-count";
 import { MAX_LABELS_PER_CARD } from "@/lib/label-schemas";
 

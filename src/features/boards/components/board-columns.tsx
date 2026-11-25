@@ -19,15 +19,15 @@ import { ColumnPreview } from "@/features/boards/components/column-preview";
 import {
   useBoardColumns,
   type BoardColumn,
-} from "@/features/boards/components/use-board-columns";
+} from "@/features/boards/hooks/use-board-columns";
 import {
   screenReaderInstructions,
   useBoardDrag,
-} from "@/features/boards/components/use-board-drag";
+} from "@/features/boards/hooks/use-board-drag";
 import {
   useBoardFilter,
   useVisibleCards,
-} from "@/features/boards/components/use-board-filter";
+} from "@/features/boards/hooks/use-board-filter";
 import { locateCard } from "@/lib/card-moves";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";

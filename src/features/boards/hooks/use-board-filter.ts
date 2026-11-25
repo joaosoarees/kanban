@@ -16,7 +16,7 @@ import { useBoardMeta } from "@/features/boards/components/board-meta";
 import type {
   BoardCard,
   BoardColumn,
-} from "@/features/boards/components/use-board-columns";
+} from "@/features/boards/hooks/use-board-columns";
 
 export function useBoardFilter() {
   const params = useSearchParams();
