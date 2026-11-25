@@ -51,8 +51,13 @@ export async function verifySessionToken(
   }
 }
 
-export async function createPendingToken(userId: string): Promise<string> {
-  return new SignJWT()
+export type PendingVerification = { userId: string; registeredAt: Date };
+
+export async function createPendingToken({
+  userId,
+  registeredAt,
+}: PendingVerification): Promise<string> {
+  return new SignJWT({ reg: registeredAt.getTime() })
     .setProtectedHeader({ alg: ALGORITHM })
     .setSubject(userId)
     .setAudience(PENDING_AUDIENCE)
@@ -63,7 +68,7 @@ export async function createPendingToken(userId: string): Promise<string> {
 
 export async function verifyPendingToken(
   token: string | undefined,
-): Promise<{ userId: string } | null> {
+): Promise<PendingVerification | null> {
   if (token === undefined || token === "") {
     return null;
   }
@@ -72,12 +77,17 @@ export async function verifyPendingToken(
     const { payload } = await jwtVerify(token, getKey(), {
       algorithms: [ALGORITHM],
       audience: PENDING_AUDIENCE,
-      requiredClaims: ["sub", "exp", "aud"],
+      requiredClaims: ["sub", "exp", "aud", "reg"],
     });
-    if (typeof payload.sub !== "string" || !USER_ID.test(payload.sub)) {
+    if (
+      typeof payload.sub !== "string" ||
+      !USER_ID.test(payload.sub) ||
+      typeof payload.reg !== "number" ||
+      !Number.isSafeInteger(payload.reg)
+    ) {
       return null;
     }
-    return { userId: payload.sub };
+    return { userId: payload.sub, registeredAt: new Date(payload.reg) };
   } catch {
     return null;
   }
