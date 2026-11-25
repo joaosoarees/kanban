@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/server/db";
 import { SESSION_COOKIE } from "@/server/session/cookie";
+import { isSessionCurrent } from "@/server/session/revocation";
 import { verifySessionToken } from "@/server/session/token";
 
 export type SessionUser = { id: string; name: string; email: string };
@@ -17,10 +18,14 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     return null;
   }
 
-  return db.user.findUnique({
+  const user = await db.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, email: true, passwordChangedAt: true },
   });
+  if (!user || !isSessionCurrent(session.issuedAt, user.passwordChangedAt)) {
+    return null;
+  }
+  return { id: user.id, name: user.name, email: user.email };
 });
 
 export async function requireUser(): Promise<SessionUser> {
