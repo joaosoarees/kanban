@@ -1,6 +1,5 @@
 "use client";
 
-import { unstable_rethrow } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
 import {
   AlertDialog,
@@ -14,9 +13,11 @@ import {
 import { dangerButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import type { ActionResult } from "@/lib/action-result";
+import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
 
 const CONFIRM_FAILED = "Não foi possível concluir. Tente de novo.";
+const CONFIRMED: ActionResult = { status: "success", data: undefined };
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -57,15 +58,12 @@ export function ConfirmDialog({
   const confirm = () => {
     setError(undefined);
     startTransition(async () => {
-      try {
-        const result = await onConfirm();
-        if (result?.status === "error") {
-          setError(result.message);
-        }
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        setError(CONFIRM_FAILED);
+      const result = await runAction(
+        async () => (await onConfirm()) ?? CONFIRMED,
+        CONFIRM_FAILED,
+      );
+      if (result.status === "error") {
+        setError(result.message);
       }
     });
   };
