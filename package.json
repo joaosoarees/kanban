@@ -31,6 +31,7 @@
     "nodemailer": "^10.6.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-email": "6.11.16",
     "react-hook-form": "^7.92.0",
     "server-only": "^0.0.1",
     "shadcn": "^4.23.0",
