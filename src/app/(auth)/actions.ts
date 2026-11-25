@@ -11,14 +11,9 @@ import {
 import { db } from "@/server/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { isUniqueViolation } from "@/server/prisma-errors";
-import { deleteSessionCookie, writeSessionCookie } from "@/lib/session-cookie";
-import { createSessionToken } from "@/lib/session-token";
+import { endSession, startSession } from "@/server/session";
 
 const AFTER_SIGN_IN = "/";
-
-async function startSession(userId: string): Promise<void> {
-  await writeSessionCookie(await createSessionToken(userId));
-}
 
 export async function signUpAction(input: unknown): Promise<ActionResult> {
   const parsed = signUpSchema.safeParse(input);
@@ -86,6 +81,6 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 }
 
 export async function signOutAction(): Promise<void> {
-  await deleteSessionCookie();
+  await endSession();
   return redirect("/sign-in");
 }

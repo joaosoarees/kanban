@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { linkButton } from "@/components/button-styles";
 import { StatusView } from "@/components/status-view";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Página não encontrada" };
 

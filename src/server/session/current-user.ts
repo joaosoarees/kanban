@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/server/db";
-import { SESSION_COOKIE } from "@/lib/session-cookie";
-import { verifySessionToken } from "@/lib/session-token";
+import { SESSION_COOKIE } from "@/server/session/cookie";
+import { verifySessionToken } from "@/server/session/token";
 
 export type SessionUser = { id: string; name: string; email: string };
 

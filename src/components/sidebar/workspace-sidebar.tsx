@@ -1,5 +1,5 @@
 import { SidebarShell } from "@/components/sidebar/sidebar-shell";
-import { requireUser } from "@/lib/auth";
+import { requireUser } from "@/server/session";
 import { getBoards } from "@/lib/boards";
 import { can } from "@/lib/permissions";
 import { getMyWorkspaces, requireMembership } from "@/lib/workspaces";
