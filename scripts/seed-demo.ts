@@ -143,10 +143,11 @@ const workspaces = [
 
 async function createPeople(db: PrismaClient) {
   const passwordHash = await hash(DEMO_PASSWORD, 12);
+  const emailVerifiedAt = new Date();
   const created = await Promise.all(
     people.map(async ({ key, name, email }) => {
       const user = await db.user.create({
-        data: { name, email, passwordHash },
+        data: { name, email, passwordHash, emailVerifiedAt },
         select: { id: true },
       });
       return [key, user.id] as const;
