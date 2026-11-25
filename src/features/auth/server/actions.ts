@@ -80,7 +80,7 @@ export async function signUpAction(input: unknown): Promise<ActionResult> {
     throw error;
   }
 
-  await startSession(userId);
+  await startSession({ userId, passwordChangedAt: null });
   return redirect(AFTER_SIGN_IN);
 }
 
@@ -96,7 +96,7 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 
   const user = await db.user.findUnique({
     where: { email: parsed.data.email },
-    select: { id: true, passwordHash: true },
+    select: { id: true, passwordHash: true, passwordChangedAt: true },
   });
 
   const matches = await verifyPassword(
@@ -110,7 +110,10 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
     };
   }
 
-  await startSession(user.id);
+  await startSession({
+    userId: user.id,
+    passwordChangedAt: user.passwordChangedAt,
+  });
   return redirect(AFTER_SIGN_IN);
 }
 
@@ -137,10 +140,10 @@ export async function verifyEmailAction(input: unknown): Promise<ActionResult> {
   }
 
   const outcome = await verifyEmail(pending, parsed.data.code, new Date());
-  if (outcome === "expired") {
+  if (outcome.status === "expired") {
     return PENDING_EXPIRED;
   }
-  if (outcome === "invalid") {
+  if (outcome.status === "invalid") {
     return {
       status: "error",
       message: INVALID_CODE_MESSAGE,
@@ -148,7 +151,10 @@ export async function verifyEmailAction(input: unknown): Promise<ActionResult> {
     };
   }
 
-  await startSession(pending.userId);
+  await startSession({
+    userId: pending.userId,
+    passwordChangedAt: outcome.passwordChangedAt,
+  });
   return redirect(AFTER_SIGN_IN);
 }
 
@@ -260,11 +266,15 @@ export async function resetPasswordAction(
     return RESET_EXPIRED;
   }
 
-  const changed = await resetPassword(grant, parsed.data.password, new Date());
-  if (!changed) {
+  const passwordChangedAt = await resetPassword(
+    grant,
+    parsed.data.password,
+    new Date(),
+  );
+  if (passwordChangedAt === null) {
     return RESET_EXPIRED;
   }
 
-  await startSession(grant.userId);
+  await startSession({ userId: grant.userId, passwordChangedAt });
   return redirect(AFTER_SIGN_IN);
 }

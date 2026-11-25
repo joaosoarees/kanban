@@ -85,7 +85,7 @@ export async function resetPassword(
   grant: ResetGrant,
   password: string,
   now: Date,
-): Promise<boolean> {
+): Promise<Date | null> {
   const passwordHash = await hashPassword(password);
   return db.$transaction(async (tx) => {
     const rows = await tx.$queryRaw<
@@ -96,7 +96,7 @@ export async function resetPassword(
       user === undefined ||
       !isResetGrantCurrent(grant.issuedAt, user.passwordChangedAt)
     ) {
-      return false;
+      return null;
     }
     await tx.user.update({
       where: { id: grant.userId },
@@ -107,6 +107,6 @@ export async function resetPassword(
       },
     });
     await tx.emailCode.deleteMany({ where: resetOwner(grant.userId) });
-    return true;
+    return now;
   });
 }

@@ -52,8 +52,9 @@ async function lockAccount(tx: Prisma.TransactionClient, userId: string) {
       name: string;
       createdAt: Date;
       emailVerifiedAt: Date | null;
+      passwordChangedAt: Date | null;
     }[]
-  >`SELECT email, name, "createdAt", "emailVerifiedAt" FROM users WHERE id = ${userId}::uuid FOR NO KEY UPDATE`;
+  >`SELECT email, name, "createdAt", "emailVerifiedAt", "passwordChangedAt" FROM users WHERE id = ${userId}::uuid FOR NO KEY UPDATE`;
   return rows.at(0);
 }
 
@@ -158,27 +159,31 @@ export async function verifyEmail(
   pending: PendingVerification,
   code: string,
   now: Date,
-): Promise<"verified" | "invalid" | "expired"> {
+): Promise<
+  | { status: "verified"; passwordChangedAt: Date | null }
+  | { status: "invalid" }
+  | { status: "expired" }
+> {
   return db.$transaction(async (tx) => {
     const account = await lockAccount(tx, pending.userId);
     if (
       account === undefined ||
       account.createdAt.getTime() !== pending.registeredAt.getTime()
     ) {
-      return "expired";
+      return { status: "expired" };
     }
     if (account.emailVerifiedAt !== null) {
-      return "invalid";
+      return { status: "invalid" };
     }
     const valid = await consumeCode(tx, verifyOwner(pending.userId), code, now);
     if (!valid) {
-      return "invalid";
+      return { status: "invalid" };
     }
     await tx.user.update({
       where: { id: pending.userId },
       data: { emailVerifiedAt: now },
     });
-    return "verified";
+    return { status: "verified", passwordChangedAt: account.passwordChangedAt };
   });
 }
 

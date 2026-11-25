@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/server/db";
 import { SESSION_COOKIE } from "@/server/session/cookie";
-import { isSessionCurrent } from "@/server/session/revocation";
 import { verifySessionToken } from "@/server/session/token";
 
 export type SessionUser = { id: string; name: string; email: string };
@@ -22,7 +21,10 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     where: { id: session.userId },
     select: { id: true, name: true, email: true, passwordChangedAt: true },
   });
-  if (!user || !isSessionCurrent(session.issuedAt, user.passwordChangedAt)) {
+  if (
+    !user ||
+    (user.passwordChangedAt?.getTime() ?? null) !== session.passwordChangedAt
+  ) {
     return null;
   }
   return { id: user.id, name: user.name, email: user.email };
