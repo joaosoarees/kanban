@@ -160,7 +160,7 @@ export function SidebarPanel({ data, headerAction }: SidebarPanelProps) {
         className="flex min-h-0 flex-1 flex-col pt-3"
       >
         <div className="flex h-8 shrink-0 items-center justify-between pr-3 pl-4.5">
-          <h2 className="text-xs font-semibold text-fg-muted">Quadros</h2>
+          <h2 className="text-[13px]/5 font-semibold text-fg-muted">Quadros</h2>
           {workspace.canManageBoards && boards !== null && (
             <NewBoardButton
               workspaceId={workspace.id}

@@ -60,7 +60,7 @@ export function WorkspaceSwitcher({
                 <span className="truncate text-sm font-medium">
                   {current.name}
                 </span>
-                <span className="truncate font-mono text-xs text-muted-foreground">
+                <span className="truncate font-mono text-[13px]/5 text-muted-foreground">
                   /w/{current.slug}
                 </span>
               </span>
@@ -106,7 +106,7 @@ export function WorkspaceSwitcher({
                     >
                       {workspace.name}
                     </span>
-                    <span className="truncate font-mono text-xs text-muted-foreground">
+                    <span className="truncate font-mono text-[13px]/5 text-muted-foreground">
                       /w/{workspace.slug}
                     </span>
                   </span>
