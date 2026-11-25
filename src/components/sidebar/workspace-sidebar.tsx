@@ -1,8 +1,8 @@
 import { SidebarShell } from "@/components/sidebar/sidebar-shell";
-import { requireUser } from "@/server/session";
 import { getBoards } from "@/lib/boards";
 import { can } from "@/lib/permissions";
 import { getMyWorkspaces, requireMembership } from "@/lib/workspaces";
+import { requireUser } from "@/server/session";
 
 async function loadBoards(workspaceId: string) {
   try {
