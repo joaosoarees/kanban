@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { SESSION_LIFETIME_SECONDS } from "@/lib/session-token";
+import { SESSION_LIFETIME_SECONDS } from "@/server/session/token";
 
 export const SESSION_COOKIE = "session";
 

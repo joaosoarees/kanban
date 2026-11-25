@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import * as z from "zod";
 import type { Role } from "@/generated/prisma/client";
-import { requireUser } from "@/lib/auth";
+import { requireUser } from "@/server/session";
 import { db } from "@/server/db";
 import { can, type WorkspaceAction } from "@/lib/permissions";
 import { hasNoNul } from "@/lib/text";

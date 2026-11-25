@@ -3,7 +3,7 @@ import { Suspense, type ReactNode } from "react";
 import { BoardPreview } from "@/components/board-preview";
 import { FreshDocument } from "@/components/fresh-document";
 import { Logo } from "@/components/logo";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/server/session";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (

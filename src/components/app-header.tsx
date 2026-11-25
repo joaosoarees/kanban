@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/logo";
 import { UserMenu } from "@/components/user-menu";
-import { requireUser } from "@/lib/auth";
+import { requireUser } from "@/server/session";
 
 function HeaderFrame({ actions }: { actions?: ReactNode }) {
   return (

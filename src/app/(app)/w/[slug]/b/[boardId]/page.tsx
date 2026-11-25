@@ -4,7 +4,7 @@ import { BoardColumns } from "@/components/boards/board-columns";
 import { BoardMenu } from "@/components/boards/board-menu";
 import { BoardMetaProvider } from "@/components/boards/board-meta";
 import { FilterMenu } from "@/components/boards/filter-menu";
-import { requireUser } from "@/lib/auth";
+import { requireUser } from "@/server/session";
 import { requireBoard } from "@/lib/boards";
 import { can } from "@/lib/permissions";
 import { getAssignableMembers, requireMembership } from "@/lib/workspaces";
