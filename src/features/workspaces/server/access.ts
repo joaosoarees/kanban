@@ -5,10 +5,12 @@ import { cache } from "react";
 import * as z from "zod";
 import {
   can,
+  type MemberTarget,
   type WorkspaceAction,
 } from "@/features/workspaces/lib/permissions";
 import type { WorkspaceSummary } from "@/features/workspaces/server/queries";
-import type { ActionError } from "@/lib/action-result";
+import type { Prisma } from "@/generated/prisma/client";
+import { FORBIDDEN, type ActionError } from "@/lib/action-result";
 import { hasNoNul } from "@/lib/text";
 import { db } from "@/server/db";
 import { requireUser } from "@/server/session";
@@ -55,6 +57,36 @@ export async function loadActorAllowedTo(
     return null;
   }
   return actor;
+}
+
+export async function recheckActor(
+  tx: Prisma.TransactionClient,
+  actor: { userId: string; workspaceId: string },
+  action: WorkspaceAction,
+  target?: MemberTarget,
+): Promise<ActionError | null> {
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM workspaces
+    WHERE id = ${actor.workspaceId}::uuid
+    FOR NO KEY UPDATE
+  `;
+  if (locked.length === 0) {
+    return WORKSPACE_GONE;
+  }
+
+  const membership = await tx.membership.findUnique({
+    where: {
+      userId_workspaceId: {
+        userId: actor.userId,
+        workspaceId: actor.workspaceId,
+      },
+    },
+    select: { role: true },
+  });
+  if (!membership || !can(membership.role, action, target)) {
+    return FORBIDDEN;
+  }
+  return null;
 }
 
 export const requireMembership = cache(async (slug: string) => {

@@ -7,14 +7,14 @@ import {
   changeRoleSchema,
   removeMemberSchema,
 } from "@/features/members/lib/schemas";
-import { can } from "@/features/workspaces/lib/permissions";
 import {
   loadActor,
   loadActorAllowedTo,
+  recheckActor,
   revalidateWorkspace,
   WORKSPACE_GONE,
 } from "@/features/workspaces/server/access";
-import type { Role } from "@/generated/prisma/client";
+import type { Prisma, Role } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
   INVALID,
@@ -23,41 +23,35 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
-import {
-  isForeignKeyViolation,
-  isUniqueViolation,
-} from "@/server/prisma-errors";
+import { isUniqueViolation } from "@/server/prisma-errors";
 
 const MEMBER_CHANGED: ActionError = {
   status: "error",
   message: "Os dados dessa pessoa mudaram. Confira e tente de novo.",
 };
 
-async function removeMembership(target: {
-  workspaceId: string;
-  userId: string;
-  role?: Role;
-}) {
+async function removeMembership(
+  tx: Prisma.TransactionClient,
+  target: { workspaceId: string; userId: string; role: Role },
+) {
   const { workspaceId, userId } = target;
-  return db.$transaction(async (tx) => {
-    await tx.$queryRaw`
-      SELECT id FROM boards
-      WHERE "workspaceId" = ${workspaceId}::uuid
-      ORDER BY id
-      FOR UPDATE
-    `;
+  await tx.$queryRaw`
+    SELECT id FROM boards
+    WHERE "workspaceId" = ${workspaceId}::uuid
+    ORDER BY id
+    FOR UPDATE
+  `;
 
-    const { count } = await tx.membership.deleteMany({ where: target });
-    if (count === 0) {
-      return false;
-    }
+  const { count } = await tx.membership.deleteMany({ where: target });
+  if (count === 0) {
+    return MEMBER_CHANGED;
+  }
 
-    await tx.card.updateMany({
-      where: { assigneeId: userId, column: { board: { workspaceId } } },
-      data: { assigneeId: null },
-    });
-    return true;
+  await tx.card.updateMany({
+    where: { assigneeId: userId, column: { board: { workspaceId } } },
+    data: { assigneeId: null },
   });
+  return null;
 }
 
 async function loadTarget(workspaceId: string, userId: string) {
@@ -91,21 +85,29 @@ export async function addMemberAction(
     return { status: "error", message, fieldErrors: { email: [message] } };
   }
 
+  const userId = user.id;
   try {
-    await db.membership.create({
-      data: {
-        userId: user.id,
-        workspaceId: actor.workspaceId,
-        role: parsed.data.role,
-      },
+    const refused = await db.$transaction(async (tx) => {
+      const denied = await recheckActor(tx, actor, "addMember");
+      if (denied) {
+        return denied;
+      }
+      await tx.membership.create({
+        data: {
+          userId,
+          workspaceId: actor.workspaceId,
+          role: parsed.data.role,
+        },
+      });
+      return null;
     });
+    if (refused) {
+      return refused;
+    }
   } catch (error) {
     if (isUniqueViolation(error)) {
       const message = `${user.name} já faz parte do workspace.`;
       return { status: "error", message, fieldErrors: { email: [message] } };
-    }
-    if (isForeignKeyViolation(error)) {
-      return WORKSPACE_GONE;
     }
     throw error;
   }
@@ -127,31 +129,30 @@ export async function changeRoleAction(
     return INVALID;
   }
 
-  const target = await loadTarget(actor.workspaceId, parsed.data.userId);
+  const { userId, role } = parsed.data;
+  const target = await loadTarget(actor.workspaceId, userId);
   if (!target) {
     revalidateWorkspace(actor.slug);
     return { status: "error", message: "Essa pessoa já saiu do workspace." };
   }
-  if (
-    !can(actor.role, "changeRole", {
-      role: target.role,
-      isSelf: parsed.data.userId === actor.userId,
-    })
-  ) {
-    return FORBIDDEN;
-  }
 
-  const { count } = await db.membership.updateMany({
-    where: {
-      userId: parsed.data.userId,
-      workspaceId: actor.workspaceId,
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "changeRole", {
       role: target.role,
-    },
-    data: { role: parsed.data.role },
+      isSelf: userId === actor.userId,
+    });
+    if (denied) {
+      return denied;
+    }
+    const { count } = await tx.membership.updateMany({
+      where: { userId, workspaceId: actor.workspaceId, role: target.role },
+      data: { role },
+    });
+    return count === 0 ? MEMBER_CHANGED : null;
   });
 
   revalidateWorkspace(actor.slug);
-  return count === 0 ? MEMBER_CHANGED : { status: "success", data: undefined };
+  return refused ?? { status: "success", data: undefined };
 }
 
 export async function removeMemberAction(
@@ -167,28 +168,30 @@ export async function removeMemberAction(
     return INVALID;
   }
 
-  const target = await loadTarget(actor.workspaceId, parsed.data.userId);
+  const { userId } = parsed.data;
+  const target = await loadTarget(actor.workspaceId, userId);
   if (!target) {
     revalidateWorkspace(actor.slug);
     return { status: "success", data: undefined };
   }
-  if (
-    !can(actor.role, "removeMember", {
-      role: target.role,
-      isSelf: parsed.data.userId === actor.userId,
-    })
-  ) {
-    return FORBIDDEN;
-  }
 
-  const removed = await removeMembership({
-    workspaceId: actor.workspaceId,
-    userId: parsed.data.userId,
-    role: target.role,
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "removeMember", {
+      role: target.role,
+      isSelf: userId === actor.userId,
+    });
+    if (denied) {
+      return denied;
+    }
+    return removeMembership(tx, {
+      workspaceId: actor.workspaceId,
+      userId,
+      role: target.role,
+    });
   });
 
   revalidateWorkspace(actor.slug);
-  return removed ? { status: "success", data: undefined } : MEMBER_CHANGED;
+  return refused ?? { status: "success", data: undefined };
 }
 
 export async function leaveWorkspaceAction(
@@ -199,10 +202,20 @@ export async function leaveWorkspaceAction(
     return FORBIDDEN;
   }
 
-  await removeMembership({
-    workspaceId: actor.workspaceId,
-    userId: actor.userId,
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "leaveWorkspace");
+    if (denied) {
+      return denied;
+    }
+    return removeMembership(tx, {
+      workspaceId: actor.workspaceId,
+      userId: actor.userId,
+      role: actor.role,
+    });
   });
+  if (refused && refused !== WORKSPACE_GONE) {
+    return refused;
+  }
 
   revalidatePath("/", "layout");
   return redirect("/");

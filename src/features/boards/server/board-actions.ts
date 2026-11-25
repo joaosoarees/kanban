@@ -7,8 +7,8 @@ import { initialPositions } from "@/features/boards/lib/position";
 import { BOARD_GONE } from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,
+  recheckActor,
   revalidateWorkspace,
-  WORKSPACE_GONE,
 } from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
@@ -16,7 +16,6 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
-import { isForeignKeyViolation } from "@/server/prisma-errors";
 
 const DEFAULT_COLUMNS = ["A fazer", "Fazendo", "Feito"];
 
@@ -34,22 +33,16 @@ export async function createBoardAction(
     return invalidFields(parsed.error);
   }
 
-  const board = await insertBoard(actor.workspaceId, parsed.data.name);
-  if (!board) {
-    return WORKSPACE_GONE;
-  }
-
-  revalidateWorkspace(actor.slug);
-  return redirect(`/w/${actor.slug}/b/${board.id}`);
-}
-
-async function insertBoard(workspaceId: string, name: string) {
   const positions = initialPositions(DEFAULT_COLUMNS.length);
-  try {
-    return await db.board.create({
+  const created = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "manageBoards");
+    if (denied) {
+      return denied;
+    }
+    return tx.board.create({
       data: {
-        workspaceId,
-        name,
+        workspaceId: actor.workspaceId,
+        name: parsed.data.name,
         columns: {
           create: DEFAULT_COLUMNS.map((columnName, index) => ({
             name: columnName,
@@ -59,12 +52,13 @@ async function insertBoard(workspaceId: string, name: string) {
       },
       select: { id: true },
     });
-  } catch (error) {
-    if (isForeignKeyViolation(error)) {
-      return null;
-    }
-    throw error;
+  });
+  if ("status" in created) {
+    return created;
   }
+
+  revalidateWorkspace(actor.slug);
+  return redirect(`/w/${actor.slug}/b/${created.id}`);
 }
 
 export async function renameBoardAction(
@@ -87,17 +81,20 @@ export async function renameBoardAction(
     return invalidFields(parsed.error);
   }
 
-  const { count } = await db.board.updateMany({
-    where: { id: id.data, workspaceId: actor.workspaceId },
-    data: { name: parsed.data.name },
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "manageBoards");
+    if (denied) {
+      return denied;
+    }
+    const { count } = await tx.board.updateMany({
+      where: { id: id.data, workspaceId: actor.workspaceId },
+      data: { name: parsed.data.name },
+    });
+    return count === 0 ? BOARD_GONE : null;
   });
 
-  if (count === 0) {
-    return BOARD_GONE;
-  }
-
   revalidateWorkspace(actor.slug);
-  return { status: "success", data: undefined };
+  return refused ?? { status: "success", data: undefined };
 }
 
 export async function deleteBoardAction(
@@ -114,9 +111,19 @@ export async function deleteBoardAction(
     return BOARD_GONE;
   }
 
-  await db.board.deleteMany({
-    where: { id: id.data, workspaceId: actor.workspaceId },
+  const refused = await db.$transaction(async (tx) => {
+    const denied = await recheckActor(tx, actor, "manageBoards");
+    if (denied) {
+      return denied;
+    }
+    await tx.board.deleteMany({
+      where: { id: id.data, workspaceId: actor.workspaceId },
+    });
+    return null;
   });
+  if (refused) {
+    return refused;
+  }
 
   revalidateWorkspace(actor.slug);
   return redirect(`/w/${actor.slug}`);
