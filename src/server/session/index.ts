@@ -10,6 +10,7 @@ import {
 import {
   createPendingToken,
   createSessionToken,
+  type PendingToken,
   type PendingVerification,
   verifyPendingToken,
 } from "@/server/session/token";
@@ -25,7 +26,7 @@ export async function startSession(userId: string): Promise<void> {
   await writeSessionCookie(await createSessionToken(userId));
 }
 
-export type { PendingVerification };
+export type { PendingToken, PendingVerification };
 
 export async function startPendingVerification(
   pending: PendingVerification,
@@ -34,7 +35,7 @@ export async function startPendingVerification(
   await writePendingCookie(await createPendingToken(pending));
 }
 
-export async function getPendingVerification(): Promise<PendingVerification | null> {
+export async function getPendingVerification(): Promise<PendingToken | null> {
   const cookieStore = await cookies();
   return verifyPendingToken(cookieStore.get(PENDING_COOKIE)?.value);
 }
