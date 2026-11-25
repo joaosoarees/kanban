@@ -10,6 +10,7 @@ type TextFieldProps = ComponentProps<"input"> & {
   id: string;
   label: string;
   labelClassName?: string;
+  inputClassName?: string;
   hint?: ReactNode;
   error?: ReactNode;
 };
@@ -18,6 +19,7 @@ export function TextField({
   id,
   label,
   labelClassName,
+  inputClassName,
   hint,
   error,
   type,
@@ -43,6 +45,7 @@ export function TextField({
           className={cn(
             "h-10 enabled:hover:border-border-strong aria-invalid:enabled:hover:border-destructive",
             isPassword && "pr-11",
+            inputClassName,
           )}
           {...props}
         />
