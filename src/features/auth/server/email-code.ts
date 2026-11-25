@@ -1,22 +1,15 @@
 import "server-only";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import {
-  type AttemptWindow,
+  CODE_LENGTH,
   codeExpiresAt,
   isCodeUsable,
-  secondsUntilAttemptsReset,
   secondsUntilResend,
-  windowAfterWrongAttempt,
 } from "@/features/auth/lib/email-code";
 import type { Prisma } from "@/generated/prisma/client";
 import type { EmailCodePurpose } from "@/generated/prisma/enums";
 
 type Owner = { userId: string; purpose: EmailCodePurpose };
-
-export type CodeCheck =
-  | { status: "valid" }
-  | { status: "invalid" }
-  | { status: "locked"; waitSeconds: number };
 
 function getKey(): string {
   const secret = process.env.EMAIL_CODE_SECRET;
@@ -32,18 +25,8 @@ function hashCode({ userId, purpose }: Owner, code: string): Buffer {
     .digest();
 }
 
-async function lockUserWindow(
-  tx: Prisma.TransactionClient,
-  userId: string,
-): Promise<AttemptWindow> {
-  const rows = await tx.$queryRaw<
-    { windowStartedAt: Date | null; windowAttempts: number }[]
-  >`SELECT "codeWindowStartedAt" AS "windowStartedAt", "codeWindowAttempts" AS "windowAttempts" FROM users WHERE id = ${userId}::uuid FOR NO KEY UPDATE`;
-  const row = rows.at(0);
-  if (row === undefined) {
-    throw new Error("The user of an e-mail code must exist.");
-  }
-  return row;
+async function lockUser(tx: Prisma.TransactionClient, userId: string) {
+  await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId}::uuid FOR NO KEY UPDATE`;
 }
 
 export async function issueCode(
@@ -51,7 +34,9 @@ export async function issueCode(
   owner: Owner,
   now: Date,
 ): Promise<string> {
-  const code = randomInt(0, 1_000_000).toString().padStart(6, "0");
+  const code = randomInt(0, 10 ** CODE_LENGTH)
+    .toString()
+    .padStart(CODE_LENGTH, "0");
   const fields = {
     codeHash: hashCode(owner, code).toString("hex"),
     sentAt: now,
@@ -71,15 +56,12 @@ export async function resendCode(
   owner: Owner,
   now: Date,
 ): Promise<{ code: string } | { waitSeconds: number }> {
-  const window = await lockUserWindow(tx, owner.userId);
+  await lockUser(tx, owner.userId);
   const current = await tx.emailCode.findUnique({
     where: { userId_purpose: owner },
     select: { sentAt: true },
   });
-  const waitSeconds = Math.max(
-    current ? secondsUntilResend(current.sentAt, now) : 0,
-    secondsUntilAttemptsReset(window, now),
-  );
+  const waitSeconds = current ? secondsUntilResend(current.sentAt, now) : 0;
   if (waitSeconds > 0) {
     return { waitSeconds };
   }
@@ -91,20 +73,15 @@ export async function consumeCode(
   owner: Owner,
   code: string,
   now: Date,
-): Promise<CodeCheck> {
-  const window = await lockUserWindow(tx, owner.userId);
-  const waitSeconds = secondsUntilAttemptsReset(window, now);
-  if (waitSeconds > 0) {
-    return { status: "locked", waitSeconds };
-  }
-
+): Promise<boolean> {
+  await lockUser(tx, owner.userId);
   const where = { userId_purpose: owner };
   const stored = await tx.emailCode.findUnique({
     where,
     select: { codeHash: true, expiresAt: true, attempts: true },
   });
   if (!stored || !isCodeUsable(stored, now)) {
-    return { status: "invalid" };
+    return false;
   }
 
   const matches = timingSafeEqual(
@@ -113,20 +90,11 @@ export async function consumeCode(
   );
   if (matches) {
     await tx.emailCode.delete({ where });
-    return { status: "valid" };
+  } else {
+    await tx.emailCode.update({
+      where,
+      data: { attempts: stored.attempts + 1 },
+    });
   }
-
-  const next = windowAfterWrongAttempt(window, now);
-  await tx.emailCode.update({
-    where,
-    data: { attempts: stored.attempts + 1 },
-  });
-  await tx.user.update({
-    where: { id: owner.userId },
-    data: {
-      codeWindowStartedAt: next.windowStartedAt,
-      codeWindowAttempts: next.windowAttempts,
-    },
-  });
-  return { status: "invalid" };
+  return matches;
 }
