@@ -180,7 +180,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 5. [x] Boards e colunas: reorder optimistic, store Zustand de colunas recolhidas
 6. [x] Cards: CRUD, drag optimistic, teste de posição
 7. [x] Etiquetas e responsável, optimistic
-8. [ ] Polimento: visual de loading/erro, dark mode, sidebar, revisão com `craft-critique`. A densidade saiu do escopo: os quadros de times pequenos têm poucos cards por coluna, e um modo compacto pediria duas versões do card nos dois temas. Volta como fatia própria se um quadro cheio pedir.
+8. [x] Polimento: visual de loading/erro, dark mode, sidebar, revisão com `craft-critique`. A densidade saiu do escopo: os quadros de times pequenos têm poucos cards por coluna, e um modo compacto pediria duas versões do card nos dois temas. Volta como fatia própria se um quadro cheio pedir.
 9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
 10. [x] Auditoria da arquitetura contra as skills
 11. [x] Módulos por funcionalidade
