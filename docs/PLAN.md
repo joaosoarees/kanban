@@ -123,8 +123,8 @@ Cada PR de feature migra os campos da feature para o `useActionForm` e ganha tes
 
 ### Verificação de e-mail (fatia 13)
 
-- Código de 6 dígitos por e-mail, válido por 15 minutos e guardado como HMAC-SHA256 com `EMAIL_CODE_SECRET`, separado do `SESSION_SECRET`. A comparação é em tempo constante.
-- Depois de 5 tentativas erradas, o código é apagado. O reenvio fica liberado a cada 60 s e substitui o código anterior.
+- Código de 6 dígitos por e-mail, válido por 15 minutos e guardado como HMAC-SHA256 com `EMAIL_CODE_SECRET`, separado do `SESSION_SECRET`. A comparação é em tempo constante. Em produção a chave vem de `SERVICE_BASE64_64_EMAILCODE`, gerada pelo Coolify.
+- Depois de 5 tentativas erradas, o código deixa de valer. A linha fica, com o `sentAt`, para o intervalo de reenvio continuar valendo. Além disso, cada conta tem até 10 tentativas erradas por hora, somando os códigos de verificação e de redefinição: a janela fica na linha do usuário, o reenvio e um novo cadastro não a zeram, e quem passa do limite vê "Muitas tentativas. Tente de novo em X min". A janela é fixa (começa no primeiro erro e dura uma hora), então perto da virada cabem até uns 20 erros seguidos; a média continua em 10 por hora. O reenvio fica liberado a cada 60 s e substitui o código anterior. Conferir e reenviar travam a linha do usuário (`FOR NO KEY UPDATE`), para tentativas em paralelo contarem uma a uma.
 - Código errado e código vencido recebem a mesma mensagem: "Código inválido ou vencido. Peça um novo."
 - Uma conta pendente não acessa nada:
   - o cadastro não abre sessão e leva para `/verify-email`;
@@ -133,16 +133,18 @@ Cada PR de feature migra os campos da feature para o `useActionForm` e ganha tes
 - A tela sabe de quem é o código por um cookie `pending_verification`, com JWT de 30 minutos e `aud` próprio, que o `verifySessionToken` recusa. O e-mail não vai na URL.
 - `getCurrentUser` exige `email_verified_at`. Todos os usuários atuais ficam pendentes na migration, e o João verifica a conta logo depois do deploy.
 - Cadastro com um e-mail já verificado recebe a mesma resposta de um cadastro novo e leva à mesma tela, sem criar código. O dono do endereço recebe um aviso ("alguém tentou criar uma conta com este e-mail"). O caminho calcula o hash da senha mesmo assim, para levar o mesmo tempo.
-- Uma conta pendente expira 3 dias depois de `created_at`, sem cron. Um novo cadastro com o mesmo e-mail substitui a conta pendente, vencida ou não.
+- Uma conta pendente não expira. Um novo cadastro com o mesmo e-mail substitui a conta pendente na mesma linha: nome, senha e `created_at` novos e um código novo no lugar do anterior, sem zerar a janela de tentativas. O id e os vínculos com workspaces ficam, e só quem recebe o código no e-mail entra. Apagar e recriar levaria os vínculos de uma conta antiga, como as que a migration deixa pendentes.
 - O rate limit do Traefik passa a cobrir também o `POST` de `/verify-email`.
 - A tela `/verify-email` (campo de 6 dígitos, reenviar com contagem regressiva, trocar de conta) passa pelo `craft` antes de ser implementada.
+- As fatias 13 e 14 vão juntas para produção, porque o aviso de cadastro repetido aponta para o "Esqueci a senha". O que não muda o comportamento (schema, regras, código, cookie, actions e templates sem uso) entra em PRs normais; a virada (`getCurrentUser` exigindo a verificação, o cadastro e o login novos e as telas) fica num PR final, depois das telas das duas fatias aprovadas.
 - Skills: `designing-data-models`, `modeling-entity-relationships`, `normalizing-relational-schemas`, `relational-keys-and-column-types`, `postgres-constraints-and-keys`, `defining-access-patterns`, `prisma-schema-and-migrations`, `prisma-transactions`, `nextjs-jwt-session`, `nextjs-auth-cookies`, `nextjs-credentials-auth-routes`, `cognito-sign-up-and-confirmation` (fluxo e mensagens), `nextjs-server-action-results`, `shadcn-react-hook-form`, `react-hook-form-zod`, `craft`.
 
 ```
-User + emailVerifiedAt?, passwordChangedAt?        CHECK (email = lower(email))
+User + emailVerifiedAt?, passwordChangedAt?, codeWindowStartedAt?, codeWindowAttempts
+  CHECK (email = lower(email)), CHECK (codeWindowAttempts BETWEEN 0 AND 10)
 EmailCode (userId, purpose: VERIFY_EMAIL | RESET_PASSWORD, codeHash, sentAt, expiresAt, attempts)
   @@id([userId, purpose]), onDelete: Cascade
-  CHECK (attempts BETWEEN 0 AND 5), CHECK (expiresAt > sentAt)
+  CHECK (attempts BETWEEN 0 AND 5), CHECK (expiresAt > sentAt), CHECK (codeHash ~ '^[0-9a-f]{64}$')
 ```
 
 As leituras usam a chave primária de `email_codes` e o `email` único de `users`. Não há índice novo; conferir com `EXPLAIN` depois da migration.
