@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
+import {
+  useState,
+  useTransition,
+  type BaseSyntheticEvent,
+  type ReactNode,
+} from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,6 +24,12 @@ import { cn } from "@/lib/utils";
 const CONFIRM_FAILED = "Não foi possível concluir. Tente de novo.";
 const CONFIRMED: ActionResult = { status: "success", data: undefined };
 
+type ConfirmForm = {
+  submit: (event?: BaseSyntheticEvent) => void;
+  isPending: boolean;
+  error?: string;
+};
+
 type ConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,9 +39,14 @@ type ConfirmDialogProps = {
   pendingLabel: string;
   cancelLabel?: string;
   confirmDisabled?: boolean;
-  onConfirm: () => Promise<ActionResult> | ActionResult | undefined;
   children?: ReactNode;
-};
+} & (
+  | {
+      onConfirm: () => Promise<ActionResult> | ActionResult | undefined;
+      form?: never;
+    }
+  | { form: ConfirmForm; onConfirm?: never }
+);
 
 export function ConfirmDialog({
   open,
@@ -42,10 +58,13 @@ export function ConfirmDialog({
   cancelLabel = "Cancelar",
   confirmDisabled = false,
   onConfirm,
+  form,
   children,
 }: ConfirmDialogProps) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string>();
+  const [isConfirming, startTransition] = useTransition();
+  const [confirmError, setError] = useState<string>();
+  const isPending = form?.isPending ?? isConfirming;
+  const error = form ? form.error : confirmError;
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (isPending) {
@@ -56,6 +75,9 @@ export function ConfirmDialog({
   };
 
   const confirm = () => {
+    if (onConfirm === undefined) {
+      return;
+    }
     setError(undefined);
     startTransition(async () => {
       const result = await runAction(
@@ -68,6 +90,34 @@ export function ConfirmDialog({
     });
   };
 
+  const body = (
+    <>
+      {children}
+      <div role="alert" className="empty:hidden">
+        {error !== undefined && (
+          <p className="mt-4 rounded-lg border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text">
+            {error}
+          </p>
+        )}
+      </div>
+      <AlertDialogFooter className="mx-0 mt-5 mb-0 border-0 bg-transparent p-0">
+        <AlertDialogCancel disabled={isPending} className="h-10 px-4">
+          {cancelLabel}
+        </AlertDialogCancel>
+        <PendingButton
+          type={form ? "submit" : "button"}
+          onClick={form ? undefined : confirm}
+          disabled={confirmDisabled}
+          isPending={isPending}
+          pendingLabel={pendingLabel}
+          className={cn("h-10 px-4", dangerButton)}
+        >
+          {confirmLabel}
+        </PendingButton>
+      </AlertDialogFooter>
+    </>
+  );
+
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent className="gap-0 p-6 data-[size=default]:sm:max-w-[440px]">
@@ -79,28 +129,13 @@ export function ConfirmDialog({
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {children}
-        <div role="alert" className="empty:hidden">
-          {error !== undefined && (
-            <p className="mt-4 rounded-lg border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text">
-              {error}
-            </p>
-          )}
-        </div>
-        <AlertDialogFooter className="mx-0 mt-5 mb-0 border-0 bg-transparent p-0">
-          <AlertDialogCancel disabled={isPending} className="h-10 px-4">
-            {cancelLabel}
-          </AlertDialogCancel>
-          <PendingButton
-            onClick={confirm}
-            disabled={confirmDisabled}
-            isPending={isPending}
-            pendingLabel={pendingLabel}
-            className={cn("h-10 px-4", dangerButton)}
-          >
-            {confirmLabel}
-          </PendingButton>
-        </AlertDialogFooter>
+        {form ? (
+          <form onSubmit={form.submit} noValidate aria-busy={isPending}>
+            {body}
+          </form>
+        ) : (
+          body
+        )}
       </AlertDialogContent>
     </AlertDialog>
   );
