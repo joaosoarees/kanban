@@ -63,7 +63,7 @@ http:
         burst: 10
 ```
 
-O roteador `kanban-auth` aplica esse limite só a `POST` em `/sign-in` e `/sign-up`.
+O roteador `kanban-auth` aplica esse limite só a `POST` em `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password` e `/reset-password`. As Server Actions das telas de entrada fazem `POST` no caminho da própria página, então o limite cobre login, cadastro, confirmação de e-mail, redefinição de senha e os reenvios de código.
 
 ## Rollback
 
