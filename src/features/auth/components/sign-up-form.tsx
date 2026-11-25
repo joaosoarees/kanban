@@ -1,45 +1,32 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useTransition } from "react";
-import { useForm } from "react-hook-form";
-import type * as z from "zod";
 import { TextField } from "@/components/text-field";
 import { signUpAction } from "@/features/auth/actions";
 import { FormFooter } from "@/features/auth/components/form-footer";
 import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/features/auth/schemas";
-import { applyActionErrors } from "@/lib/form-errors";
+import { useActionForm } from "@/hooks/use-action-form";
 
-type SignUpInput = z.input<typeof signUpSchema>;
-type SignUpOutput = z.output<typeof signUpSchema>;
+const SIGN_UP_FAILED = "Não foi possível criar a conta. Tente de novo.";
 
 export function SignUpForm() {
-  const [isPending, startTransition] = useTransition();
   const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<SignUpInput, unknown, SignUpOutput>({
-    resolver: zodResolver(signUpSchema),
+    form: {
+      register,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: signUpSchema,
     defaultValues: { name: "", email: "", password: "" },
-  });
-
-  const onSubmit = handleSubmit((values) => {
-    startTransition(async () => {
-      const result = await signUpAction(values);
-      if (result.status === "error") {
-        applyActionErrors(result, setError);
-      }
-    });
+    action: signUpAction,
+    failure: SIGN_UP_FAILED,
   });
 
   return (
     <form
-      onSubmit={(event) => {
-        void onSubmit(event);
-      }}
+      onSubmit={submit}
       noValidate
       aria-busy={isPending}
       className="flex flex-col gap-5"
