@@ -37,6 +37,7 @@ import {
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 import {
+  endPendingVerification,
   endSession,
   getPasswordReset,
   getPasswordResetGrant,
@@ -180,6 +181,11 @@ export async function resendCodeAction(): Promise<
     status: "success",
     data: { sent: resend.status === "sent", waitSeconds: resend.waitSeconds },
   };
+}
+
+export async function switchAccountAction(): Promise<void> {
+  await endPendingVerification();
+  return redirect("/sign-in");
 }
 
 const RESET_EXPIRED: ActionError = {

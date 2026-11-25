@@ -227,3 +227,35 @@ export async function resendVerification(
     ? { status: "sent", waitSeconds: RESEND_SECONDS }
     : { status: "failed" };
 }
+
+export async function loadPendingVerification(
+  pending: PendingToken,
+  now: Date,
+): Promise<{ email: string; waitSeconds: number } | null> {
+  const account = await db.user.findUnique({
+    where: { id: pending.userId },
+    select: {
+      email: true,
+      createdAt: true,
+      emailVerifiedAt: true,
+      emailCodes: {
+        where: { purpose: "VERIFY_EMAIL" },
+        select: { sentAt: true },
+      },
+    },
+  });
+  if (
+    account === null ||
+    account.createdAt.getTime() !== pending.registeredAt.getTime()
+  ) {
+    return null;
+  }
+  const sentAt =
+    account.emailVerifiedAt === null
+      ? account.emailCodes.at(0)?.sentAt
+      : pending.issuedAt;
+  return {
+    email: account.email,
+    waitSeconds: sentAt === undefined ? 0 : secondsUntilResend(sentAt, now),
+  };
+}
