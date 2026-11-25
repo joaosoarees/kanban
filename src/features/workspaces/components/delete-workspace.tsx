@@ -2,12 +2,12 @@
 
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { deleteWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { dangerOutlineButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { deleteWorkspaceAction } from "@/features/workspaces/actions";
 import { cn } from "@/lib/utils";
 
 type DeleteWorkspaceProps = {

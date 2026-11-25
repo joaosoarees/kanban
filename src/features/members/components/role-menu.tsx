@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { ROLE_LABELS } from "@/components/role-badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +8,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ROLE_LABELS } from "@/features/workspaces/components/role-badge";
 import type { Role } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { DeleteWorkspace } from "@/components/delete-workspace";
-import { RenameWorkspaceForm } from "@/components/rename-workspace-form";
-import { can } from "@/lib/permissions";
-import { requireMembership } from "@/lib/workspaces";
+import { requireMembership } from "@/features/workspaces/access";
+import { DeleteWorkspace } from "@/features/workspaces/components/delete-workspace";
+import { RenameWorkspaceForm } from "@/features/workspaces/components/rename-workspace-form";
+import { can } from "@/features/workspaces/permissions";
 
 export async function generateMetadata({
   params,

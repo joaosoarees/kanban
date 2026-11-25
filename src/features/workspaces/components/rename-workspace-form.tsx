@@ -1,16 +1,16 @@
 "use client";
 
 import { toast } from "sonner";
-import { renameWorkspaceAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
-import { useActionForm } from "@/hooks/use-action-form";
-import { cn } from "@/lib/utils";
+import { renameWorkspaceAction } from "@/features/workspaces/actions";
 import {
   renameWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
-} from "@/lib/workspace-schemas";
+} from "@/features/workspaces/schemas";
+import { useActionForm } from "@/hooks/use-action-form";
+import { cn } from "@/lib/utils";
 
 const RENAME_FAILED = "Não foi possível renomear o workspace. Tente de novo.";
 

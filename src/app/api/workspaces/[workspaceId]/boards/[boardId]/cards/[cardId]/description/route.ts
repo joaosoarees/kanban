@@ -1,7 +1,7 @@
 import * as z from "zod";
+import { loadActorAllowedTo } from "@/features/workspaces/access";
 import { FORBIDDEN, type ActionResult } from "@/lib/action-result";
 import { CARD_GONE } from "@/lib/boards";
-import { loadActorAllowedTo } from "@/lib/workspaces";
 import { db } from "@/server/db";
 
 const NO_STORE = { "Cache-Control": "private, no-store" };

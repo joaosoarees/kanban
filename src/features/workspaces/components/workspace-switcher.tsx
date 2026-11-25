@@ -5,7 +5,6 @@ import { Check, ChevronsUpDown, LayoutGrid, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { CreateWorkspaceDialog } from "@/components/create-workspace-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { WorkspaceTile } from "@/components/workspace-tile";
+import { CreateWorkspaceDialog } from "@/features/workspaces/components/create-workspace-dialog";
+import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
 import { cn } from "@/lib/utils";
 
 export type SwitcherWorkspace = { id: string; name: string; slug: string };

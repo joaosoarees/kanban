@@ -6,15 +6,15 @@ import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type * as z from "zod";
-import { addMemberAction } from "@/app/(app)/w/[slug]/settings/actions";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
-import { RoleMenu } from "@/components/role-menu";
 import { TextField } from "@/components/text-field";
 import { Label } from "@/components/ui/label";
+import { addMemberAction } from "@/features/members/actions";
+import { RoleMenu } from "@/features/members/components/role-menu";
+import { addMemberSchema } from "@/features/members/schemas";
 import { applyActionErrors } from "@/lib/form-errors";
 import { cn } from "@/lib/utils";
-import { addMemberSchema } from "@/lib/workspace-schemas";
 
 type AddMemberInput = z.input<typeof addMemberSchema>;
 type AddMemberOutput = z.output<typeof addMemberSchema>;

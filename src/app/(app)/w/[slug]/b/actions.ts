@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 import * as z from "zod";
 import {
+  loadActorAllowedTo,
+  revalidateWorkspace,
+} from "@/features/workspaces/access";
+import {
   FORBIDDEN,
   invalidFields,
   type ActionError,
@@ -11,7 +15,6 @@ import {
 import { boardNameSchema } from "@/lib/board-schemas";
 import { BOARD_GONE } from "@/lib/boards";
 import { initialPositions } from "@/lib/position";
-import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 import { db } from "@/server/db";
 import { isForeignKeyViolation } from "@/server/prisma-errors";
 

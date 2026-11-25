@@ -1,6 +1,10 @@
 "use server";
 
 import * as z from "zod";
+import {
+  loadActorAllowedTo,
+  revalidateWorkspace,
+} from "@/features/workspaces/access";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
@@ -11,7 +15,6 @@ import {
 import { columnNameSchema, moveColumnSchema } from "@/lib/board-schemas";
 import { BOARD_GONE, COLUMN_GONE, COLUMN_ORDER, lockBoard } from "@/lib/boards";
 import { planMove, positionAtEnd } from "@/lib/position";
-import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 import { db } from "@/server/db";
 
 async function lockBoardColumns(

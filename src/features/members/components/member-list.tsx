@@ -2,25 +2,25 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { rowButton } from "@/components/button-styles";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { Button } from "@/components/ui/button";
 import {
   changeRoleAction,
   removeMemberAction,
-} from "@/app/(app)/w/[slug]/settings/actions";
-import { rowButton } from "@/components/button-styles";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { RoleBadge } from "@/components/role-badge";
+} from "@/features/members/actions";
 import {
   type AssignableRole,
   isAssignableRole,
   RoleMenu,
-} from "@/components/role-menu";
-import { Button } from "@/components/ui/button";
+} from "@/features/members/components/role-menu";
+import type { WorkspaceMember } from "@/features/members/queries";
+import { RoleBadge } from "@/features/workspaces/components/role-badge";
+import { can } from "@/features/workspaces/permissions";
 import type { Role } from "@/generated/prisma/enums";
 import { cardsLabel } from "@/lib/card-count";
 import { initialsOf } from "@/lib/initials";
-import { can } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import type { WorkspaceMember } from "@/lib/workspaces";
 
 type OptimisticChange =
   | { type: "role"; userId: string; role: AssignableRole }

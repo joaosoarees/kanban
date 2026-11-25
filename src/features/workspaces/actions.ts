@@ -3,9 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
-import type { ActionResult } from "@/lib/action-result";
-import { slugify, withRandomSuffix } from "@/lib/slug";
-import { createWorkspaceSchema } from "@/lib/workspace-schemas";
+import { loadActorAllowedTo } from "@/features/workspaces/access";
+import {
+  createWorkspaceSchema,
+  renameWorkspaceSchema,
+} from "@/features/workspaces/schemas";
+import { slugify, withRandomSuffix } from "@/features/workspaces/slug";
+import {
+  FORBIDDEN,
+  invalidFields,
+  type ActionResult,
+} from "@/lib/action-result";
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 import { requireUser } from "@/server/session";
@@ -68,4 +76,48 @@ async function createWithFreeSlug(
   }
 
   return createWithFreeSlug(name, userId, baseSlug, attempt + 1);
+}
+
+export async function renameWorkspaceAction(
+  workspaceId: unknown,
+  input: unknown,
+): Promise<ActionResult> {
+  const actor = await loadActorAllowedTo(workspaceId, "renameWorkspace");
+  if (!actor) {
+    return FORBIDDEN;
+  }
+
+  const parsed = renameWorkspaceSchema.safeParse(input);
+  if (!parsed.success) {
+    return invalidFields(parsed.error);
+  }
+
+  await db.workspace.update({
+    where: { id: actor.workspaceId },
+    data: { name: parsed.data.name },
+  });
+
+  revalidatePath("/", "layout");
+  return { status: "success", data: undefined };
+}
+
+export async function deleteWorkspaceAction(
+  workspaceId: unknown,
+  confirmation: unknown,
+): Promise<ActionResult> {
+  const actor = await loadActorAllowedTo(workspaceId, "deleteWorkspace");
+  if (!actor) {
+    return FORBIDDEN;
+  }
+  if (confirmation !== actor.name) {
+    return {
+      status: "error",
+      message: "Digite o nome do workspace exatamente como aparece.",
+    };
+  }
+
+  await db.workspace.delete({ where: { id: actor.workspaceId } });
+
+  revalidatePath("/", "layout");
+  return redirect("/");
 }
