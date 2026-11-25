@@ -28,7 +28,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 - Convenção do Next: Server Components e Server Actions usam o Prisma direto (`@/server/db`).
 - Sem use cases, repositórios, containers de DI ou interfaces criadas só para testar. Camadas extras só quando o código pedir de verdade.
 - Testes só para lógica pura não trivial (ex.: cálculo de posição). Sem mocks, sem testes de componente.
-- Erros esperados: a action retorna `{ status: "error", message }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados: `error.tsx` por segmento; um bloco secundário da página, como a lista de quadros, pode mostrar a falha no próprio lugar.
+- Erros esperados: a action retorna `{ status: "error", message }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados ao carregar a página: `error.tsx` por segmento; um bloco secundário da página, como a lista de quadros, pode mostrar a falha no próprio lugar. Ao enviar uma action, o `useActionForm` e o `runAction` mostram a falha no próprio lugar, sem perder o que foi digitado.
 - Membership e papel checados no layout, em toda página e em toda Server Action. O layout do workspace não segura as rotas filhas enquanto verifica, então cada página de `/w/[slug]` precisa chamar `requireMembership`.
 - Zustand só para preferências de UI; dados do servidor nunca vão para o store.
 - Todo campo digitado usa React Hook Form + Zod pelo `useActionForm` (`@/hooks/use-action-form`). Ações de um clique (etiqueta, responsável, mover) chamam a action por `runAction` (`@/lib/run-action`), que repassa o controle do Next e transforma exceção em `ActionError`.
