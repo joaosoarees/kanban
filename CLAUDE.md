@@ -51,4 +51,4 @@ O bun roda só no container `app`; não instale bun, hk ou pkl na máquina.
 
 Os hooks nativos do git ficam em `.husky` e rodam no container: ele precisa estar ligado para commitar, e commits a partir de git worktrees são recusados.
 
-Variáveis em `.env` (modelo em `.env.example`): `DATABASE_URL` e `SESSION_SECRET` (`openssl rand -base64 32`).
+Variáveis em `.env` (modelo em `.env.example`): `DATABASE_URL`, `SESSION_SECRET` e `EMAIL_CODE_SECRET` (cada um com o seu `openssl rand -base64 32`).

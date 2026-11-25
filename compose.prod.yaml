@@ -47,6 +47,7 @@ services:
     environment:
       DATABASE_URL: *database-url
       SESSION_SECRET: ${SERVICE_BASE64_64_SESSION}
+      EMAIL_CODE_SECRET: ${SERVICE_BASE64_64_EMAILCODE}
       MAIL_FROM: ${MAIL_FROM:?}
       AWS_REGION: sa-east-1
       AWS_ACCESS_KEY_ID: ${MAIL_AWS_ACCESS_KEY_ID:?}

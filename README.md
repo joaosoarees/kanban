@@ -74,7 +74,7 @@ O app só precisa de Docker. Crie o `.env`:
 cp .env.example .env
 ```
 
-Preencha `SESSION_SECRET` no `.env` com o resultado de `openssl rand -base64 32` e suba tudo:
+Preencha `SESSION_SECRET` e `EMAIL_CODE_SECRET` no `.env`, cada um com um resultado diferente de `openssl rand -base64 32`, e suba tudo:
 
 ```bash
 docker compose up -d
