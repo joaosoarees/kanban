@@ -20,7 +20,11 @@ import { can } from "@/features/workspaces/permissions";
 import type { Role } from "@/generated/prisma/enums";
 import { cardsLabel } from "@/lib/card-count";
 import { initialsOf } from "@/lib/initials";
+import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
+
+const ROLE_FAILED = "O papel não foi alterado.";
+const REMOVE_FAILED = "A pessoa não foi removida.";
 
 type OptimisticChange =
   | { type: "role"; userId: string; role: AssignableRole }
@@ -68,10 +72,11 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
     }
     startTransition(async () => {
       applyOptimistic({ type: "role", userId: member.userId, role });
-      const result = await changeRoleAction(workspaceId, {
-        userId: member.userId,
-        role,
-      });
+      const result = await runAction(
+        async () =>
+          changeRoleAction(workspaceId, { userId: member.userId, role }),
+        ROLE_FAILED,
+      );
       if (result.status === "error") {
         toast.error(`Não foi possível mudar o papel de ${member.name}.`, {
           description: `${result.message} A lista voltou ao que era.`,
@@ -84,9 +89,10 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
     setIsRemoveOpen(false);
     startTransition(async () => {
       applyOptimistic({ type: "remove", userId: member.userId });
-      const result = await removeMemberAction(workspaceId, {
-        userId: member.userId,
-      });
+      const result = await runAction(
+        async () => removeMemberAction(workspaceId, { userId: member.userId }),
+        REMOVE_FAILED,
+      );
       if (result.status === "error") {
         toast.error(`Não foi possível remover ${member.name}.`, {
           description: `${result.message} A lista voltou ao que era.`,
