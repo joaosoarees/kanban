@@ -8,6 +8,10 @@ export const MAX_CODE_ATTEMPTS = 5;
 export const RESEND_INTERVAL_MS = MINUTE_MS;
 
 export const INVALID_CODE_MESSAGE = "Código inválido ou vencido. Peça um novo.";
+export const MAIL_FAILED_MESSAGE =
+  "Não conseguimos enviar o e-mail. Tente de novo em instantes.";
+export const PENDING_EXPIRED_MESSAGE =
+  "Esta tela expirou. Cadastre-se de novo.";
 
 export const verifyCodeSchema = z.object({
   code: z
