@@ -28,7 +28,7 @@ export async function createSessionToken(userId: string): Promise<string> {
 
 export async function verifySessionToken(
   token: string | undefined,
-): Promise<{ userId: string } | null> {
+): Promise<{ userId: string; issuedAt: Date } | null> {
   if (token === undefined || token === "") {
     return null;
   }
@@ -36,16 +36,17 @@ export async function verifySessionToken(
   try {
     const { payload } = await jwtVerify(token, getKey(), {
       algorithms: [ALGORITHM],
-      requiredClaims: ["sub", "exp"],
+      requiredClaims: ["sub", "exp", "iat"],
     });
     if (
       payload.aud !== undefined ||
       typeof payload.sub !== "string" ||
-      !USER_ID.test(payload.sub)
+      !USER_ID.test(payload.sub) ||
+      payload.iat === undefined
     ) {
       return null;
     }
-    return { userId: payload.sub };
+    return { userId: payload.sub, issuedAt: new Date(payload.iat * 1000) };
   } catch {
     return null;
   }
