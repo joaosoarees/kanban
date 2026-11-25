@@ -54,8 +54,12 @@ async function removeMembership(
   return null;
 }
 
-async function loadTarget(workspaceId: string, userId: string) {
-  return db.membership.findUnique({
+async function loadTarget(
+  client: Prisma.TransactionClient,
+  workspaceId: string,
+  userId: string,
+) {
+  return client.membership.findUnique({
     where: { userId_workspaceId: { userId, workspaceId } },
     select: { role: true },
   });
@@ -130,7 +134,7 @@ export async function changeRoleAction(
   }
 
   const { userId, role } = parsed.data;
-  const target = await loadTarget(actor.workspaceId, userId);
+  const target = await loadTarget(db, actor.workspaceId, userId);
   if (!target) {
     revalidateWorkspace(actor.slug);
     return { status: "error", message: "Essa pessoa já saiu do workspace." };
@@ -169,7 +173,7 @@ export async function removeMemberAction(
   }
 
   const { userId } = parsed.data;
-  const target = await loadTarget(actor.workspaceId, userId);
+  const target = await loadTarget(db, actor.workspaceId, userId);
   if (!target) {
     revalidateWorkspace(actor.slug);
     return { status: "success", data: undefined };
@@ -207,10 +211,14 @@ export async function leaveWorkspaceAction(
     if (denied) {
       return denied;
     }
+    const current = await loadTarget(tx, actor.workspaceId, actor.userId);
+    if (!current) {
+      return null;
+    }
     return removeMembership(tx, {
       workspaceId: actor.workspaceId,
       userId: actor.userId,
-      role: actor.role,
+      role: current.role,
     });
   });
   if (refused && refused !== WORKSPACE_GONE) {
