@@ -6,13 +6,13 @@ import {
   addMemberSchema,
   changeRoleSchema,
   removeMemberSchema,
-} from "@/features/members/schemas";
+} from "@/features/members/lib/schemas";
+import { can } from "@/features/workspaces/lib/permissions";
 import {
   loadActor,
   loadActorAllowedTo,
   revalidateWorkspace,
-} from "@/features/workspaces/access";
-import { can } from "@/features/workspaces/permissions";
+} from "@/features/workspaces/server/access";
 import type { Role } from "@/generated/prisma/client";
 import {
   FORBIDDEN,

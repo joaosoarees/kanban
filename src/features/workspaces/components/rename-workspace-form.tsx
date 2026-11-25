@@ -4,11 +4,11 @@ import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
-import { renameWorkspaceAction } from "@/features/workspaces/actions";
 import {
   renameWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
-} from "@/features/workspaces/schemas";
+} from "@/features/workspaces/lib/schemas";
+import { renameWorkspaceAction } from "@/features/workspaces/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 

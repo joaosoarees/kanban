@@ -2,13 +2,13 @@
 
 import { redirect } from "next/navigation";
 import * as z from "zod";
-import { BOARD_GONE } from "@/features/boards/access";
-import { initialPositions } from "@/features/boards/position";
-import { boardNameSchema } from "@/features/boards/schemas";
+import { initialPositions } from "@/features/boards/lib/position";
+import { boardNameSchema } from "@/features/boards/lib/schemas";
+import { BOARD_GONE } from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
-} from "@/features/workspaces/access";
+} from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
   invalidFields,

@@ -14,7 +14,6 @@ import { COLUMN_DROP } from "@/components/boards/card-keyboard";
 import { SortableCard } from "@/components/boards/sortable-card";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
-import { deleteColumnAction } from "@/features/boards/column-actions";
 import { ColumnMenu } from "@/features/boards/components/column-menu";
 import { ColumnNameEditor } from "@/features/boards/components/column-name-editor";
 import {
@@ -27,6 +26,7 @@ import type {
   BoardColumn,
 } from "@/features/boards/hooks/use-board-columns";
 import type { DragKind } from "@/features/boards/hooks/use-board-drag";
+import { deleteColumnAction } from "@/features/boards/server/column-actions";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";
 

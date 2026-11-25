@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/empty-state";
 import { BoardTile } from "@/features/boards/components/board-tile";
 import { NewBoardButton } from "@/features/boards/components/new-board-button";
 import { RetryButton } from "@/features/boards/components/retry-button";
-import { getBoards } from "@/features/boards/queries";
+import { getBoards } from "@/features/boards/server/queries";
 
 type BoardsSectionProps = {
   workspaceId: string;

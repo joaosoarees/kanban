@@ -7,12 +7,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { activeFilterCount, NO_FILTER } from "@/features/boards/board-filter";
 import { FilterOptions } from "@/features/boards/components/filter-options";
 import {
   replaceBoardFilter,
   useBoardFilter,
 } from "@/features/boards/hooks/use-board-filter";
+import {
+  activeFilterCount,
+  NO_FILTER,
+} from "@/features/boards/lib/board-filter";
 import { cn } from "@/lib/utils";
 
 function clearFilter() {

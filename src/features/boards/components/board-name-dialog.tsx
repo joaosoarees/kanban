@@ -18,7 +18,7 @@ import {
 import {
   BOARD_NAME_MAX_LENGTH,
   boardNameSchema,
-} from "@/features/boards/schemas";
+} from "@/features/boards/lib/schemas";
 import { useActionForm } from "@/hooks/use-action-form";
 import type { ActionResult } from "@/lib/action-result";
 import { cn } from "@/lib/utils";

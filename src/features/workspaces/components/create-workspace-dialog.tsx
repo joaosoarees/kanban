@@ -13,11 +13,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createWorkspaceAction } from "@/features/workspaces/actions";
 import {
   createWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
-} from "@/features/workspaces/schemas";
+} from "@/features/workspaces/lib/schemas";
+import { createWorkspaceAction } from "@/features/workspaces/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 

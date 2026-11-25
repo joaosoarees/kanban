@@ -3,8 +3,11 @@ import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import * as z from "zod";
-import { can, type WorkspaceAction } from "@/features/workspaces/permissions";
-import type { WorkspaceSummary } from "@/features/workspaces/queries";
+import {
+  can,
+  type WorkspaceAction,
+} from "@/features/workspaces/lib/permissions";
+import type { WorkspaceSummary } from "@/features/workspaces/server/queries";
 import { hasNoNul } from "@/lib/text";
 import { db } from "@/server/db";
 import { requireUser } from "@/server/session";

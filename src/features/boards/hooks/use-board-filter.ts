@@ -2,6 +2,11 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useBoardMeta } from "@/features/boards/components/board-meta";
+import type {
+  BoardCard,
+  BoardColumn,
+} from "@/features/boards/hooks/use-board-columns";
 import {
   filterKey,
   isCardVisible,
@@ -11,12 +16,7 @@ import {
   takeFilterSnapshot,
   writeBoardFilter,
   type BoardFilter,
-} from "@/features/boards/board-filter";
-import { useBoardMeta } from "@/features/boards/components/board-meta";
-import type {
-  BoardCard,
-  BoardColumn,
-} from "@/features/boards/hooks/use-board-columns";
+} from "@/features/boards/lib/board-filter";
 
 export function useBoardFilter() {
   const params = useSearchParams();

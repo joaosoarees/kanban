@@ -5,9 +5,12 @@ import { useId, useState, type ReactNode } from "react";
 import { comparable } from "@/components/boards/label-list";
 import { LabelTag } from "@/components/boards/label-tag";
 import { MemberAvatar } from "@/components/boards/member-avatar";
-import { NO_ASSIGNEE, type BoardFilter } from "@/features/boards/board-filter";
 import { useBoardMeta } from "@/features/boards/components/board-meta";
 import { replaceBoardFilter } from "@/features/boards/hooks/use-board-filter";
+import {
+  NO_ASSIGNEE,
+  type BoardFilter,
+} from "@/features/boards/lib/board-filter";
 import { cn } from "@/lib/utils";
 
 const ANY_ASSIGNEE = "any";

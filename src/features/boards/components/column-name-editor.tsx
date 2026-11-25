@@ -5,11 +5,11 @@ import { useEffect, useRef } from "react";
 import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { renameColumnAction } from "@/features/boards/column-actions";
 import {
   COLUMN_NAME_MAX_LENGTH,
   columnNameSchema,
-} from "@/features/boards/schemas";
+} from "@/features/boards/lib/schemas";
+import { renameColumnAction } from "@/features/boards/server/column-actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 

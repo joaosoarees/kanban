@@ -6,17 +6,17 @@ import { rowButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  changeRoleAction,
-  removeMemberAction,
-} from "@/features/members/actions";
-import {
   type AssignableRole,
   isAssignableRole,
   RoleMenu,
 } from "@/features/members/components/role-menu";
-import type { WorkspaceMember } from "@/features/members/queries";
+import {
+  changeRoleAction,
+  removeMemberAction,
+} from "@/features/members/server/actions";
+import type { WorkspaceMember } from "@/features/members/server/queries";
 import { RoleBadge } from "@/features/workspaces/components/role-badge";
-import { can } from "@/features/workspaces/permissions";
+import { can } from "@/features/workspaces/lib/permissions";
 import type { Role } from "@/generated/prisma/enums";
 import { cardsLabel } from "@/lib/card-count";
 import { initialsOf } from "@/lib/initials";

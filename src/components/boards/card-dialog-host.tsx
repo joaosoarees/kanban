@@ -9,12 +9,12 @@ import {
   readCardParam,
   replaceCardUrl,
 } from "@/components/boards/card-url";
-import { isFilterActive } from "@/features/boards/board-filter";
 import type {
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
 import { useBoardFilter } from "@/features/boards/hooks/use-board-filter";
+import { isFilterActive } from "@/features/boards/lib/board-filter";
 import { locateCard } from "@/lib/card-moves";
 
 const CARD_NOT_FOUND =

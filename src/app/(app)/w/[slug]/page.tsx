@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { linkButton } from "@/components/button-styles";
 import { BoardsSection } from "@/features/boards/components/boards-section";
-import { requireMembership } from "@/features/workspaces/access";
 import { MemberCount } from "@/features/workspaces/components/member-count";
 import { RoleBadge } from "@/features/workspaces/components/role-badge";
 import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
-import { can } from "@/features/workspaces/permissions";
+import { can } from "@/features/workspaces/lib/permissions";
+import { requireMembership } from "@/features/workspaces/server/access";
 
 export async function generateMetadata({
   params,

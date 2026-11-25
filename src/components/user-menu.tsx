@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOutAction } from "@/features/auth/actions";
+import { signOutAction } from "@/features/auth/server/actions";
 import { initialsOf } from "@/lib/initials";
 import { revealTheme } from "@/lib/reveal-theme";
 import { cn } from "@/lib/utils";

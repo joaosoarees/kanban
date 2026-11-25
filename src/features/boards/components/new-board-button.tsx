@@ -4,8 +4,8 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { primaryButton } from "@/components/button-styles";
 import { Button } from "@/components/ui/button";
-import { createBoardAction } from "@/features/boards/actions";
 import { BoardNameDialog } from "@/features/boards/components/board-name-dialog";
+import { createBoardAction } from "@/features/boards/server/actions";
 import { cn } from "@/lib/utils";
 
 const BUTTON_VARIANT = {
