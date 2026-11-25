@@ -29,6 +29,7 @@ No Coolify, no recurso `kanban`:
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `SERVICE_PASSWORD_POSTGRES`                                | gerada pelo Coolify                                                                                     |
 | `SERVICE_BASE64_64_SESSION`                                | gerada pelo Coolify; trocar derruba todas as sessões                                                    |
+| `SERVICE_BASE64_64_EMAILCODE`                              | gerada pelo Coolify; chave do HMAC dos códigos por e-mail; trocar invalida os códigos já enviados       |
 | `SERVICE_FQDN_APP`                                         | preenchida pelo Coolify a partir do domínio do serviço `app`                                            |
 | `BACKUP_S3_ENDPOINT`, `BACKUP_S3_BUCKET`, `BACKUP_S3_PATH` | destino do backup                                                                                       |
 | `BACKUP_AWS_ACCESS_KEY_ID`, `BACKUP_AWS_SECRET_ACCESS_KEY` | credencial com acesso ao prefixo do backup                                                              |
