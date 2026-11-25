@@ -8,22 +8,17 @@ import { BOARD_GONE } from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
+  WORKSPACE_GONE,
 } from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
   invalidFields,
-  type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
 import { isForeignKeyViolation } from "@/server/prisma-errors";
 
 const DEFAULT_COLUMNS = ["A fazer", "Fazendo", "Feito"];
-
-const WORKSPACE_GONE: ActionError = {
-  status: "error",
-  message: "Esse workspace não existe mais.",
-};
 
 export async function createBoardAction(
   workspaceId: unknown,

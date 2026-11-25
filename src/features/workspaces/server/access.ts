@@ -8,9 +8,15 @@ import {
   type WorkspaceAction,
 } from "@/features/workspaces/lib/permissions";
 import type { WorkspaceSummary } from "@/features/workspaces/server/queries";
+import type { ActionError } from "@/lib/action-result";
 import { hasNoNul } from "@/lib/text";
 import { db } from "@/server/db";
 import { requireUser } from "@/server/session";
+
+export const WORKSPACE_GONE: ActionError = {
+  status: "error",
+  message: "Esse workspace não existe mais.",
+};
 
 export function revalidateWorkspace(slug: string) {
   revalidatePath(`/w/${slug}`, "layout");

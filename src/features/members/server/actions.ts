@@ -12,6 +12,7 @@ import {
   loadActor,
   loadActorAllowedTo,
   revalidateWorkspace,
+  WORKSPACE_GONE,
 } from "@/features/workspaces/server/access";
 import type { Role } from "@/generated/prisma/client";
 import {
@@ -22,7 +23,10 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
-import { isUniqueViolation } from "@/server/prisma-errors";
+import {
+  isForeignKeyViolation,
+  isUniqueViolation,
+} from "@/server/prisma-errors";
 
 const MEMBER_CHANGED: ActionError = {
   status: "error",
@@ -99,6 +103,9 @@ export async function addMemberAction(
     if (isUniqueViolation(error)) {
       const message = `${user.name} já faz parte do workspace.`;
       return { status: "error", message, fieldErrors: { email: [message] } };
+    }
+    if (isForeignKeyViolation(error)) {
+      return WORKSPACE_GONE;
     }
     throw error;
   }
