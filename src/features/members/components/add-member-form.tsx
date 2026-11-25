@@ -1,11 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
-import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { toast } from "sonner";
-import type * as z from "zod";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
@@ -13,36 +10,30 @@ import { Label } from "@/components/ui/label";
 import { addMemberAction } from "@/features/members/actions";
 import { RoleMenu } from "@/features/members/components/role-menu";
 import { addMemberSchema } from "@/features/members/schemas";
-import { applyActionErrors } from "@/lib/form-errors";
+import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 
-type AddMemberInput = z.input<typeof addMemberSchema>;
-type AddMemberOutput = z.output<typeof addMemberSchema>;
+const ADD_FAILED = "Não foi possível adicionar o membro. Tente de novo.";
 
 export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
-  const [isPending, startTransition] = useTransition();
   const {
-    register,
-    control,
-    handleSubmit,
-    setError,
-    reset,
-    formState: { errors },
-  } = useForm<AddMemberInput, unknown, AddMemberOutput>({
-    resolver: zodResolver(addMemberSchema),
+    form: {
+      register,
+      control,
+      reset,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: addMemberSchema,
     defaultValues: { email: "", role: "MEMBER" },
-  });
-
-  const onSubmit = handleSubmit((values) => {
-    startTransition(async () => {
-      const result = await addMemberAction(workspaceId, values);
-      if (result.status === "error") {
-        applyActionErrors(result, setError);
-        return;
-      }
+    action: async (values) => addMemberAction(workspaceId, values),
+    failure: ADD_FAILED,
+    onSuccess: (_, values) => {
       reset();
       toast.success(`${values.email} agora faz parte do workspace.`);
-    });
+    },
   });
 
   return (
@@ -53,14 +44,7 @@ export function AddMemberForm({ workspaceId }: { workspaceId: string }) {
       <h2 id="add-member-title" className="text-[15px] font-semibold">
         Adicionar membro
       </h2>
-      <form
-        onSubmit={(event) => {
-          void onSubmit(event);
-        }}
-        noValidate
-        aria-busy={isPending}
-        className="mt-4"
-      >
+      <form onSubmit={submit} noValidate aria-busy={isPending} className="mt-4">
         <fieldset
           disabled={isPending}
           className="m-0 flex min-w-0 flex-col gap-3 border-0 p-0 sm:grid sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-start"
