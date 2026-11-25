@@ -159,6 +159,10 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 - O código `RESET_PASSWORD` usa a mesma tabela, a mesma tela de código e as mesmas regras. O código certo leva à tela de nova senha.
 - Redefinir a senha também verifica o e-mail de uma conta pendente.
 - `password_changed_at`: o `getCurrentUser` recusa token com `iat` anterior a essa data, o que derruba as outras sessões. Quem redefiniu a senha recebe uma sessão nova.
+- O cookie `password_reset` guarda primeiro o e-mail pedido (JWT de 30 minutos com `aud` próprio), para a resposta ser a mesma com ou sem conta. O código certo troca o cookie por uma permissão de 10 minutos com o id, que vale uma vez só: ela cai quando `password_changed_at` passa do seu `iat`.
+- O e-mail de redefinição sai depois da resposta (`after`), para o tempo do envio não revelar se a conta existe. Por isso, uma falha no envio só fica no log; quem não recebeu pede de novo depois do intervalo.
+- A contagem do reenvio parte do cookie para todos, então um e-mail sem conta segue o mesmo ritmo de um com conta.
+- O `iat` da sessão tem segundos inteiros: uma sessão aberta no mesmo segundo da troca de senha continua valendo, o que mantém a sessão nova de quem redefiniu.
 - As telas passam pelo `craft`.
 - Skills: `cognito-password-reset` (fluxo), `nextjs-jwt-session`, `password-hashing`, `craft`.
 
