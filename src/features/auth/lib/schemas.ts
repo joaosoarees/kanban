@@ -3,8 +3,6 @@ import { hasNoNul, hasVisibleText, INVALID_CHARACTER } from "@/lib/text";
 
 const PASSWORD_MAX_BYTES = 72;
 
-export const EMAIL_TAKEN_MESSAGE = "Já existe uma conta com esse e-mail.";
-
 const byteLength = (text: string) => new TextEncoder().encode(text).length;
 
 const emailField = z
