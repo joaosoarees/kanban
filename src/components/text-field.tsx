@@ -10,6 +10,7 @@ type TextFieldProps = ComponentProps<"input"> & {
   id: string;
   label: string;
   labelClassName?: string;
+  labelAction?: ReactNode;
   inputClassName?: string;
   hint?: ReactNode;
   error?: ReactNode;
@@ -19,6 +20,7 @@ export function TextField({
   id,
   label,
   labelClassName,
+  labelAction,
   inputClassName,
   hint,
   error,
@@ -33,9 +35,12 @@ export function TextField({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={id} className={labelClassName}>
-        {label}
-      </Label>
+      <div className="flex items-baseline justify-between gap-3">
+        <Label htmlFor={id} className={labelClassName}>
+          {label}
+        </Label>
+        {labelAction}
+      </div>
       <div className="relative">
         <Input
           id={id}
