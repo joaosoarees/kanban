@@ -105,7 +105,7 @@ export async function registerAccount(
 
     await tx.user.update({
       where: { id: existing.id },
-      data: { name, passwordHash, createdAt: now },
+      data: { name, passwordHash, createdAt: now, passwordChangedAt: now },
     });
     const resent = await resendCode(tx, verifyOwner(existing.id), now);
     return {
