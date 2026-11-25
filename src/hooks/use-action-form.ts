@@ -12,7 +12,7 @@ type ActionFormOptions<
   TData,
 > = {
   schema: z.ZodType<TOutput, TInput>;
-  defaultValues: DefaultValues<TInput>;
+  defaultValues: DefaultValues<NoInfer<TInput>>;
   action: (values: TOutput) => Promise<ActionResult<TData>>;
   failure: string;
   onSuccess?: (data: TData, values: TOutput) => void;
