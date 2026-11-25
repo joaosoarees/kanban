@@ -3,7 +3,7 @@ import { cardsLabel } from "@/lib/card-count";
 import { cn } from "@/lib/utils";
 
 export const COLUMN_SHELL =
-  "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-muted p-2 sm:w-72";
+  "flex h-full w-[312px] shrink-0 snap-center flex-col rounded-xl bg-muted p-2 sm:w-68";
 
 export function cardCountLabel(count: number, visible: number | null = null) {
   if (visible !== null) {
