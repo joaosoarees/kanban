@@ -63,6 +63,7 @@ export function RenameWorkspaceForm({
             labelClassName="text-[15px] font-semibold"
             autoComplete="off"
             maxLength={WORKSPACE_NAME_MAX_LENGTH}
+            defaultValue={name}
             hint={
               <>
                 O endereço <span className="font-mono">/w/{slug}</span> não
