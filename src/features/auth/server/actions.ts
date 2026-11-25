@@ -28,6 +28,7 @@ import { isUniqueViolation } from "@/server/prisma-errors";
 import {
   endSession,
   getPendingVerification,
+  startPendingVerification,
   startSession,
 } from "@/server/session";
 
@@ -150,6 +151,9 @@ export async function resendCodeAction(): Promise<
   }
   if (resend.status === "failed") {
     return { status: "error", message: MAIL_FAILED_MESSAGE };
+  }
+  if (resend.status === "sent") {
+    await startPendingVerification(pending);
   }
   return {
     status: "success",

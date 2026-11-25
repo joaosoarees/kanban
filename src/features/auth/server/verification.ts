@@ -1,7 +1,10 @@
 import "server-only";
 import { signUpAttemptMail } from "@/features/auth/emails/sign-up-attempt";
 import { verifyEmailMail } from "@/features/auth/emails/verify-email";
-import { RESEND_INTERVAL_MS } from "@/features/auth/lib/email-code";
+import {
+  RESEND_INTERVAL_MS,
+  secondsUntilResend,
+} from "@/features/auth/lib/email-code";
 import {
   consumeCode,
   issueCode,
@@ -11,7 +14,7 @@ import { hashPassword } from "@/features/auth/server/password";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/server/db";
 import { sendMail } from "@/server/mail/send";
-import type { PendingVerification } from "@/server/session";
+import type { PendingToken, PendingVerification } from "@/server/session";
 
 type Delivery =
   | { kind: "code"; to: string; name: string; code: string }
@@ -180,7 +183,7 @@ export async function verifyEmail(
 }
 
 export async function resendVerification(
-  pending: PendingVerification,
+  pending: PendingToken,
   now: Date,
 ): Promise<Resend> {
   const result = await db.$transaction(async (tx) => {
@@ -192,10 +195,10 @@ export async function resendVerification(
       return { status: "expired" } as const;
     }
     if (account.emailVerifiedAt !== null) {
-      return {
-        status: "sent",
-        delivery: { kind: "none" } as Delivery,
-      } as const;
+      const waitSeconds = secondsUntilResend(pending.issuedAt, now);
+      return waitSeconds > 0
+        ? ({ status: "wait", waitSeconds } as const)
+        : ({ status: "sent", delivery: { kind: "none" } as Delivery } as const);
     }
     const resent = await resendCode(tx, verifyOwner(pending.userId), now);
     if ("waitSeconds" in resent) {
