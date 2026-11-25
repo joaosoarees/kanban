@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { signInSchema, signUpSchema } from "./auth-schemas";
+import { signInSchema, signUpSchema } from "@/features/auth/schemas";
 import { boardNameSchema, columnNameSchema } from "./board-schemas";
 import { createWorkspaceSchema } from "./workspace-schemas";
 

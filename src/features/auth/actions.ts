@@ -2,13 +2,13 @@
 
 import { redirect } from "next/navigation";
 import * as z from "zod";
-import type { ActionResult } from "@/lib/action-result";
+import { hashPassword, verifyPassword } from "@/features/auth/password";
 import {
   EMAIL_TAKEN_MESSAGE,
   signInSchema,
   signUpSchema,
-} from "@/lib/auth-schemas";
-import { hashPassword, verifyPassword } from "@/lib/password";
+} from "@/features/auth/schemas";
+import type { ActionResult } from "@/lib/action-result";
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 import { endSession, startSession } from "@/server/session";
