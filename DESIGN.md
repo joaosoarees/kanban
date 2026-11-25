@@ -117,6 +117,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — O e-mail de verificação termina em "Se você não criou uma conta, ignore este e-mail.", sem o prazo de 3 dias — a conta pendente deixou de expirar; um novo cadastro com o mesmo e-mail a substitui.
 - 2026-11-25 — O código do e-mail tem 8 dígitos, mostrados em dois grupos de 4 separados por espaço visual (`4829 1375`); o texto puro e a cópia trazem os 8 dígitos juntos — 8 dígitos substituíram a janela de tentativas por conta, e os grupos facilitam ler e digitar.
 - 2026-11-25 — A caixa do código ocupa a largura do cartão, com os dígitos centralizados, no computador e no celular — o código é o centro do e-mail, e a mesma caixa nas duas larguras dispensa a regra de celular.
+- 2026-11-25 — Tela `/verify-email` desenhada no canvas da fatia 13 (https://claude.ai/artifact/XtSnssDmDRLW5exph1onZW, pranchas 13.1 a 13.4, claro e escuro): mesmo layout do login, campo único com teclado numérico, código enviado só pelo botão, reenvio com contagem na mesma largura e "Usar outro e-mail" levando a `/sign-in` — segue as telas de entrada e evita as caixinhas, que atrapalham colar e o leitor de tela.
 
 ## Perguntas abertas
 
