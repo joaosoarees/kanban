@@ -1,7 +1,6 @@
 "use client";
 
-import { unstable_rethrow } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DialogTitle } from "@/components/ui/dialog";
 import {
@@ -9,6 +8,7 @@ import {
   cardTitleSchema,
 } from "@/features/boards/lib/card-schemas";
 import { renameCardAction } from "@/features/boards/server/card-actions";
+import { useActionForm } from "@/hooks/use-action-form";
 
 const RENAME_FAILED = "Não foi possível salvar o título. Tente de novo.";
 const TITLE_TEXT =
@@ -89,81 +89,76 @@ function CardTitleEditor({
   title,
   onClose,
 }: CardTitleEditorProps) {
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const isCancelled = useRef(false);
-  const [value, setValue] = useState(title);
-  const [error, setError] = useState<string>();
-  const [isPending, startTransition] = useTransition();
   const messageId = `${cardId}-title-message`;
+
+  const close = () => {
+    onClose(document.activeElement === inputRef.current);
+  };
+
+  const {
+    form: {
+      register,
+      getValues,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: cardTitleSchema,
+    defaultValues: { title },
+    action: async (values) =>
+      renameCardAction(workspaceId, boardId, cardId, values),
+    failure: RENAME_FAILED,
+    onSuccess: close,
+    onError: (failure) => {
+      if (
+        failure.fieldErrors?.title?.at(0) === undefined &&
+        failure.gone !== true
+      ) {
+        toast.error(failure.message);
+      }
+    },
+  });
+  const { ref: registerRef, onBlur, ...field } = register("title");
+  const error = errors.title?.message;
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
   }, []);
 
-  const close = () => {
-    onClose(document.activeElement === inputRef.current);
-  };
-
   const save = () => {
     if (isCancelled.current || isPending) {
       return;
     }
-    const parsed = cardTitleSchema.safeParse({ title: value });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0].message);
-      return;
-    }
-    if (parsed.data.title === title) {
+    const parsed = cardTitleSchema.safeParse(getValues());
+    if (parsed.success && parsed.data.title === title) {
       close();
       return;
     }
-
-    startTransition(async () => {
-      try {
-        const result = await renameCardAction(
-          workspaceId,
-          boardId,
-          cardId,
-          parsed.data,
-        );
-        if (result.status === "error") {
-          const fieldError = result.fieldErrors?.title?.at(0);
-          if (fieldError !== undefined) {
-            setError(fieldError);
-            return;
-          }
-          if (result.gone !== true) {
-            toast.error(result.message);
-          }
-          return;
-        }
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        toast.error(RENAME_FAILED);
-        return;
-      }
-      startTransition(close);
-    });
+    submit();
   };
 
   return (
     <div>
       <textarea
-        ref={inputRef}
+        {...field}
+        ref={(element) => {
+          registerRef(element);
+          inputRef.current = element;
+        }}
         rows={1}
         aria-label="Título do card"
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby={error === undefined ? undefined : messageId}
-        value={value}
         readOnly={isPending}
         maxLength={CARD_TITLE_MAX_LENGTH}
-        onChange={(event) => {
-          setValue(event.target.value);
-          setError(undefined);
+        onBlur={(event) => {
+          void onBlur(event);
+          save();
         }}
-        onBlur={save}
         onKeyDown={(event) => {
           if (event.key === "Enter" && !event.nativeEvent.isComposing) {
             event.preventDefault();
