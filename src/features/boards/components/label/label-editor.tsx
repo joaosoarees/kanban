@@ -1,16 +1,8 @@
 "use client";
 
 import { Check, ChevronLeft } from "lucide-react";
-import { unstable_rethrow } from "next/navigation";
-import {
-  startTransition,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useTransition,
-  type ComponentProps,
-} from "react";
+import { useEffect, useId } from "react";
+import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
@@ -28,6 +20,8 @@ import {
   updateLabelAction,
 } from "@/features/boards/server/label-actions";
 import type { LabelColor } from "@/generated/prisma/enums";
+import { useActionForm } from "@/hooks/use-action-form";
+import type { ActionResult } from "@/lib/action-result";
 import { cn } from "@/lib/utils";
 
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";
@@ -66,20 +60,74 @@ export function LabelEditor({
   onCreated,
   onDelete,
 }: LabelEditorProps) {
-  const [name, setName] = useState(draft.name);
-  const [color, setColor] = useState(draft.color);
-  const [error, setError] = useState<string>();
-  const [isSaving, startSaving] = useTransition();
-  const inputRef = useRef<HTMLInputElement>(null);
   const nameId = useId();
   const hintId = useId();
   const labelId = draft.id;
 
+  const persist = async (input: {
+    name: string;
+    color: LabelColor;
+  }): Promise<ActionResult<string | null>> => {
+    if (labelId !== null) {
+      const result = await updateLabelAction(
+        workspaceId,
+        boardId,
+        labelId,
+        input,
+      );
+      return result.status === "success"
+        ? { status: "success", data: null }
+        : result;
+    }
+    const result = await createLabelAction(workspaceId, boardId, input);
+    return result.status === "success"
+      ? { status: "success", data: result.data.id }
+      : result;
+  };
+
+  const {
+    form: {
+      register,
+      control,
+      setFocus,
+      formState: { errors },
+    },
+    submit,
+    isPending: isSaving,
+  } = useActionForm({
+    schema: labelSchema,
+    defaultValues: { name: draft.name, color: draft.color },
+    action: persist,
+    failure: SAVE_FAILED,
+    onSuccess: (createdId) => {
+      if (createdId === null) {
+        onBack();
+      } else {
+        onCreated(createdId);
+      }
+    },
+    onError: (failure) => {
+      if (failure.gone === true) {
+        onBack();
+        return;
+      }
+      if (failure.message === LABEL_GONE_MESSAGE) {
+        toast.error(failure.message);
+        onBack();
+        return;
+      }
+      setFocus("name");
+    },
+  });
+  const name = useWatch({ control, name: "name" });
+  const color = useWatch({ control, name: "color" });
+  const error = errors.name?.message ?? errors.root?.message;
+
   useEffect(() => {
     if (window.matchMedia("(pointer: fine)").matches) {
-      inputRef.current?.focus();
+      setFocus("name");
     }
-  }, []);
+  }, [setFocus]);
 
   useEffect(() => {
     onBusyChange(isSaving);
@@ -88,76 +136,8 @@ export function LabelEditor({
     };
   }, [isSaving, onBusyChange]);
 
-  const persist = async (input: { name: string; color: LabelColor }) => {
-    if (labelId !== null) {
-      const result = await updateLabelAction(
-        workspaceId,
-        boardId,
-        labelId,
-        input,
-      );
-      return { result, createdId: null };
-    }
-    const result = await createLabelAction(workspaceId, boardId, input);
-    return {
-      result,
-      createdId: result.status === "success" ? result.data.id : null,
-    };
-  };
-
-  const save: ComponentProps<"form">["onSubmit"] = (event) => {
-    event.preventDefault();
-    const parsed = labelSchema.safeParse({ name, color });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? SAVE_FAILED);
-      inputRef.current?.focus();
-      return;
-    }
-
-    const showFailure = (message: string) => {
-      const input = inputRef.current;
-      if (input === null) {
-        toast.error(message);
-        return;
-      }
-      setError(message);
-      input.focus();
-    };
-
-    setError(undefined);
-    startSaving(async () => {
-      try {
-        const { result, createdId } = await persist(parsed.data);
-        if (result.status === "success") {
-          startTransition(() => {
-            if (createdId === null) {
-              onBack();
-            } else {
-              onCreated(createdId);
-            }
-          });
-          return;
-        }
-        if (result.gone === true) {
-          startTransition(onBack);
-          return;
-        }
-        if (result.message === LABEL_GONE_MESSAGE) {
-          toast.error(result.message);
-          startTransition(onBack);
-          return;
-        }
-        showFailure(result.fieldErrors?.name?.[0] ?? result.message);
-      } catch (caught) {
-        unstable_rethrow(caught);
-        console.error(caught);
-        showFailure(SAVE_FAILED);
-      }
-    });
-  };
-
   return (
-    <form onSubmit={save} noValidate className="flex flex-col gap-3 p-3">
+    <form onSubmit={submit} noValidate className="flex flex-col gap-3 p-3">
       <div className="flex items-center gap-1.5 text-sm font-semibold">
         <Button
           type="button"
@@ -178,17 +158,12 @@ export function LabelEditor({
           Nome
         </label>
         <Input
-          ref={inputRef}
+          {...register("name")}
           id={nameId}
-          value={name}
           maxLength={LABEL_NAME_MAX_LENGTH}
           readOnly={isSaving}
           aria-invalid={error !== undefined}
           aria-describedby={hintId}
-          onChange={(event) => {
-            setName(event.target.value);
-            setError(undefined);
-          }}
           className="h-11 text-base sm:h-9 sm:text-sm"
         />
         <div id={hintId} className="min-h-[18px] text-[13px]/[18px]">
@@ -220,14 +195,10 @@ export function LabelEditor({
           {COLOR_OPTIONS.map((option) => (
             <label key={option.color} className="relative cursor-pointer">
               <input
+                {...register("color")}
                 type="radio"
-                name="label-color"
                 value={option.color}
-                checked={color === option.color}
                 aria-label={option.name}
-                onChange={() => {
-                  setColor(option.color);
-                }}
                 className="peer sr-only"
               />
               <span
