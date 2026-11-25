@@ -1,10 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
-import { useTransition } from "react";
-import { useForm } from "react-hook-form";
-import type * as z from "zod";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
@@ -22,11 +18,10 @@ import {
   createWorkspaceSchema,
   WORKSPACE_NAME_MAX_LENGTH,
 } from "@/features/workspaces/schemas";
-import { applyActionErrors } from "@/lib/form-errors";
+import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 
-type CreateWorkspaceInput = z.input<typeof createWorkspaceSchema>;
-type CreateWorkspaceOutput = z.output<typeof createWorkspaceSchema>;
+const CREATE_FAILED = "Não foi possível criar o workspace. Tente de novo.";
 
 type CreateWorkspaceDialogProps = {
   open: boolean;
@@ -37,16 +32,19 @@ export function CreateWorkspaceDialog({
   open,
   onOpenChange,
 }: CreateWorkspaceDialogProps) {
-  const [isPending, startTransition] = useTransition();
   const {
-    register,
-    handleSubmit,
-    setError,
-    reset,
-    formState: { errors },
-  } = useForm<CreateWorkspaceInput, unknown, CreateWorkspaceOutput>({
-    resolver: zodResolver(createWorkspaceSchema),
+    form: {
+      register,
+      reset,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: createWorkspaceSchema,
     defaultValues: { name: "" },
+    action: createWorkspaceAction,
+    failure: CREATE_FAILED,
   });
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -58,15 +56,6 @@ export function CreateWorkspaceDialog({
     }
     onOpenChange(nextOpen);
   };
-
-  const onSubmit = handleSubmit((values) => {
-    startTransition(async () => {
-      const result = await createWorkspaceAction(values);
-      if (result.status === "error") {
-        applyActionErrors(result, setError);
-      }
-    });
-  });
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -83,9 +72,7 @@ export function CreateWorkspaceDialog({
           </DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={(event) => {
-            void onSubmit(event);
-          }}
+          onSubmit={submit}
           noValidate
           aria-busy={isPending}
           className="mt-5"
