@@ -26,6 +26,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 ## Arquitetura
 
 - Convenção do Next: Server Components e Server Actions usam o Prisma direto (`@/server/db`).
+- Cada feature em `src/features/<feature>/` tem `server/` (queries, actions e access, que tocam o banco), `lib/` (schemas e regras puras), `components/` e `hooks/`. `src/server/` é só infraestrutura sem feature; `src/app` só monta as rotas.
 - Sem use cases, repositórios, containers de DI ou interfaces criadas só para testar. Camadas extras só quando o código pedir de verdade.
 - Testes só para lógica pura não trivial (ex.: cálculo de posição). Sem mocks, sem testes de componente.
 - Erros esperados: a action retorna `{ status: "error", message }`. Recurso inexistente ou sem acesso: `notFound()`. Erros inesperados ao carregar a página: `error.tsx` por segmento; um bloco secundário da página, como a lista de quadros, pode mostrar a falha no próprio lugar. Ao enviar uma action, o `useActionForm` e o `runAction` mostram a falha no próprio lugar, sem perder o que foi digitado.
