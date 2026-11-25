@@ -1,9 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import * as z from "zod";
+import { RESET_EXPIRED_MESSAGE } from "@/features/auth/lib/password-reset";
 import {
   EMAIL_TAKEN_MESSAGE,
+  newPasswordSchema,
+  resetRequestSchema,
   signInSchema,
   signUpSchema,
 } from "@/features/auth/lib/schemas";
@@ -14,6 +18,13 @@ import {
   verifyCodeSchema,
 } from "@/features/auth/lib/email-code";
 import { hashPassword, verifyPassword } from "@/features/auth/server/password";
+import {
+  checkResetCode,
+  requestPasswordReset,
+  resendPasswordReset,
+  resetPassword,
+  sendResetMail,
+} from "@/features/auth/server/password-reset";
 import {
   resendVerification,
   verifyEmail,
@@ -27,7 +38,11 @@ import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 import {
   endSession,
+  getPasswordReset,
+  getPasswordResetGrant,
   getPendingVerification,
+  grantPasswordReset,
+  startPasswordReset,
   startPendingVerification,
   startSession,
 } from "@/server/session";
@@ -159,4 +174,97 @@ export async function resendCodeAction(): Promise<
     status: "success",
     data: { sent: resend.status === "sent", waitSeconds: resend.waitSeconds },
   };
+}
+
+const RESET_EXPIRED: ActionError = {
+  status: "error",
+  message: RESET_EXPIRED_MESSAGE,
+  gone: true,
+};
+
+export async function requestPasswordResetAction(
+  input: unknown,
+): Promise<ActionResult> {
+  const parsed = resetRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    return invalidFields(parsed.error);
+  }
+
+  const { email } = parsed.data;
+  const mail = await requestPasswordReset(email, new Date());
+  await startPasswordReset(email);
+  if (mail !== null) {
+    after(async () => sendResetMail(mail));
+  }
+  return { status: "success", data: undefined };
+}
+
+export async function resendResetCodeAction(): Promise<
+  ActionResult<{ sent: boolean; waitSeconds: number }>
+> {
+  const reset = await getPasswordReset();
+  if (reset === null) {
+    return RESET_EXPIRED;
+  }
+
+  const resend = await resendPasswordReset(reset, new Date());
+  if (resend.status === "sent") {
+    await startPasswordReset(reset.email);
+    const { mail } = resend;
+    if (mail !== null) {
+      after(async () => sendResetMail(mail));
+    }
+  }
+  return {
+    status: "success",
+    data: { sent: resend.status === "sent", waitSeconds: resend.waitSeconds },
+  };
+}
+
+export async function verifyResetCodeAction(
+  input: unknown,
+): Promise<ActionResult> {
+  const parsed = verifyCodeSchema.safeParse(input);
+  if (!parsed.success) {
+    return invalidFields(parsed.error);
+  }
+
+  const reset = await getPasswordReset();
+  if (reset === null) {
+    return RESET_EXPIRED;
+  }
+
+  const granted = await checkResetCode(reset, parsed.data.code, new Date());
+  if (granted === null) {
+    return {
+      status: "error",
+      message: INVALID_CODE_MESSAGE,
+      fieldErrors: { code: [INVALID_CODE_MESSAGE] },
+    };
+  }
+
+  await grantPasswordReset(granted.userId);
+  return { status: "success", data: undefined };
+}
+
+export async function resetPasswordAction(
+  input: unknown,
+): Promise<ActionResult> {
+  const parsed = newPasswordSchema.safeParse(input);
+  if (!parsed.success) {
+    return invalidFields(parsed.error);
+  }
+
+  const grant = await getPasswordResetGrant();
+  if (grant === null) {
+    return RESET_EXPIRED;
+  }
+
+  const changed = await resetPassword(grant, parsed.data.password, new Date());
+  if (!changed) {
+    return RESET_EXPIRED;
+  }
+
+  await startSession(grant.userId);
+  return redirect(AFTER_SIGN_IN);
 }
