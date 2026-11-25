@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useWatch } from "react-hook-form";
 import { TextField } from "@/components/text-field";
 import { FormFooter } from "@/features/auth/components/form-footer";
 import { signInSchema } from "@/features/auth/lib/schemas";
@@ -11,6 +13,7 @@ const SIGN_IN_FAILED = "Não foi possível entrar. Tente de novo.";
 export function SignInForm() {
   const {
     form: {
+      control,
       register,
       formState: { errors },
     },
@@ -22,6 +25,7 @@ export function SignInForm() {
     action: signInAction,
     failure: SIGN_IN_FAILED,
   });
+  const email = useWatch({ control, name: "email" }).trim();
 
   return (
     <form
@@ -49,6 +53,18 @@ export function SignInForm() {
           id="password"
           required
           label="Senha"
+          labelAction={
+            <Link
+              href={
+                email === ""
+                  ? "/forgot-password"
+                  : `/forgot-password?email=${encodeURIComponent(email)}`
+              }
+              className="rounded-sm text-[13px]/5 font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              Esqueci a senha
+            </Link>
+          }
           type="password"
           autoComplete="current-password"
           error={errors.password?.message ?? errors.root?.message}
