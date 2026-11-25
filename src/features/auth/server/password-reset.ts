@@ -12,6 +12,9 @@ import { db } from "@/server/db";
 import { sendMail } from "@/server/mail/send";
 import type { ResetGrant, ResetToken } from "@/server/session";
 
+export type ResetStep =
+  { step: "code"; email: string; waitSeconds: number } | { step: "password" };
+
 export type ResetMail = { to: string; name: string; code: string };
 
 export type ResetResend =
@@ -109,4 +112,21 @@ export async function resetPassword(
     await tx.emailCode.deleteMany({ where: resetOwner(grant.userId) });
     return now;
   });
+}
+
+export function loadPasswordReset(
+  reset: ResetToken | null,
+  grant: ResetGrant | null,
+): ResetStep | null {
+  if (grant !== null) {
+    return { step: "password" };
+  }
+  if (reset === null) {
+    return null;
+  }
+  return {
+    step: "code",
+    email: reset.email,
+    waitSeconds: resetWaitSeconds(reset, new Date()),
+  };
 }
