@@ -2,7 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import { SESSION_COOKIE } from "@/lib/session-cookie";
 import { verifySessionToken } from "@/lib/session-token";
 

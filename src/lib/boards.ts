@@ -4,7 +4,7 @@ import { cache } from "react";
 import * as z from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import type { ActionError } from "@/lib/action-result";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 
 export const BOARD_GONE: ActionError = {
   status: "error",

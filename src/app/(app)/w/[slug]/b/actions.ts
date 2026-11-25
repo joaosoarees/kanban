@@ -10,9 +10,9 @@ import {
 } from "@/lib/action-result";
 import { boardNameSchema } from "@/lib/board-schemas";
 import { BOARD_GONE } from "@/lib/boards";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import { initialPositions } from "@/lib/position";
-import { isForeignKeyViolation } from "@/lib/prisma-errors";
+import { isForeignKeyViolation } from "@/server/prisma-errors";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 
 const DEFAULT_COLUMNS = ["A fazer", "Fazendo", "Feito"];

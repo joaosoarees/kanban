@@ -9,9 +9,9 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import { can } from "@/lib/permissions";
-import { isUniqueViolation } from "@/lib/prisma-errors";
+import { isUniqueViolation } from "@/server/prisma-errors";
 import {
   addMemberSchema,
   changeRoleSchema,
