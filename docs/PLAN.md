@@ -92,20 +92,20 @@ Deletes em cascata de Workspace até Card.
 
 Relatório: https://claude.ai/artifact/GKgUHkBcU9CF3zuHkvFzEq. Bugs confirmados no app: com o `localStorage` bloqueado nenhum workspace abre, e depois de sair a página guarda o conteúdo de quem estava logado. Decisões:
 
-- Features: `auth`, `workspaces` (acesso: `requireMembership`, `loadActorAllowedTo`, `can`), `members`, `boards`, `cards` e `labels`, com `cards` e `labels` dependendo de `boards`. `src/server` tem `db` e o módulo de sessão (`getCurrentUser`, `requireUser`, `startSession`, `endSession`).
+- Features: `auth`, `workspaces` (acesso: `requireMembership`, `loadActorAllowedTo`, `can`), `members` e `boards`. Colunas, cards e etiquetas ficam dentro de `boards`, com subpastas em `components/` (`board/`, `column/`, `card/`, `label/`, `filter/`): separados, criavam dependências nos dois sentidos, porque o quadro renderiza cards e etiquetas e as actions deles travam o quadro. `src/server` tem `db` e o módulo de sessão (`getCurrentUser`, `requireUser`, `startSession`, `endSession`).
 - Os helpers de resultado (`invalidFields`, `FORBIDDEN`, `INVALID`) ficam, apesar de a `nextjs-server-action-results` dispensá-los; erros que o cliente precisa distinguir ganham um `code` em vez de comparar mensagens.
 - `useActionForm({ schema, defaultValues, action, onSuccess })` devolve o `form` do React Hook Form e um `submit`, e cuida de `zodResolver`, erros de campo vindos do servidor, `unstable_rethrow` e o toast de falha. Editores inline salvam com `handleSubmit` no Enter ou no blur e cancelam com `reset()`.
 
 Ordem dos PRs:
 
-1. Bug: armazenamento bloqueado.
-2. Bug: conteúdo depois de sair.
-3. `useActionForm` e o executor de actions.
-4. `src/server`.
-5. `features/auth`.
-6. `features/workspaces` e `features/members`.
-7. `features/boards`.
-8. `features/cards` e `features/labels`, com o route handler da descrição respondendo 401 e 404.
+1. [x] Bug: armazenamento bloqueado.
+2. [x] Bug: conteúdo depois de sair.
+3. [x] `useActionForm` e o executor de actions.
+4. [x] `src/server`.
+5. [x] `features/auth`.
+6. [x] `features/workspaces` e `features/members`.
+7. [x] `features/boards`.
+8. Cards e etiquetas dentro de `features/boards`, com o route handler da descrição respondendo 401 e 404.
 9. Limites de erro (`w/[slug]/error.tsx`, `(auth)/error.tsx`), corridas devolvendo mensagem, papel conferido dentro da transação, `CLAUDE.md` atualizado.
 
 Cada PR de feature migra os campos da feature para o `useActionForm` e ganha teste para as regras puras que mudam de lugar e ainda não têm.
