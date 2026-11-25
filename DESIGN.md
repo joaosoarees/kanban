@@ -109,6 +109,11 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — Falha numa página do workspace mostra o erro ao lado da barra lateral, só com "Tentar de novo" — a barra já leva aos quadros e às configurações, e um "Voltar aos quadros" apontaria para a própria página quando é ela que falha.
 - 2026-11-25 — Falha fora do workspace (o layout da entrada, por exemplo) vira "Algo deu errado" em tela cheia, com fontes e tema, sem o logo nem o painel da entrada — o `error.tsx` não cobre o layout do próprio segmento, e mover a checagem de sessão para cada página custaria mais que o caso raro.
 - 2026-11-25 — "Tentar de novo" das telas de erro novas tem 44px no celular e 40px a partir de `sm` — alvo de toque mínimo; as telas de erro antigas seguem com 40px.
+- 2026-11-25 — E-mails desenhados em https://claude.ai/artifact/ECdeYrVh5Wd6Bb5FftPmoL (pranchas 12.1 a 12.4), aprovados — canvas próprio da fatia 12.
+- 2026-11-25 — Marca dos e-mails: as três barras em células com cor de fundo, ao lado de "Kanbanary" em texto — aparece mesmo com imagens bloqueadas e não depende de uma URL pública do app.
+- 2026-11-25 — E-mails só no tema claro, com `color-scheme: light` — Gmail e Outlook invertem as cores por conta própria; a variante invertida foi conferida no canvas.
+- 2026-11-25 — E-mails sem links nem botões, e o código fora do assunto e da prévia — a tela de código depende de um cookie do navegador do cadastro, link em e-mail tem cara de phishing, e o código não aparece na tela de bloqueio.
+- 2026-11-25 — Cores dos e-mails são os tokens zinc e indigo em hex, e a fonte é a do sistema — clientes de e-mail não leem `oklch` nem variáveis CSS, e a Geist não carrega no Gmail nem no Outlook.
 
 ## Perguntas abertas
 

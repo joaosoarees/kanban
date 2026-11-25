@@ -118,7 +118,7 @@ Cada PR de feature migra os campos da feature para o `useActionForm` e ganha tes
 - Remetente em `MAIL_FROM`. Antes de configurar, conferir se o domínio está verificado no SES e se a conta saiu do sandbox.
 - Usuário IAM `kanban-mailer`, criado pelo João no console, com só `ses:SendRawEmail` a partir da identidade do domínio. A chave vai para o Coolify como segredo.
 - O e-mail é enviado dentro da Server Action, sem fila. Se o envio falhar, a conta continua pendente e a tela oferece reenviar.
-- Templates em React Email com o ícone e a marca, mais uma versão em texto puro. O visual passa pelo `craft`.
+- Templates em React Email com o ícone e a marca, mais uma versão em texto puro. O visual passa pelo `craft`. O layout e a caixa do código ficam em `src/server/mail/`, e os três e-mails da conta (código de verificação, aviso de cadastro repetido e código de redefinição) em `src/features/auth/emails/`.
 - Skills: `choosing-email-sending-service`, `nodemailer-ses-transport`, `ses-domain-identity`, `ses-sandbox-and-production-access`, `craft`.
 
 ### Verificação de e-mail (fatia 13)
@@ -175,6 +175,6 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 9. [x] Deploy: imagem de produção, compose com Postgres e backup, deploy pelo CI no Coolify
 10. [x] Auditoria da arquitetura contra as skills
 11. [x] Módulos por funcionalidade
-12. [ ] Envio de e-mail: Mailpit, SES e templates
+12. [x] Envio de e-mail: Mailpit, SES e templates
 13. [ ] Verificação de e-mail
 14. [ ] Esqueci a senha
