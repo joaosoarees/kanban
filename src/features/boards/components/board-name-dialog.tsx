@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { linkButton, primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
@@ -70,7 +70,7 @@ export function BoardNameDialog({
     },
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (open) {
       reset({ name: defaultName });
     }
