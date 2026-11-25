@@ -10,7 +10,7 @@ export function VerifyEmail({ to, name, code }: VerifyEmailProps) {
       to={to}
       preview="Use o código para confirmar seu e-mail. Vale por 15 minutos."
       title="Confirme seu e-mail"
-      note="Se você não criou uma conta, ignore este e-mail. Sem a confirmação, a conta é apagada em 3 dias."
+      note="Se você não criou uma conta, ignore este e-mail."
     >
       <MailText>
         Olá, {name}. Use este código para confirmar seu e-mail no Kanbanary:

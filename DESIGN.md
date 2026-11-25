@@ -114,6 +114,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — E-mails só no tema claro, com `color-scheme: light` — Gmail e Outlook invertem as cores por conta própria; a variante invertida foi conferida no canvas.
 - 2026-11-25 — E-mails sem links nem botões, e o código fora do assunto e da prévia — a tela de código depende de um cookie do navegador do cadastro, link em e-mail tem cara de phishing, e o código não aparece na tela de bloqueio.
 - 2026-11-25 — Cores dos e-mails são os tokens zinc e indigo em hex, e a fonte é a do sistema — clientes de e-mail não leem `oklch` nem variáveis CSS, e a Geist não carrega no Gmail nem no Outlook.
+- 2026-11-25 — O e-mail de verificação termina em "Se você não criou uma conta, ignore este e-mail.", sem o prazo de 3 dias — a conta pendente deixou de expirar; um novo cadastro com o mesmo e-mail a substitui.
 
 ## Perguntas abertas
 
