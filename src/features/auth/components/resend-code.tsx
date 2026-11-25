@@ -2,9 +2,13 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { MAIL_FAILED_MESSAGE } from "@/features/auth/lib/email-code";
-import { resendCodeAction } from "@/features/auth/server/actions";
+import type { ActionResult } from "@/lib/action-result";
 import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
+
+export type ResendAction = () => Promise<
+  ActionResult<{ sent: boolean; waitSeconds: number }>
+>;
 
 type Notice = { tone: "info" | "error"; text: string };
 
@@ -14,9 +18,11 @@ function formatWait(seconds: number): string {
 }
 
 export function ResendCode({
+  action,
   initialWait,
   onExpired,
 }: {
+  action: ResendAction;
   initialWait: number;
   onExpired: () => void;
 }) {
@@ -36,7 +42,7 @@ export function ResendCode({
   const resend = () => {
     setNotice(null);
     startTransition(async () => {
-      const result = await runAction(resendCodeAction, MAIL_FAILED_MESSAGE);
+      const result = await runAction(action, MAIL_FAILED_MESSAGE);
       if (result.status === "success") {
         setWait(result.data.waitSeconds);
         if (result.data.sent) {
