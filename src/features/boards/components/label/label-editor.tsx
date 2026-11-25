@@ -90,6 +90,7 @@ export function LabelEditor({
       register,
       control,
       setFocus,
+      clearErrors,
       formState: { errors },
     },
     submit,
@@ -121,7 +122,8 @@ export function LabelEditor({
   });
   const name = useWatch({ control, name: "name" });
   const color = useWatch({ control, name: "color" });
-  const error = errors.name?.message ?? errors.root?.message;
+  const error =
+    errors.name?.message ?? errors.color?.message ?? errors.root?.message;
 
   useEffect(() => {
     if (window.matchMedia("(pointer: fine)").matches) {
@@ -158,7 +160,11 @@ export function LabelEditor({
           Nome
         </label>
         <Input
-          {...register("name")}
+          {...register("name", {
+            onChange: () => {
+              clearErrors("root");
+            },
+          })}
           id={nameId}
           maxLength={LABEL_NAME_MAX_LENGTH}
           readOnly={isSaving}

@@ -130,7 +130,11 @@ export function useCardDescription({
     isEditing,
     isDirty,
     isSaving,
-    field: register("description"),
+    field: register("description", {
+      onChange: () => {
+        clearErrors("root");
+      },
+    }),
     startEditing: () => {
       reset({ description: saved ?? "" });
       setIsEditing(true);
