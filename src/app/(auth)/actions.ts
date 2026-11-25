@@ -8,8 +8,8 @@ import {
   signInSchema,
   signUpSchema,
 } from "@/lib/auth-schemas";
-import { db } from "@/server/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
+import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 import { endSession, startSession } from "@/server/session";
 

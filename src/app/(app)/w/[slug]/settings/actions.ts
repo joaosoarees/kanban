@@ -9,9 +9,7 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { db } from "@/server/db";
 import { can } from "@/lib/permissions";
-import { isUniqueViolation } from "@/server/prisma-errors";
 import {
   addMemberSchema,
   changeRoleSchema,
@@ -24,6 +22,8 @@ import {
   removeMembership,
   revalidateWorkspace,
 } from "@/lib/workspaces";
+import { db } from "@/server/db";
+import { isUniqueViolation } from "@/server/prisma-errors";
 
 const MEMBER_CHANGED: ActionError = {
   status: "error",

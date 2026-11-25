@@ -10,9 +10,9 @@ import {
 } from "@/lib/action-result";
 import { columnNameSchema, moveColumnSchema } from "@/lib/board-schemas";
 import { BOARD_GONE, COLUMN_GONE, COLUMN_ORDER, lockBoard } from "@/lib/boards";
-import { db } from "@/server/db";
 import { planMove, positionAtEnd } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
+import { db } from "@/server/db";
 
 async function lockBoardColumns(
   tx: Prisma.TransactionClient,

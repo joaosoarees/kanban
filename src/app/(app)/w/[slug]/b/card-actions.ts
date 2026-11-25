@@ -15,10 +15,10 @@ import {
   createCardSchema,
   moveCardSchema,
 } from "@/lib/card-schemas";
-import { db } from "@/server/db";
 import { cardAssigneeSchema } from "@/lib/label-schemas";
 import { positionAtEnd, positionInColumn } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
+import { db } from "@/server/db";
 
 const BOARD_CHANGED: ActionError = {
   status: "error",
