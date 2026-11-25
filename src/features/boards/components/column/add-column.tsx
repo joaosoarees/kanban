@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import {
   COLUMN_NAME_MAX_LENGTH,
   columnNameSchema,
-} from "@/features/boards/lib/schemas";
+} from "@/features/boards/lib/board-schemas";
 import { createColumnAction } from "@/features/boards/server/column-actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";

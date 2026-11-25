@@ -1,5 +1,6 @@
 "use server";
 
+import { moveCardSchema } from "@/features/boards/lib/card-schemas";
 import { positionInColumn } from "@/features/boards/lib/position";
 import {
   BOARD_GONE,
@@ -17,7 +18,6 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { moveCardSchema } from "@/lib/card-schemas";
 import { db } from "@/server/db";
 
 const BOARD_CHANGED: ActionError = {

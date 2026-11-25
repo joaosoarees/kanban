@@ -3,9 +3,12 @@
 import { unstable_rethrow } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { renameCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
 import { DialogTitle } from "@/components/ui/dialog";
-import { CARD_TITLE_MAX_LENGTH, cardTitleSchema } from "@/lib/card-schemas";
+import {
+  CARD_TITLE_MAX_LENGTH,
+  cardTitleSchema,
+} from "@/features/boards/lib/card-schemas";
+import { renameCardAction } from "@/features/boards/server/card-actions";
 
 const RENAME_FAILED = "Não foi possível salvar o título. Tente de novo.";
 const TITLE_TEXT =

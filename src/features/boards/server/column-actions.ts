@@ -1,11 +1,11 @@
 "use server";
 
 import * as z from "zod";
-import { planMove, positionAtEnd } from "@/features/boards/lib/position";
 import {
   columnNameSchema,
   moveColumnSchema,
-} from "@/features/boards/lib/schemas";
+} from "@/features/boards/lib/board-schemas";
+import { planMove, positionAtEnd } from "@/features/boards/lib/position";
 import {
   BOARD_GONE,
   COLUMN_GONE,

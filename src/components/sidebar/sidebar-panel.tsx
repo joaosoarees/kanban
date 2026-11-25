@@ -7,8 +7,8 @@ import type { ReactNode } from "react";
 import { LogoMark } from "@/components/logo";
 import { SidebarLink } from "@/components/sidebar/sidebar-links";
 import { UserMenu } from "@/components/user-menu";
-import { NewBoardButton } from "@/features/boards/components/new-board-button";
-import { RetryButton } from "@/features/boards/components/retry-button";
+import { NewBoardButton } from "@/features/boards/components/board/new-board-button";
+import { RetryButton } from "@/features/boards/components/board/retry-button";
 import {
   WorkspaceSwitcher,
   type SwitcherWorkspace,

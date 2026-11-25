@@ -1,5 +1,5 @@
-import { AssigneePicker } from "@/components/boards/assignee-picker";
-import { LabelPicker } from "@/components/boards/label-picker";
+import { AssigneePicker } from "@/features/boards/components/card/assignee-picker";
+import { LabelPicker } from "@/features/boards/components/label/label-picker";
 import type {
   BoardCard,
   BoardColumn,

@@ -2,10 +2,10 @@
 
 import { Check, Search, UsersRound } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
-import { comparable } from "@/components/boards/label-list";
-import { LabelTag } from "@/components/boards/label-tag";
-import { MemberAvatar } from "@/components/boards/member-avatar";
-import { useBoardMeta } from "@/features/boards/components/board-meta";
+import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
+import { comparable } from "@/features/boards/components/label/label-list";
+import { LabelTag } from "@/features/boards/components/label/label-tag";
 import { replaceBoardFilter } from "@/features/boards/hooks/use-board-filter";
 import {
   NO_ASSIGNEE,

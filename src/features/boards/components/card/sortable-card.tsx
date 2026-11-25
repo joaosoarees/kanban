@@ -3,9 +3,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { PointerEvent } from "react";
-import { BoardCardButton } from "@/components/boards/board-card";
-import { pushCardUrl } from "@/components/boards/card-url";
+import { BoardCardButton } from "@/features/boards/components/card/board-card";
 import type { BoardCard } from "@/features/boards/hooks/use-board-columns";
+import { pushCardUrl } from "@/features/boards/lib/card-url";
 import { cn } from "@/lib/utils";
 
 type SortableCardProps = {

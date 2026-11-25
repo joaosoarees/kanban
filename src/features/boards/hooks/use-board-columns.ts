@@ -3,10 +3,10 @@
 import { arrayMove } from "@dnd-kit/sortable";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
-import { moveCardAction } from "@/app/(app)/w/[slug]/b/card-move-actions";
+import { moveCardTo, previousCardIdOf } from "@/features/boards/lib/card-moves";
+import { moveCardAction } from "@/features/boards/server/card-move-actions";
 import { moveColumnAction } from "@/features/boards/server/column-actions";
 import type { ActionResult } from "@/lib/action-result";
-import { moveCardTo, previousCardIdOf } from "@/lib/card-moves";
 import { runAction } from "@/lib/run-action";
 
 export type BoardCard = {

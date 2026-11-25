@@ -1,8 +1,8 @@
 import { AlignLeft } from "lucide-react";
 import type { ComponentProps } from "react";
-import { LabelTag } from "@/components/boards/label-tag";
-import { MemberAvatar } from "@/components/boards/member-avatar";
-import { useBoardMeta } from "@/features/boards/components/board-meta";
+import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
+import { LabelTag } from "@/features/boards/components/label/label-tag";
 import type { BoardCard as BoardCardData } from "@/features/boards/hooks/use-board-columns";
 import { cn } from "@/lib/utils";
 

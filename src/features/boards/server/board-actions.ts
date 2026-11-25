@@ -2,8 +2,8 @@
 
 import { redirect } from "next/navigation";
 import * as z from "zod";
+import { boardNameSchema } from "@/features/boards/lib/board-schemas";
 import { initialPositions } from "@/features/boards/lib/position";
-import { boardNameSchema } from "@/features/boards/lib/schemas";
 import { BOARD_GONE } from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,

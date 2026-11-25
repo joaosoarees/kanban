@@ -2,7 +2,7 @@ import { Settings } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { linkButton } from "@/components/button-styles";
-import { BoardsSection } from "@/features/boards/components/boards-section";
+import { BoardsSection } from "@/features/boards/components/board/boards-section";
 import { MemberCount } from "@/features/workspaces/components/member-count";
 import { RoleBadge } from "@/features/workspaces/components/role-badge";
 import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
