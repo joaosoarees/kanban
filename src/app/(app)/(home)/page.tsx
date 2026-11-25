@@ -11,7 +11,7 @@ import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
 import {
   getMyWorkspaces,
   type WorkspaceSummary,
-} from "@/features/workspaces/queries";
+} from "@/features/workspaces/server/queries";
 
 export const metadata: Metadata = { title: "Seus workspaces" };
 

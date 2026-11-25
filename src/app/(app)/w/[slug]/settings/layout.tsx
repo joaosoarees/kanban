@@ -1,7 +1,7 @@
-import { requireMembership } from "@/features/workspaces/access";
 import { SettingsTabs } from "@/features/workspaces/components/settings-tabs";
 import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
-import { can } from "@/features/workspaces/permissions";
+import { can } from "@/features/workspaces/lib/permissions";
+import { requireMembership } from "@/features/workspaces/server/access";
 import { cn } from "@/lib/utils";
 
 export default async function SettingsLayout({

@@ -7,11 +7,11 @@ import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createColumnAction } from "@/features/boards/column-actions";
 import {
   COLUMN_NAME_MAX_LENGTH,
   columnNameSchema,
-} from "@/features/boards/schemas";
+} from "@/features/boards/lib/schemas";
+import { createColumnAction } from "@/features/boards/server/column-actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 

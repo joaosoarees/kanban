@@ -7,9 +7,9 @@ import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
 import { Label } from "@/components/ui/label";
-import { addMemberAction } from "@/features/members/actions";
 import { RoleMenu } from "@/features/members/components/role-menu";
-import { addMemberSchema } from "@/features/members/schemas";
+import { addMemberSchema } from "@/features/members/lib/schemas";
+import { addMemberAction } from "@/features/members/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 

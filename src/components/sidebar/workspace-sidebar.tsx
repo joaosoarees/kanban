@@ -1,8 +1,8 @@
 import { SidebarShell } from "@/components/sidebar/sidebar-shell";
-import { getBoards } from "@/features/boards/queries";
-import { requireMembership } from "@/features/workspaces/access";
-import { can } from "@/features/workspaces/permissions";
-import { getMyWorkspaces } from "@/features/workspaces/queries";
+import { getBoards } from "@/features/boards/server/queries";
+import { can } from "@/features/workspaces/lib/permissions";
+import { requireMembership } from "@/features/workspaces/server/access";
+import { getMyWorkspaces } from "@/features/workspaces/server/queries";
 import { requireUser } from "@/server/session";
 
 async function loadBoards(workspaceId: string) {

@@ -1,9 +1,9 @@
 "use client";
 
 import { TextField } from "@/components/text-field";
-import { signInAction } from "@/features/auth/actions";
 import { FormFooter } from "@/features/auth/components/form-footer";
-import { signInSchema } from "@/features/auth/schemas";
+import { signInSchema } from "@/features/auth/lib/schemas";
+import { signInAction } from "@/features/auth/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 
 const SIGN_IN_FAILED = "Não foi possível entrar. Tente de novo.";

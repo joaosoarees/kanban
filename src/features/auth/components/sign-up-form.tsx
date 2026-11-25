@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { TextField } from "@/components/text-field";
-import { signUpAction } from "@/features/auth/actions";
 import { FormFooter } from "@/features/auth/components/form-footer";
-import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/features/auth/schemas";
+import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/features/auth/lib/schemas";
+import { signUpAction } from "@/features/auth/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 
 const SIGN_UP_FAILED = "Não foi possível criar a conta. Tente de novo.";

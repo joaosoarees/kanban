@@ -1,11 +1,11 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
+import { initialPositions } from "@/features/boards/lib/position";
 import {
   PrismaClient,
   type LabelColor,
   type Role,
 } from "@/generated/prisma/client";
-import { initialPositions } from "@/features/boards/position";
 
 export const DEMO_PASSWORD = "demo-kanbanary";
 export const DEMO_EMAIL = "ana@demo.kanbanary.dev";

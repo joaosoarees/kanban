@@ -1,11 +1,15 @@
 "use server";
 
 import * as z from "zod";
-import { BOARD_GONE, CARD_GONE, lockBoard } from "@/features/boards/access";
+import {
+  BOARD_GONE,
+  CARD_GONE,
+  lockBoard,
+} from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
-} from "@/features/workspaces/access";
+} from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
   invalidFields,

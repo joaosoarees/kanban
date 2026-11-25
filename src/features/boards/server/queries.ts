@@ -2,7 +2,7 @@ import "server-only";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import * as z from "zod";
-import { COLUMN_ORDER } from "@/features/boards/access";
+import { COLUMN_ORDER } from "@/features/boards/server/access";
 import { db } from "@/server/db";
 
 type CardRow = {

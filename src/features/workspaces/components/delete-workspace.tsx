@@ -9,7 +9,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { deleteWorkspaceAction } from "@/features/workspaces/actions";
+import { deleteWorkspaceAction } from "@/features/workspaces/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
 

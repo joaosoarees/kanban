@@ -1,6 +1,6 @@
 import * as z from "zod";
-import { CARD_GONE } from "@/features/boards/access";
-import { loadActorAllowedTo } from "@/features/workspaces/access";
+import { CARD_GONE } from "@/features/boards/server/access";
+import { loadActorAllowedTo } from "@/features/workspaces/server/access";
 import { FORBIDDEN, type ActionResult } from "@/lib/action-result";
 import { db } from "@/server/db";
 

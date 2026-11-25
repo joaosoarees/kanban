@@ -1,18 +1,21 @@
 "use server";
 
 import * as z from "zod";
+import { planMove, positionAtEnd } from "@/features/boards/lib/position";
+import {
+  columnNameSchema,
+  moveColumnSchema,
+} from "@/features/boards/lib/schemas";
 import {
   BOARD_GONE,
   COLUMN_GONE,
   COLUMN_ORDER,
   lockBoard,
-} from "@/features/boards/access";
-import { planMove, positionAtEnd } from "@/features/boards/position";
-import { columnNameSchema, moveColumnSchema } from "@/features/boards/schemas";
+} from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
-} from "@/features/workspaces/access";
+} from "@/features/workspaces/server/access";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   FORBIDDEN,

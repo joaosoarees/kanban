@@ -3,12 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
-import { loadActorAllowedTo } from "@/features/workspaces/access";
 import {
   createWorkspaceSchema,
   renameWorkspaceSchema,
-} from "@/features/workspaces/schemas";
-import { slugify, withRandomSuffix } from "@/features/workspaces/slug";
+} from "@/features/workspaces/lib/schemas";
+import { slugify, withRandomSuffix } from "@/features/workspaces/lib/slug";
+import { loadActorAllowedTo } from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
   invalidFields,
