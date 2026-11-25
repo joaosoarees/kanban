@@ -118,6 +118,10 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — O código do e-mail tem 8 dígitos, mostrados em dois grupos de 4 separados por espaço visual (`4829 1375`); o texto puro e a cópia trazem os 8 dígitos juntos — 8 dígitos substituíram a janela de tentativas por conta, e os grupos facilitam ler e digitar.
 - 2026-11-25 — A caixa do código ocupa a largura do cartão, com os dígitos centralizados, no computador e no celular — o código é o centro do e-mail, e a mesma caixa nas duas larguras dispensa a regra de celular.
 - 2026-11-25 — Tela `/verify-email` desenhada no canvas da fatia 13 (https://claude.ai/artifact/XtSnssDmDRLW5exph1onZW, pranchas 13.1 a 13.4, claro e escuro): mesmo layout do login, campo único com teclado numérico, código enviado só pelo botão, reenvio com contagem na mesma largura e "Usar outro e-mail" levando a `/sign-in` — segue as telas de entrada e evita as caixinhas, que atrapalham colar e o leitor de tela.
+- 2026-11-25 — Telas de "Esqueci a senha" desenhadas no canvas da fatia 14 (https://claude.ai/artifact/LJf4wocJmG26Rdq9r8f1mm, pranchas 14.1 a 14.6, claro e escuro) — mesmo layout das telas de entrada; o código reaproveita o formulário do `/verify-email`.
+- 2026-11-25 — "Esqueci a senha" fica na linha do rótulo Senha e leva o e-mail digitado — o `TextField` ganhou um espaço opcional à direita do rótulo, só usado no login por enquanto.
+- 2026-11-25 — `/reset-password` mostra o código ou a senha nova conforme o cookie, e o texto do código diz "Se houver uma conta" — uma rota a menos, e a tela não revela se a conta existe.
+- 2026-11-25 — A senha nova avisa que as outras sessões serão encerradas — explica por que outro aparelho pede login de novo.
 
 ## Perguntas abertas
 
