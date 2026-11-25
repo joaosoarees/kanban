@@ -8,7 +8,10 @@ import {
   renameWorkspaceSchema,
 } from "@/features/workspaces/lib/schemas";
 import { slugify, withRandomSuffix } from "@/features/workspaces/lib/slug";
-import { loadActorAllowedTo } from "@/features/workspaces/server/access";
+import {
+  loadActorAllowedTo,
+  WORKSPACE_GONE,
+} from "@/features/workspaces/server/access";
 import {
   FORBIDDEN,
   invalidFields,
@@ -92,10 +95,13 @@ export async function renameWorkspaceAction(
     return invalidFields(parsed.error);
   }
 
-  await db.workspace.update({
+  const { count } = await db.workspace.updateMany({
     where: { id: actor.workspaceId },
     data: { name: parsed.data.name },
   });
+  if (count === 0) {
+    return WORKSPACE_GONE;
+  }
 
   revalidatePath("/", "layout");
   return { status: "success", data: undefined };
@@ -116,7 +122,7 @@ export async function deleteWorkspaceAction(
     };
   }
 
-  await db.workspace.delete({ where: { id: actor.workspaceId } });
+  await db.workspace.deleteMany({ where: { id: actor.workspaceId } });
 
   revalidatePath("/", "layout");
   return redirect("/");
