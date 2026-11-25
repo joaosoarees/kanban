@@ -2,6 +2,7 @@ import { Text } from "react-email";
 import { mailColors } from "@/server/mail/layout";
 
 export function CodeBox({ code }: { code: string }) {
+  const middle = Math.ceil(code.length / 2);
   return (
     <Text
       className="code-box"
@@ -20,7 +21,8 @@ export function CodeBox({ code }: { code: string }) {
         color: mailColors.foreground,
       }}
     >
-      {code}
+      <span style={{ paddingRight: 16 }}>{code.slice(0, middle)}</span>
+      <span>{code.slice(middle)}</span>
     </Text>
   );
 }
