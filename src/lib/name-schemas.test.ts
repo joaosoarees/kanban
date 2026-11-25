@@ -3,7 +3,7 @@ import { signInSchema, signUpSchema } from "@/features/auth/lib/schemas";
 import {
   boardNameSchema,
   columnNameSchema,
-} from "@/features/boards/lib/schemas";
+} from "@/features/boards/lib/board-schemas";
 import { createWorkspaceSchema } from "@/features/workspaces/lib/schemas";
 
 const NUL = String.fromCodePoint(0);

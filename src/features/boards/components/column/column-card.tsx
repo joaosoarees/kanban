@@ -9,23 +9,23 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, UnfoldHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { AddCard } from "@/components/boards/add-card";
-import { COLUMN_DROP } from "@/components/boards/card-keyboard";
-import { SortableCard } from "@/components/boards/sortable-card";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
-import { ColumnMenu } from "@/features/boards/components/column-menu";
-import { ColumnNameEditor } from "@/features/boards/components/column-name-editor";
+import { AddCard } from "@/features/boards/components/card/add-card";
+import { SortableCard } from "@/features/boards/components/card/sortable-card";
+import { ColumnMenu } from "@/features/boards/components/column/column-menu";
+import { ColumnNameEditor } from "@/features/boards/components/column/column-name-editor";
 import {
   cardCountLabel,
   COLUMN_SHELL,
   deleteColumnDescription,
-} from "@/features/boards/components/column-preview";
+} from "@/features/boards/components/column/column-preview";
 import type {
   BoardCard,
   BoardColumn,
 } from "@/features/boards/hooks/use-board-columns";
 import type { DragKind } from "@/features/boards/hooks/use-board-drag";
+import { COLUMN_DROP } from "@/features/boards/lib/card-keyboard";
 import { deleteColumnAction } from "@/features/boards/server/column-actions";
 import { cn } from "@/lib/utils";
 import { useCollapsedColumns } from "@/stores/collapsed-columns";

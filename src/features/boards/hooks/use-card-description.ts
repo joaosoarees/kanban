@@ -3,8 +3,8 @@
 import { unstable_rethrow } from "next/navigation";
 import { useEffect, useEffectEvent, useState, useTransition } from "react";
 import * as z from "zod";
-import { updateCardDescriptionAction } from "@/app/(app)/w/[slug]/b/card-actions";
-import { cardDescriptionSchema } from "@/lib/card-schemas";
+import { cardDescriptionSchema } from "@/features/boards/lib/card-schemas";
+import { updateCardDescriptionAction } from "@/features/boards/server/card-actions";
 
 const LOAD_FAILED = "Não foi possível abrir o card. Tente de novo.";
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";

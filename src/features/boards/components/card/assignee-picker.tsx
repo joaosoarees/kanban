@@ -1,8 +1,6 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { setCardAssigneeAction } from "@/app/(app)/w/[slug]/b/card-actions";
-import { MemberAvatar } from "@/components/boards/member-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +8,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useBoardMeta } from "@/features/boards/components/board-meta";
+import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
 import type {
   BoardCard,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import { setCardAssigneeAction } from "@/features/boards/server/card-actions";
 import { cn } from "@/lib/utils";
 
 const NO_ASSIGNEE = "none";

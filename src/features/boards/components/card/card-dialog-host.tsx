@@ -3,19 +3,19 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CardDialog } from "@/components/boards/card-dialog";
-import {
-  pushCardUrl,
-  readCardParam,
-  replaceCardUrl,
-} from "@/components/boards/card-url";
+import { CardDialog } from "@/features/boards/components/card/card-dialog";
 import type {
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
 import { useBoardFilter } from "@/features/boards/hooks/use-board-filter";
 import { isFilterActive } from "@/features/boards/lib/board-filter";
-import { locateCard } from "@/lib/card-moves";
+import { locateCard } from "@/features/boards/lib/card-moves";
+import {
+  pushCardUrl,
+  readCardParam,
+  replaceCardUrl,
+} from "@/features/boards/lib/card-url";
 
 const CARD_NOT_FOUND =
   "Card não encontrado. Ele pode ter sido excluído ou estar em outro quadro.";

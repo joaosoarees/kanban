@@ -1,6 +1,12 @@
 "use server";
 
 import * as z from "zod";
+import {
+  cardDescriptionSchema,
+  cardTitleSchema,
+  createCardSchema,
+} from "@/features/boards/lib/card-schemas";
+import { cardAssigneeSchema } from "@/features/boards/lib/label-schemas";
 import { positionAtEnd } from "@/features/boards/lib/position";
 import {
   BOARD_GONE,
@@ -19,12 +25,6 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import {
-  cardDescriptionSchema,
-  cardTitleSchema,
-  createCardSchema,
-} from "@/lib/card-schemas";
-import { cardAssigneeSchema } from "@/lib/label-schemas";
 import { db } from "@/server/db";
 
 const MEMBER_GONE: ActionError = {

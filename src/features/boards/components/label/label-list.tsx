@@ -2,13 +2,13 @@
 
 import { Check, Pencil, Plus, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { LabelTag } from "@/components/boards/label-tag";
-import type { BoardLabel } from "@/features/boards/components/board-meta";
+import type { BoardLabel } from "@/features/boards/components/board/board-meta";
+import { LabelTag } from "@/features/boards/components/label/label-tag";
 import {
   LABEL_NAME_MAX_LENGTH,
   MAX_LABELS_PER_BOARD,
   MAX_LABELS_PER_CARD,
-} from "@/lib/label-schemas";
+} from "@/features/boards/lib/label-schemas";
 import { cn } from "@/lib/utils";
 
 export function comparable(text: string) {

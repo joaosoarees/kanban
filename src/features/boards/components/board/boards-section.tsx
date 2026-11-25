@@ -1,8 +1,8 @@
 import { SquareKanban, TriangleAlert } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
-import { BoardTile } from "@/features/boards/components/board-tile";
-import { NewBoardButton } from "@/features/boards/components/new-board-button";
-import { RetryButton } from "@/features/boards/components/retry-button";
+import { BoardTile } from "@/features/boards/components/board/board-tile";
+import { NewBoardButton } from "@/features/boards/components/board/new-board-button";
+import { RetryButton } from "@/features/boards/components/board/retry-button";
 import { getBoards } from "@/features/boards/server/queries";
 
 type BoardsSectionProps = {

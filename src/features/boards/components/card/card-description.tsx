@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { CardDescriptionState } from "@/components/boards/use-card-description";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CARD_DESCRIPTION_MAX_LENGTH } from "@/lib/card-schemas";
+import type { CardDescriptionState } from "@/features/boards/hooks/use-card-description";
+import { CARD_DESCRIPTION_MAX_LENGTH } from "@/features/boards/lib/card-schemas";
 import { cn } from "@/lib/utils";
 
 const BOX =

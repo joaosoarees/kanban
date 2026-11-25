@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useBoardMeta } from "@/features/boards/components/board-meta";
+import { useBoardMeta } from "@/features/boards/components/board/board-meta";
 import type {
   BoardCard,
   BoardColumn,

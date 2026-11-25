@@ -11,11 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BoardNameDialog } from "@/features/boards/components/board-name-dialog";
+import { BoardNameDialog } from "@/features/boards/components/board/board-name-dialog";
 import {
   deleteBoardAction,
   renameBoardAction,
-} from "@/features/boards/server/actions";
+} from "@/features/boards/server/board-actions";
 
 const ITEM = "h-11 cursor-pointer gap-2.5 px-2 sm:h-10";
 const DESTRUCTIVE_ITEM = `${ITEM} data-[variant=destructive]:text-danger-text data-[variant=destructive]:focus:text-danger-text`;

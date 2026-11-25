@@ -18,12 +18,12 @@ import {
   type UniqueIdentifier,
 } from "@dnd-kit/core";
 import { useState } from "react";
+import type { BoardColumn } from "@/features/boards/hooks/use-board-columns";
 import {
   boardKeyboardCoordinates,
   COLUMN_DROP,
-} from "@/components/boards/card-keyboard";
-import type { BoardColumn } from "@/features/boards/hooks/use-board-columns";
-import { locateCard, moveCardTo } from "@/lib/card-moves";
+} from "@/features/boards/lib/card-keyboard";
+import { locateCard, moveCardTo } from "@/features/boards/lib/card-moves";
 
 export type DragKind = "column" | "card";
 

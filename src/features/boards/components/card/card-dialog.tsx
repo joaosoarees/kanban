@@ -4,15 +4,6 @@ import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
-import {
-  CardDescription,
-  CardDescriptionActions,
-} from "@/components/boards/card-description";
-import { CardMoveMenu } from "@/components/boards/card-move-menu";
-import { CardProperties } from "@/components/boards/card-properties";
-import { CardTitle } from "@/components/boards/card-title";
-import { useCardDescription } from "@/components/boards/use-card-description";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,11 +12,20 @@ import {
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  CardDescription,
+  CardDescriptionActions,
+} from "@/features/boards/components/card/card-description";
+import { CardMoveMenu } from "@/features/boards/components/card/card-move-menu";
+import { CardProperties } from "@/features/boards/components/card/card-properties";
+import { CardTitle } from "@/features/boards/components/card/card-title";
 import type {
   BoardCard,
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import { useCardDescription } from "@/features/boards/hooks/use-card-description";
+import { deleteCardAction } from "@/features/boards/server/card-actions";
 import type { ActionResult } from "@/lib/action-result";
 
 const DISCARDED: ActionResult = { status: "success", data: undefined };

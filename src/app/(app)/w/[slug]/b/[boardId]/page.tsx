@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BoardColumns } from "@/features/boards/components/board-columns";
-import { BoardMenu } from "@/features/boards/components/board-menu";
-import { BoardMetaProvider } from "@/features/boards/components/board-meta";
-import { FilterMenu } from "@/features/boards/components/filter-menu";
+import { BoardColumns } from "@/features/boards/components/board/board-columns";
+import { BoardMenu } from "@/features/boards/components/board/board-menu";
+import { BoardMetaProvider } from "@/features/boards/components/board/board-meta";
+import { FilterMenu } from "@/features/boards/components/filter/filter-menu";
 import { requireBoard } from "@/features/boards/server/queries";
 import { getAssignableMembers } from "@/features/members/server/queries";
 import { can } from "@/features/workspaces/lib/permissions";

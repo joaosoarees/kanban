@@ -2,32 +2,32 @@
 
 import { Plus } from "lucide-react";
 import { startTransition, useState } from "react";
-import {
-  addCardLabelAction,
-  deleteLabelAction,
-  removeCardLabelAction,
-} from "@/app/(app)/w/[slug]/b/label-actions";
-import {
-  LABEL_COLORS,
-  LabelEditor,
-  type LabelDraft,
-} from "@/components/boards/label-editor";
-import { LabelList } from "@/components/boards/label-list";
-import { LabelTag } from "@/components/boards/label-tag";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useBoardMeta } from "@/features/boards/components/board-meta";
+import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import {
+  LABEL_COLORS,
+  LabelEditor,
+  type LabelDraft,
+} from "@/features/boards/components/label/label-editor";
+import { LabelList } from "@/features/boards/components/label/label-list";
+import { LabelTag } from "@/features/boards/components/label/label-tag";
 import type {
   BoardCard,
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import { MAX_LABELS_PER_CARD } from "@/features/boards/lib/label-schemas";
+import {
+  addCardLabelAction,
+  deleteLabelAction,
+  removeCardLabelAction,
+} from "@/features/boards/server/label-actions";
 import { cardsLabel } from "@/lib/card-count";
-import { MAX_LABELS_PER_CARD } from "@/lib/label-schemas";
 
 const TOGGLE_FAILED = "Não foi possível salvar a etiqueta. Tente de novo.";
 

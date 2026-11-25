@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FilterOptions } from "@/features/boards/components/filter-options";
+import { FilterOptions } from "@/features/boards/components/filter/filter-options";
 import {
   replaceBoardFilter,
   useBoardFilter,

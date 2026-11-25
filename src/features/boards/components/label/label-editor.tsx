@@ -12,22 +12,22 @@ import {
   type ComponentProps,
 } from "react";
 import { toast } from "sonner";
-import {
-  createLabelAction,
-  updateLabelAction,
-} from "@/app/(app)/w/[slug]/b/label-actions";
-import { LABEL_COLOR_CLASSES } from "@/components/boards/label-tag";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { BoardLabel } from "@/features/boards/components/board-meta";
-import type { LabelColor } from "@/generated/prisma/enums";
+import type { BoardLabel } from "@/features/boards/components/board/board-meta";
+import { LABEL_COLOR_CLASSES } from "@/features/boards/components/label/label-tag";
 import {
   LABEL_GONE_MESSAGE,
   LABEL_NAME_MAX_LENGTH,
   labelSchema,
-} from "@/lib/label-schemas";
+} from "@/features/boards/lib/label-schemas";
+import {
+  createLabelAction,
+  updateLabelAction,
+} from "@/features/boards/server/label-actions";
+import type { LabelColor } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";

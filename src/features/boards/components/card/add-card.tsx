@@ -4,8 +4,11 @@ import { Plus } from "lucide-react";
 import { unstable_rethrow } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
-import { CARD_TITLE_MAX_LENGTH, createCardSchema } from "@/lib/card-schemas";
+import {
+  CARD_TITLE_MAX_LENGTH,
+  createCardSchema,
+} from "@/features/boards/lib/card-schemas";
+import { createCardAction } from "@/features/boards/server/card-actions";
 import { cn } from "@/lib/utils";
 
 const CREATE_FAILED = "Não foi possível criar o card. Tente de novo.";
