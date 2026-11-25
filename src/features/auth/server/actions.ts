@@ -37,6 +37,7 @@ import {
 import { db } from "@/server/db";
 import { isUniqueViolation } from "@/server/prisma-errors";
 import {
+  endPasswordReset,
   endPendingVerification,
   endSession,
   getPasswordReset,
@@ -188,6 +189,8 @@ export async function switchAccountAction(): Promise<void> {
   return redirect("/sign-in");
 }
 
+const RESET_PATH = "/reset-password";
+
 const RESET_EXPIRED: ActionError = {
   status: "error",
   message: RESET_EXPIRED_MESSAGE,
@@ -208,7 +211,7 @@ export async function requestPasswordResetAction(
   if (mail !== null) {
     after(async () => sendResetMail(mail));
   }
-  return { status: "success", data: undefined };
+  return redirect(RESET_PATH);
 }
 
 export async function resendResetCodeAction(): Promise<
@@ -256,7 +259,12 @@ export async function verifyResetCodeAction(
   }
 
   await grantPasswordReset(granted.userId);
-  return { status: "success", data: undefined };
+  return redirect(RESET_PATH);
+}
+
+export async function restartPasswordResetAction(): Promise<void> {
+  await endPasswordReset();
+  return redirect("/forgot-password");
 }
 
 export async function resetPasswordAction(
