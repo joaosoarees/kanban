@@ -21,8 +21,13 @@ function getKey(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export async function createSessionToken(userId: string): Promise<string> {
-  return new SignJWT()
+export type SessionOwner = { userId: string; passwordChangedAt: Date | null };
+
+export async function createSessionToken({
+  userId,
+  passwordChangedAt,
+}: SessionOwner): Promise<string> {
+  return new SignJWT({ pwc: passwordChangedAt?.getTime() ?? null })
     .setProtectedHeader({ alg: ALGORITHM })
     .setSubject(userId)
     .setIssuedAt()
@@ -32,7 +37,7 @@ export async function createSessionToken(userId: string): Promise<string> {
 
 export async function verifySessionToken(
   token: string | undefined,
-): Promise<{ userId: string; issuedAt: Date } | null> {
+): Promise<{ userId: string; passwordChangedAt: number | null } | null> {
   if (token === undefined || token === "") {
     return null;
   }
@@ -40,17 +45,18 @@ export async function verifySessionToken(
   try {
     const { payload } = await jwtVerify(token, getKey(), {
       algorithms: [ALGORITHM],
-      requiredClaims: ["sub", "exp", "iat"],
+      requiredClaims: ["sub", "exp"],
     });
+    const passwordChangedAt = payload.pwc ?? null;
     if (
       payload.aud !== undefined ||
       typeof payload.sub !== "string" ||
       !USER_ID.test(payload.sub) ||
-      payload.iat === undefined
+      (passwordChangedAt !== null && typeof passwordChangedAt !== "number")
     ) {
       return null;
     }
-    return { userId: payload.sub, issuedAt: new Date(payload.iat * 1000) };
+    return { userId: payload.sub, passwordChangedAt };
   } catch {
     return null;
   }

@@ -19,6 +19,7 @@ import {
   type PendingVerification,
   type ResetGrant,
   type ResetToken,
+  type SessionOwner,
   verifyPendingToken,
   verifyResetGrant,
   verifyResetToken,
@@ -30,13 +31,19 @@ export {
   type SessionUser,
 } from "@/server/session/current-user";
 
-export async function startSession(userId: string): Promise<void> {
+export async function startSession(owner: SessionOwner): Promise<void> {
   await deletePendingCookie();
   await deleteResetCookie();
-  await writeSessionCookie(await createSessionToken(userId));
+  await writeSessionCookie(await createSessionToken(owner));
 }
 
-export type { PendingToken, PendingVerification, ResetGrant, ResetToken };
+export type {
+  PendingToken,
+  PendingVerification,
+  ResetGrant,
+  ResetToken,
+  SessionOwner,
+};
 
 export async function startPendingVerification(
   pending: PendingVerification,
