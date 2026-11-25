@@ -10,7 +10,7 @@ import {
 } from "@/lib/action-result";
 import { columnNameSchema, moveColumnSchema } from "@/lib/board-schemas";
 import { BOARD_GONE, COLUMN_GONE, COLUMN_ORDER, lockBoard } from "@/lib/boards";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import { planMove, positionAtEnd } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 

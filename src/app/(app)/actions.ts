@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import * as z from "zod";
 import type { ActionResult } from "@/lib/action-result";
 import { requireUser } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { isUniqueViolation } from "@/lib/prisma-errors";
+import { db } from "@/server/db";
+import { isUniqueViolation } from "@/server/prisma-errors";
 import { slugify, withRandomSuffix } from "@/lib/slug";
 import { createWorkspaceSchema } from "@/lib/workspace-schemas";
 

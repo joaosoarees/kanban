@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 
 const NO_STORE = { "Cache-Control": "no-store" };
 

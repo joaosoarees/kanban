@@ -8,14 +8,14 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { BOARD_GONE, CARD_GONE, lockBoard } from "@/lib/boards";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import {
   LABEL_GONE_MESSAGE,
   labelSchema,
   MAX_LABELS_PER_BOARD,
   MAX_LABELS_PER_CARD,
 } from "@/lib/label-schemas";
-import { isUniqueViolation } from "@/lib/prisma-errors";
+import { isUniqueViolation } from "@/server/prisma-errors";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";
 
 const LABEL_GONE: ActionError = {

@@ -15,7 +15,7 @@ import {
   createCardSchema,
   moveCardSchema,
 } from "@/lib/card-schemas";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import { cardAssigneeSchema } from "@/lib/label-schemas";
 import { positionAtEnd, positionInColumn } from "@/lib/position";
 import { loadActorAllowedTo, revalidateWorkspace } from "@/lib/workspaces";

@@ -8,9 +8,9 @@ import {
   signInSchema,
   signUpSchema,
 } from "@/lib/auth-schemas";
-import { db } from "@/lib/db";
+import { db } from "@/server/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { isUniqueViolation } from "@/lib/prisma-errors";
+import { isUniqueViolation } from "@/server/prisma-errors";
 import { deleteSessionCookie, writeSessionCookie } from "@/lib/session-cookie";
 import { createSessionToken } from "@/lib/session-token";
 
