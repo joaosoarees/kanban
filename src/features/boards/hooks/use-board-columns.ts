@@ -1,13 +1,13 @@
 "use client";
 
 import { arrayMove } from "@dnd-kit/sortable";
-import { unstable_rethrow } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 import { moveCardAction } from "@/app/(app)/w/[slug]/b/card-actions";
 import { moveColumnAction } from "@/features/boards/column-actions";
 import type { ActionResult } from "@/lib/action-result";
 import { moveCardTo, previousCardIdOf } from "@/lib/card-moves";
+import { runAction } from "@/lib/run-action";
 
 export type BoardCard = {
   id: string;
@@ -60,15 +60,9 @@ export function useBoardColumns(
           ),
         })),
       );
-      try {
-        const result = await write();
-        if (result.status === "error" && result.gone !== true) {
-          toast.error(result.message);
-        }
-      } catch (error) {
-        unstable_rethrow(error);
-        console.error(error);
-        toast.error(failure);
+      const result = await runAction(write, failure);
+      if (result.status === "error" && result.gone !== true) {
+        toast.error(result.message);
       }
     });
   };
@@ -90,18 +84,16 @@ export function useBoardColumns(
 
     startTransition(async () => {
       setOptimisticColumns(next);
-      try {
-        const result = await moveColumnAction(workspaceId, boardId, {
-          columnId,
-          previousColumnId,
-        });
-        if (result.status === "error") {
-          toast.error(result.message);
-        }
-      } catch (error) {
-        unstable_rethrow(error);
-        console.error(error);
-        toast.error(MOVE_FAILED);
+      const result = await runAction(
+        async () =>
+          moveColumnAction(workspaceId, boardId, {
+            columnId,
+            previousColumnId,
+          }),
+        MOVE_FAILED,
+      );
+      if (result.status === "error") {
+        toast.error(result.message);
       }
     });
   };
@@ -115,19 +107,17 @@ export function useBoardColumns(
 
     startTransition(async () => {
       setOptimisticColumns(next);
-      try {
-        const result = await moveCardAction(workspaceId, boardId, {
-          cardId,
-          columnId,
-          previousCardId,
-        });
-        if (result.status === "error") {
-          toast.error(result.message);
-        }
-      } catch (error) {
-        unstable_rethrow(error);
-        console.error(error);
-        toast.error(CARD_MOVE_FAILED);
+      const result = await runAction(
+        async () =>
+          moveCardAction(workspaceId, boardId, {
+            cardId,
+            columnId,
+            previousCardId,
+          }),
+        CARD_MOVE_FAILED,
+      );
+      if (result.status === "error") {
+        toast.error(result.message);
       }
     });
   };
