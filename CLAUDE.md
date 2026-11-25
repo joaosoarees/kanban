@@ -42,7 +42,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 
 O bun roda só no container `app`; não instale bun, hk ou pkl na máquina.
 
-- `docker compose up -d`: sobe Postgres e app, instala dependências, aplica migrations e inicia o Next
+- `docker compose up -d`: sobe Postgres, Mailpit e app, instala dependências, aplica migrations e inicia o Next. Os e-mails enviados em desenvolvimento aparecem no Mailpit em `localhost:8025`
 - `docker compose exec app bun db:migrate --name <nome>`: cria e aplica uma migration
 - `docker compose exec app bun lint` / `bun check` / `bun test --isolate=modules` / `bun run build`: o mesmo que o CI roda
 - `npx prisma studio`: abre o Prisma Studio fora do container
