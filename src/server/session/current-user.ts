@@ -19,10 +19,17 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 
   const user = await db.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, name: true, email: true, passwordChangedAt: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      passwordChangedAt: true,
+      emailVerifiedAt: true,
+    },
   });
   if (
     !user ||
+    user.emailVerifiedAt === null ||
     (user.passwordChangedAt?.getTime() ?? null) !== session.passwordChangedAt
   ) {
     return null;
