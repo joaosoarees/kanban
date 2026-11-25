@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { TextField } from "@/components/text-field";
 import { FormFooter } from "@/features/auth/components/form-footer";
-import { EMAIL_TAKEN_MESSAGE, signUpSchema } from "@/features/auth/lib/schemas";
+import { signUpSchema } from "@/features/auth/lib/schemas";
 import { signUpAction } from "@/features/auth/server/actions";
 import { useActionForm } from "@/hooks/use-action-form";
 
@@ -51,21 +50,7 @@ export function SignUpForm() {
           label="E-mail"
           type="email"
           autoComplete="email"
-          error={
-            errors.email?.message === EMAIL_TAKEN_MESSAGE ? (
-              <>
-                {EMAIL_TAKEN_MESSAGE}{" "}
-                <Link
-                  href="/sign-in"
-                  className="rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  Entre
-                </Link>
-              </>
-            ) : (
-              errors.email?.message
-            )
-          }
+          error={errors.email?.message}
           {...register("email")}
         />
         <TextField

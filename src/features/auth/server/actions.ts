@@ -2,10 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { after } from "next/server";
-import * as z from "zod";
 import { RESET_EXPIRED_MESSAGE } from "@/features/auth/lib/password-reset";
 import {
-  EMAIL_TAKEN_MESSAGE,
   newPasswordSchema,
   resetRequestSchema,
   signInSchema,
@@ -17,7 +15,7 @@ import {
   PENDING_EXPIRED_MESSAGE,
   verifyCodeSchema,
 } from "@/features/auth/lib/email-code";
-import { hashPassword, verifyPassword } from "@/features/auth/server/password";
+import { verifyPassword } from "@/features/auth/server/password";
 import {
   checkResetCode,
   requestPasswordReset,
@@ -26,7 +24,9 @@ import {
   sendResetMail,
 } from "@/features/auth/server/password-reset";
 import {
+  registerAccount,
   resendVerification,
+  resumeVerification,
   verifyEmail,
 } from "@/features/auth/server/verification";
 import {
@@ -35,7 +35,6 @@ import {
   invalidFields,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
-import { isUniqueViolation } from "@/server/prisma-errors";
 import {
   endPasswordReset,
   endPendingVerification,
@@ -50,55 +49,36 @@ import {
 } from "@/server/session";
 
 const AFTER_SIGN_IN = "/";
+const VERIFY_PATH = "/verify-email";
 
 export async function signUpAction(input: unknown): Promise<ActionResult> {
   const parsed = signUpSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      status: "error",
-      message: "Confira os campos e tente de novo.",
-      fieldErrors: z.flattenError(parsed.error).fieldErrors,
-    };
+    return invalidFields(parsed.error);
   }
 
-  const { name, email, password } = parsed.data;
-  const passwordHash = await hashPassword(password);
-
-  let userId: string;
-  try {
-    const user = await db.user.create({
-      data: { name, email, passwordHash },
-      select: { id: true },
-    });
-    userId = user.id;
-  } catch (error) {
-    if (isUniqueViolation(error)) {
-      return {
-        status: "error",
-        message: EMAIL_TAKEN_MESSAGE,
-        fieldErrors: { email: [EMAIL_TAKEN_MESSAGE] },
-      };
-    }
-    throw error;
+  const { pending, delivered } = await registerAccount(parsed.data, new Date());
+  await startPendingVerification(pending);
+  if (!delivered) {
+    return { status: "error", message: MAIL_FAILED_MESSAGE };
   }
-
-  await startSession({ userId, passwordChangedAt: null });
-  return redirect(AFTER_SIGN_IN);
+  return redirect(VERIFY_PATH);
 }
 
 export async function signInAction(input: unknown): Promise<ActionResult> {
   const parsed = signInSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      status: "error",
-      message: "Confira os campos e tente de novo.",
-      fieldErrors: z.flattenError(parsed.error).fieldErrors,
-    };
+    return invalidFields(parsed.error);
   }
 
   const user = await db.user.findUnique({
     where: { email: parsed.data.email },
-    select: { id: true, passwordHash: true, passwordChangedAt: true },
+    select: {
+      id: true,
+      passwordHash: true,
+      passwordChangedAt: true,
+      emailVerifiedAt: true,
+    },
   });
 
   const matches = await verifyPassword(
@@ -110,6 +90,17 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
       status: "error",
       message: "E-mail ou senha incorretos. Confira e tente de novo.",
     };
+  }
+
+  if (user.emailVerifiedAt === null) {
+    const resumed = await resumeVerification(user.id, new Date());
+    if (resumed !== null) {
+      await startPendingVerification(resumed.pending);
+      if (!resumed.delivered) {
+        return { status: "error", message: MAIL_FAILED_MESSAGE };
+      }
+      return redirect(VERIFY_PATH);
+    }
   }
 
   await startSession({
