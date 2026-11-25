@@ -2,17 +2,26 @@ import "server-only";
 import { cookies } from "next/headers";
 import {
   deletePendingCookie,
+  deleteResetCookie,
   deleteSessionCookie,
   PENDING_COOKIE,
+  RESET_COOKIE,
   writePendingCookie,
+  writeResetCookie,
   writeSessionCookie,
 } from "@/server/session/cookie";
 import {
   createPendingToken,
+  createResetGrant,
+  createResetToken,
   createSessionToken,
   type PendingToken,
   type PendingVerification,
+  type ResetGrant,
+  type ResetToken,
   verifyPendingToken,
+  verifyResetGrant,
+  verifyResetToken,
 } from "@/server/session/token";
 
 export {
@@ -23,10 +32,11 @@ export {
 
 export async function startSession(userId: string): Promise<void> {
   await deletePendingCookie();
+  await deleteResetCookie();
   await writeSessionCookie(await createSessionToken(userId));
 }
 
-export type { PendingToken, PendingVerification };
+export type { PendingToken, PendingVerification, ResetGrant, ResetToken };
 
 export async function startPendingVerification(
   pending: PendingVerification,
@@ -46,4 +56,26 @@ export async function endPendingVerification(): Promise<void> {
 
 export async function endSession(): Promise<void> {
   await deleteSessionCookie();
+}
+
+export async function startPasswordReset(email: string): Promise<void> {
+  await writeResetCookie(await createResetToken(email));
+}
+
+export async function getPasswordReset(): Promise<ResetToken | null> {
+  const cookieStore = await cookies();
+  return verifyResetToken(cookieStore.get(RESET_COOKIE)?.value);
+}
+
+export async function grantPasswordReset(userId: string): Promise<void> {
+  await writeResetCookie(await createResetGrant(userId));
+}
+
+export async function getPasswordResetGrant(): Promise<ResetGrant | null> {
+  const cookieStore = await cookies();
+  return verifyResetGrant(cookieStore.get(RESET_COOKIE)?.value);
+}
+
+export async function endPasswordReset(): Promise<void> {
+  await deleteResetCookie();
 }
