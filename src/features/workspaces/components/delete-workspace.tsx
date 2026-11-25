@@ -2,13 +2,27 @@
 
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "react-hook-form";
+import * as z from "zod";
 import { dangerOutlineButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deleteWorkspaceAction } from "@/features/workspaces/actions";
+import { useActionForm } from "@/hooks/use-action-form";
 import { cn } from "@/lib/utils";
+
+const DELETE_FAILED = "Não foi possível excluir o workspace. Tente de novo.";
+const NAME_MISMATCH = "Digite o nome do workspace exatamente como aparece.";
+
+function confirmationSchema(workspaceName: string) {
+  return z.object({
+    confirmation: z
+      .string()
+      .refine((value) => value === workspaceName, NAME_MISMATCH),
+  });
+}
 
 type DeleteWorkspaceProps = {
   workspaceId: string;
@@ -22,7 +36,23 @@ export function DeleteWorkspace({
   memberCount,
 }: DeleteWorkspaceProps) {
   const [open, setOpen] = useState(false);
-  const [confirmation, setConfirmation] = useState("");
+  const {
+    form: {
+      register,
+      control,
+      reset,
+      formState: { errors },
+    },
+    submit,
+    isPending,
+  } = useActionForm({
+    schema: confirmationSchema(workspaceName),
+    defaultValues: { confirmation: "" },
+    action: async ({ confirmation }) =>
+      deleteWorkspaceAction(workspaceId, confirmation),
+    failure: DELETE_FAILED,
+  });
+  const confirmation = useWatch({ control, name: "confirmation" });
 
   const members =
     memberCount === 1
@@ -58,7 +88,7 @@ export function DeleteWorkspace({
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen);
           if (!nextOpen) {
-            setConfirmation("");
+            reset();
           }
         }}
         title={`Excluir ${workspaceName}?`}
@@ -66,7 +96,11 @@ export function DeleteWorkspace({
         confirmLabel="Excluir workspace"
         pendingLabel="Excluindo…"
         confirmDisabled={confirmation !== workspaceName}
-        onConfirm={async () => deleteWorkspaceAction(workspaceId, confirmation)}
+        form={{
+          submit,
+          isPending,
+          error: errors.confirmation?.message ?? errors.root?.message,
+        }}
       >
         <div className="mt-4 flex flex-col gap-2">
           <Label htmlFor="delete-confirmation" className="block font-normal">
@@ -75,10 +109,7 @@ export function DeleteWorkspace({
           </Label>
           <Input
             id="delete-confirmation"
-            value={confirmation}
-            onChange={(event) => {
-              setConfirmation(event.target.value);
-            }}
+            {...register("confirmation")}
             autoComplete="off"
             spellCheck={false}
             className="h-10"
