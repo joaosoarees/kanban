@@ -59,12 +59,15 @@ function waitForCode(waitSeconds: number): ActionError {
   };
 }
 
-async function passwordMatches(userId: string, password: string) {
-  const stored = await db.user.findUniqueOrThrow({
+async function matchingPasswordHash(
+  userId: string,
+  password: string,
+): Promise<string | null> {
+  const { passwordHash } = await db.user.findUniqueOrThrow({
     where: { id: userId },
     select: { passwordHash: true },
   });
-  return verifyPassword(password, stored.passwordHash);
+  return (await verifyPassword(password, passwordHash)) ? passwordHash : null;
 }
 
 export async function changePasswordAction(
@@ -77,11 +80,8 @@ export async function changePasswordAction(
   }
 
   const { currentPassword, newPassword } = parsed.data;
-  const stored = await db.user.findUniqueOrThrow({
-    where: { id: user.id },
-    select: { passwordHash: true },
-  });
-  if (!(await verifyPassword(currentPassword, stored.passwordHash))) {
+  const currentHash = await matchingPasswordHash(user.id, currentPassword);
+  if (currentHash === null) {
     return {
       status: "error",
       message: WRONG_PASSWORD,
@@ -93,7 +93,7 @@ export async function changePasswordAction(
   const passwordHash = await hashPassword(newPassword);
   const changed = await db.$transaction(async (tx) => {
     const { count } = await tx.user.updateMany({
-      where: { id: user.id, passwordHash: stored.passwordHash },
+      where: { id: user.id, passwordHash: currentHash },
       data: { passwordHash, passwordChangedAt },
     });
     if (count === 0) {
@@ -128,7 +128,7 @@ export async function requestEmailChangeAction(
     const message = "Este já é o seu e-mail.";
     return { status: "error", message, fieldErrors: { newEmail: [message] } };
   }
-  if (!(await passwordMatches(user.id, password))) {
+  if ((await matchingPasswordHash(user.id, password)) === null) {
     return {
       status: "error",
       message: WRONG_PASSWORD,
