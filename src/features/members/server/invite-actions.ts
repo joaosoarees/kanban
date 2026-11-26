@@ -89,25 +89,16 @@ export async function dismissInviteAction(): Promise<void> {
   await forgetInvite();
 }
 
-const INVITE_NOT_DELIVERED =
-  "O convite foi salvo, mas não conseguimos enviar o e-mail. Use “Reenviar” em instantes.";
-
 function inviteResult(
   sent: InviteSent | ActionError,
-): ActionResult<{ email: string }> {
-  if ("status" in sent) {
-    return sent;
-  }
-  if (!sent.delivered) {
-    return { status: "error", message: INVITE_NOT_DELIVERED };
-  }
-  return { status: "success", data: { email: sent.email } };
+): ActionResult<InviteSent> {
+  return "status" in sent ? sent : { status: "success", data: sent };
 }
 
 export async function inviteMemberAction(
   workspaceId: unknown,
   input: unknown,
-): Promise<ActionResult<{ email: string }>> {
+): Promise<ActionResult<InviteSent>> {
   const actor = await loadActorAllowedTo(workspaceId, "inviteMember");
   if (!actor) {
     return FORBIDDEN;
@@ -126,7 +117,7 @@ export async function inviteMemberAction(
 export async function resendInviteAction(
   workspaceId: unknown,
   input: unknown,
-): Promise<ActionResult<{ email: string }>> {
+): Promise<ActionResult<InviteSent>> {
   const actor = await loadActorAllowedTo(workspaceId, "inviteMember");
   const parsed = inviteIdSchema.safeParse(input);
   if (!actor) {
