@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   afterPasswordFailure,
+  afterPasswordMatch,
   isPasswordLocked,
   minutesUntilUnlock,
 } from "@/features/auth/lib/password-lock";
@@ -67,5 +68,56 @@ describe("minutesUntilUnlock", () => {
     const guard = { failedPasswordAttempts: 0, passwordLockedUntil: later(ms) };
 
     expect(minutesUntilUnlock(guard, now)).toBe(expected);
+  });
+});
+
+describe("afterPasswordMatch", () => {
+  it("should unlock and clear the count when nothing changed since the attempt", () => {
+    const reserved = { failedPasswordAttempts: 3, passwordLockedUntil: null };
+
+    const next = afterPasswordMatch(reserved, reserved);
+
+    expect(next).toEqual({
+      failedPasswordAttempts: 0,
+      passwordLockedUntil: null,
+    });
+  });
+
+  it("should unlock when this attempt was the one that set the lock", () => {
+    const reserved = {
+      failedPasswordAttempts: 0,
+      passwordLockedUntil: later(15 * 60_000),
+    };
+
+    const next = afterPasswordMatch({ ...reserved }, reserved);
+
+    expect(next).toEqual({
+      failedPasswordAttempts: 0,
+      passwordLockedUntil: null,
+    });
+  });
+
+  it("should keep failures counted after this attempt, minus this attempt", () => {
+    const reserved = { failedPasswordAttempts: 2, passwordLockedUntil: null };
+    const current = { failedPasswordAttempts: 4, passwordLockedUntil: null };
+
+    const next = afterPasswordMatch(current, reserved);
+
+    expect(next).toEqual({
+      failedPasswordAttempts: 3,
+      passwordLockedUntil: null,
+    });
+  });
+
+  it("should keep a lock that later failures set", () => {
+    const reserved = { failedPasswordAttempts: 3, passwordLockedUntil: null };
+    const current = {
+      failedPasswordAttempts: 0,
+      passwordLockedUntil: later(15 * 60_000),
+    };
+
+    const next = afterPasswordMatch(current, reserved);
+
+    expect(next).toEqual(current);
   });
 });
