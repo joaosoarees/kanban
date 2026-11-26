@@ -18,7 +18,7 @@ type CardCommentsProps = {
 };
 
 export type CommentsState = {
-  unsaved: "comment" | "edit" | null;
+  unsaved: "comment" | "edit" | "both" | null;
   isBusy: boolean;
 };
 
@@ -65,9 +65,17 @@ export function CardComments({
   const [edits, setEdits] = useState<ReadonlyMap<string, CommentFormState>>(
     new Map(),
   );
-  const editStates = [...edits.values()];
+  const editStates = comments.comments.flatMap(
+    (comment) => edits.get(comment.id) ?? [],
+  );
   const hasEdit = editStates.some((state) => state.isDirty);
-  const unsaved = composer.isDirty ? "comment" : hasEdit ? "edit" : null;
+  const unsaved = composer.isDirty
+    ? hasEdit
+      ? "both"
+      : "comment"
+    : hasEdit
+      ? "edit"
+      : null;
   const isDirty = unsaved !== null;
   const isBusy =
     composer.isPending || editStates.some((state) => state.isPending);
@@ -149,8 +157,17 @@ export function CardComments({
               }}
               onEditStateChange={(commentId, state) => {
                 setEdits((current) => {
+                  const isOpen = state.isDirty || state.isPending;
+                  const known = current.get(commentId);
+                  if (
+                    (!isOpen && known === undefined) ||
+                    (known?.isDirty === state.isDirty &&
+                      known.isPending === state.isPending)
+                  ) {
+                    return current;
+                  }
                   const next = new Map(current);
-                  if (state.isDirty || state.isPending) {
+                  if (isOpen) {
                     next.set(commentId, state);
                   } else {
                     next.delete(commentId);

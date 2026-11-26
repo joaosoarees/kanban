@@ -79,13 +79,6 @@ function CommentEditor({
     reportState({ isDirty, isPending });
   }, [isDirty, isPending]);
 
-  useEffect(
-    () => () => {
-      reportState(IDLE_FORM);
-    },
-    [],
-  );
-
   const field = form.register("body", {
     onChange: () => {
       form.clearErrors("root");
@@ -148,13 +141,15 @@ export function CommentItem({
   const [isDeleting, setIsDeleting] = useState(false);
   const editButtonRef = useRef<HTMLButtonElement>(null);
   const wasEditing = useRef(false);
+  const reportEditState = useEffectEvent(onEditStateChange);
 
   useEffect(() => {
     if (!isEditing && wasEditing.current) {
+      reportEditState(comment.id, IDLE_FORM);
       editButtonRef.current?.focus();
     }
     wasEditing.current = isEditing;
-  }, [isEditing]);
+  }, [comment.id, isEditing]);
 
   const stopEditing = () => {
     setIsEditing(false);
