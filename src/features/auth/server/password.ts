@@ -11,7 +11,7 @@ let decoyHash: Promise<string> | undefined;
 
 export async function verifyPassword(
   password: string,
-  passwordHash: string | undefined,
+  passwordHash?: string,
 ): Promise<boolean> {
   decoyHash ??= hash(crypto.randomUUID(), COST);
 
