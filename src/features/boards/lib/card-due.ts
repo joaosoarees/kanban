@@ -84,3 +84,9 @@ export function isDueThisWeek(card: DueCard, today: string) {
     card.dueOn <= addDays(today, DUE_SOON_DAYS)
   );
 }
+
+export function msUntilTomorrow(now: Date) {
+  const tomorrow = new Date(now);
+  tomorrow.setHours(24, 0, 1, 0);
+  return tomorrow.getTime() - now.getTime();
+}

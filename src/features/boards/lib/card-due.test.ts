@@ -6,6 +6,7 @@ import {
   isDueThisWeek,
   isOverdue,
   localDay,
+  msUntilTomorrow,
 } from "./card-due";
 
 const TODAY = "2026-11-26";
@@ -112,4 +113,18 @@ describe("isDueThisWeek", () => {
       expect(dueSoon).toBe(expected);
     },
   );
+});
+
+describe("msUntilTomorrow", () => {
+  it("should wait until one second past the next local midnight", () => {
+    const now = new Date(2026, 10, 26, 23, 59, 0);
+
+    expect(msUntilTomorrow(now)).toBe(61_000);
+  });
+
+  it("should wait a whole day and one second from midnight itself", () => {
+    const now = new Date(2026, 10, 26, 0, 0, 0);
+
+    expect(msUntilTomorrow(now)).toBe(24 * 60 * 60 * 1000 + 1000);
+  });
 });

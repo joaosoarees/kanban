@@ -1,13 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { localDay } from "@/features/boards/lib/card-due";
-
-function msUntilTomorrow(now: Date) {
-  const tomorrow = new Date(now);
-  tomorrow.setHours(24, 0, 1, 0);
-  return tomorrow.getTime() - now.getTime();
-}
+import { localDay, msUntilTomorrow } from "@/features/boards/lib/card-due";
 
 const listeners = new Set<() => void>();
 let stopClock: (() => void) | null = null;
