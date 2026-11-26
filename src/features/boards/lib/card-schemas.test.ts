@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { cardDescriptionSchema, cardTitleSchema } from "./card-schemas";
+import {
+  cardDescriptionSchema,
+  cardDueSchema,
+  cardTitleSchema,
+} from "./card-schemas";
 
 const NUL = String.fromCodePoint(0);
 const ZERO_WIDTH = String.fromCodePoint(0x200b);
@@ -93,5 +97,22 @@ describe("cardDescriptionSchema", () => {
       description: `a${NUL}b`,
     });
     expect(parsed.success).toBe(false);
+  });
+});
+
+describe("cardDueSchema", () => {
+  it("takes a calendar day or null", () => {
+    expect(cardDueSchema.safeParse({ dueOn: "2026-11-12" }).success).toBe(true);
+    expect(cardDueSchema.safeParse({ dueOn: null }).success).toBe(true);
+  });
+
+  it("refuses a time, an impossible day and a missing key", () => {
+    expect(
+      cardDueSchema.safeParse({ dueOn: "2026-11-12T10:00:00Z" }).success,
+    ).toBe(false);
+    expect(cardDueSchema.safeParse({ dueOn: "2026-02-30" }).success).toBe(
+      false,
+    );
+    expect(cardDueSchema.safeParse({}).success).toBe(false);
   });
 });
