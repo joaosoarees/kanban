@@ -21,6 +21,12 @@ export const CARD_GONE: ActionError = {
   gone: true,
 };
 
+export const COMMENT_GONE: ActionError = {
+  status: "error",
+  message: "Este comentário foi excluído.",
+  gone: true,
+};
+
 export function parseCardRef(boardId: unknown, cardId: unknown) {
   const board = z.uuid().safeParse(boardId);
   const card = z.uuid().safeParse(cardId);
