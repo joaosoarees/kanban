@@ -2,6 +2,7 @@ import "server-only";
 import { inviteMail } from "@/features/members/emails/invite";
 import { newInviteToken } from "@/features/members/server/invite-token";
 import {
+  expiredInviteCutoff,
   inviteExpiresAt,
   isInviteExpired,
   MAX_DAILY_INVITE_SENDS,
@@ -131,6 +132,13 @@ export async function inviteMember(
     if (denied) {
       return denied;
     }
+
+    await tx.invite.deleteMany({
+      where: {
+        workspaceId: actor.workspaceId,
+        expiresAt: { lt: expiredInviteCutoff(now) },
+      },
+    });
 
     const member = await tx.membership.findFirst({
       where: { workspaceId: actor.workspaceId, user: { email } },
