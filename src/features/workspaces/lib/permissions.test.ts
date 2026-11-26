@@ -24,10 +24,10 @@ describe("can", () => {
     expect(can("MEMBER", "manageCards")).toBe(true);
   });
 
-  it("lets owners and admins add members and rename, but not members", () => {
-    expect(can("OWNER", "addMember")).toBe(true);
-    expect(can("ADMIN", "addMember")).toBe(true);
-    expect(can("MEMBER", "addMember")).toBe(false);
+  it("lets owners and admins invite members and rename, but not members", () => {
+    expect(can("OWNER", "inviteMember")).toBe(true);
+    expect(can("ADMIN", "inviteMember")).toBe(true);
+    expect(can("MEMBER", "inviteMember")).toBe(false);
     expect(can("ADMIN", "renameWorkspace")).toBe(true);
     expect(can("MEMBER", "renameWorkspace")).toBe(false);
   });
