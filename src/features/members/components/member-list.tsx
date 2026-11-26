@@ -108,7 +108,16 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
   };
 
   return (
-    <section aria-label="Membros">
+    <section aria-labelledby="members-title" className="flex flex-col gap-3">
+      <h2
+        id="members-title"
+        className="flex items-center gap-2 text-[15px] font-semibold"
+      >
+        Membros
+        <span className="rounded-full bg-muted px-1.5 text-xs font-normal text-muted-foreground">
+          {optimisticMembers.length}
+        </span>
+      </h2>
       <ul className="divide-y rounded-xl border bg-card">
         {optimisticMembers.map((member) => {
           const target = {
@@ -118,7 +127,7 @@ export function MemberList({ workspaceId, members, viewer }: MemberListProps) {
           const canChangeRole = can(viewer.role, "changeRole", target);
           const canRemove = can(viewer.role, "removeMember", target);
           const showsControls =
-            can(viewer.role, "addMember") || canChangeRole || canRemove;
+            can(viewer.role, "inviteMember") || canChangeRole || canRemove;
 
           return (
             <li

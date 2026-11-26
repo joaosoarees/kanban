@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { AddMemberForm } from "@/features/members/components/add-member-form";
+import { InviteForm } from "@/features/members/components/invite-form";
 import { LeaveWorkspace } from "@/features/members/components/leave-workspace";
 import { MemberList } from "@/features/members/components/member-list";
-import { getMembers } from "@/features/members/server/queries";
+import { PendingInvites } from "@/features/members/components/pending-invites";
+import {
+  getMembers,
+  getPendingInvites,
+} from "@/features/members/server/queries";
 import { can } from "@/features/workspaces/lib/permissions";
 import { requireMembership } from "@/features/workspaces/server/access";
 import { requireUser } from "@/server/session";
@@ -23,12 +27,23 @@ export default async function MembersPage({
     requireUser(),
     requireMembership(slug),
   ]);
-  const members = await getMembers(workspace.id);
+  const canInvite = can(workspace.role, "inviteMember");
+  const [members, invites] = await Promise.all([
+    getMembers(workspace.id),
+    canInvite ? getPendingInvites(workspace.id) : [],
+  ]);
 
   return (
     <>
-      {can(workspace.role, "addMember") && (
-        <AddMemberForm workspaceId={workspace.id} />
+      {canInvite && (
+        <>
+          <InviteForm workspaceId={workspace.id} />
+          <PendingInvites
+            workspaceId={workspace.id}
+            invites={invites}
+            viewerId={user.id}
+          />
+        </>
       )}
       <MemberList
         workspaceId={workspace.id}
