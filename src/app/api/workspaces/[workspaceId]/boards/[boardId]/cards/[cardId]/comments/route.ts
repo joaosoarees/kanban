@@ -5,7 +5,7 @@ import {
   getCardComments,
   type CommentPage,
 } from "@/features/boards/server/comment-queries";
-import { loadActorAllowedTo } from "@/features/workspaces/server/access";
+import { loadActorFor } from "@/features/workspaces/server/access";
 import {
   INVALID,
   type ActionError,
@@ -30,12 +30,13 @@ export async function GET(
     params,
   }: RouteContext<"/api/workspaces/[workspaceId]/boards/[boardId]/cards/[cardId]/comments">,
 ) {
-  if ((await getCurrentUser()) === null) {
+  const user = await getCurrentUser();
+  if (user === null) {
     return reply(SIGNED_OUT, 401);
   }
 
   const { workspaceId, boardId, cardId } = await params;
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
+  const actor = await loadActorFor(user, workspaceId, "manageCards");
   const ref = parseCardRef(boardId, cardId);
   if (!actor || !ref) {
     return reply(CARD_GONE, 404);
