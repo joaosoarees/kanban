@@ -75,3 +75,27 @@ export async function getAssignableMembers(
         a.id.localeCompare(b.id),
     );
 }
+
+export type PendingInvite = {
+  id: string;
+  email: string;
+  role: Role;
+  sentAt: Date;
+  expiresAt: Date;
+};
+
+export async function getPendingInvites(
+  workspaceId: string,
+): Promise<PendingInvite[]> {
+  return db.invite.findMany({
+    where: { workspaceId },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      sentAt: true,
+      expiresAt: true,
+    },
+    orderBy: [{ sentAt: "desc" }, { id: "desc" }],
+  });
+}
