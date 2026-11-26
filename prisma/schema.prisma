@@ -158,15 +158,15 @@ model Card {
 }
 
 model Comment {
-  id        String    @id @default(uuid(7)) @db.Uuid
+  id        String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
   cardId    String    @db.Uuid
-  authorId  String    @db.Uuid
+  authorId  String?   @db.Uuid
   body      String
   createdAt DateTime  @default(now()) @db.Timestamptz(3)
   editedAt  DateTime? @db.Timestamptz(3)
 
-  card   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  card   Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([cardId, id])
   @@index([authorId])
