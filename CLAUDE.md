@@ -4,6 +4,12 @@
 
 Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão em [docs/PLAN.md](docs/PLAN.md): leia antes de começar uma fatia e marque a fatia como feita quando ela entrar na `main`.
 
+## Skills
+
+- **Use as skills pela ferramenta Skill** (`/nome-da-skill`), nunca só citando o nome nem lendo o `SKILL.md` com `cat`, `grep` ou `Read`.
+- Antes de planejar ou escrever código de um passo, liste as skills de `~/.claude/skills` que se aplicam e invoque cada uma.
+- Em cada decisão e em cada relatório, diga quais skills foram invocadas e o que cada uma decidiu ou confirmou. Uma skill só citada não conta.
+
 ## Commits
 
 - Commits pequenos, um assunto por commit. Dentro de uma fatia, commite a cada passo coerente (schema e migration, depois a action, depois a UI), nunca tudo no final.
