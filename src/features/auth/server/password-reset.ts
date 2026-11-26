@@ -110,6 +110,7 @@ export async function resetPassword(
         emailVerifiedAt: user.emailVerifiedAt ?? now,
         ...UNLOCKED_PASSWORD,
       },
+      select: { id: true },
     });
     await tx.emailCode.deleteMany({ where: resetOwner(grant.userId) });
     return now;

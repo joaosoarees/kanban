@@ -38,7 +38,11 @@ async function reserveAttempt(userId: string, now: Date): Promise<Reservation> {
       return { status: "locked", minutes: minutesUntilUnlock(guard, now) };
     }
     const next = afterPasswordFailure(guard, now);
-    await tx.user.update({ where: { id: userId }, data: next });
+    await tx.user.update({
+      where: { id: userId },
+      data: next,
+      select: { id: true },
+    });
     return {
       status: "reserved",
       passwordHash: guard.passwordHash,

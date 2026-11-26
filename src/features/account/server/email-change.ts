@@ -154,6 +154,7 @@ export async function confirmEmailChange(
       await tx.user.update({
         where: { id: account.id },
         data: { email: newEmail },
+        select: { id: true },
       });
       await tx.emailCode.deleteMany({
         where: {
@@ -202,6 +203,7 @@ export async function cancelEmailChange(
     await tx.emailCode.update({
       where: { userId_purpose: changeOwner(userId) },
       data: { expiresAt: new Date(expiresAt) },
+      select: { userId: true },
     });
   });
 }

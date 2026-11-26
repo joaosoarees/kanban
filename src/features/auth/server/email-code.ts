@@ -49,6 +49,7 @@ export async function issueCode(
     where: { userId_purpose: owner },
     create: { ...owner, ...fields },
     update: fields,
+    select: { userId: true },
   });
   return code;
 }
@@ -96,11 +97,12 @@ export async function consumeCode(
     hashCode(owner, code),
   );
   if (matches) {
-    await tx.emailCode.delete({ where });
+    await tx.emailCode.delete({ where, select: { userId: true } });
   } else {
     await tx.emailCode.update({
       where,
       data: { attempts: stored.attempts + 1 },
+      select: { userId: true },
     });
   }
   return matches ? { newEmail: stored.newEmail } : null;

@@ -41,7 +41,11 @@ export async function renameAction(
   }
 
   const { name } = parsed.data;
-  await db.user.update({ where: { id: user.id }, data: { name } });
+  await db.user.update({
+    where: { id: user.id },
+    data: { name },
+    select: { id: true },
+  });
   revalidatePath("/", "layout");
   return { status: "success", data: { name } };
 }
