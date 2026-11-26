@@ -31,3 +31,24 @@ export function afterPasswordFailure(
   }
   return { failedPasswordAttempts: failures, passwordLockedUntil: null };
 }
+
+export const UNLOCKED_PASSWORD: PasswordGuard = {
+  failedPasswordAttempts: 0,
+  passwordLockedUntil: null,
+};
+
+function sameLock(a: Date | null, b: Date | null): boolean {
+  return a?.getTime() === b?.getTime();
+}
+
+export function afterPasswordMatch(
+  current: PasswordGuard,
+  reserved: PasswordGuard,
+): PasswordGuard {
+  return sameLock(current.passwordLockedUntil, reserved.passwordLockedUntil)
+    ? UNLOCKED_PASSWORD
+    : {
+        failedPasswordAttempts: current.failedPasswordAttempts,
+        passwordLockedUntil: current.passwordLockedUntil,
+      };
+}
