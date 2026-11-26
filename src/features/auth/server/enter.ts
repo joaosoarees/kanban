@@ -12,12 +12,12 @@ export async function enter(userId: string): Promise<never> {
     return redirect(AFTER_SIGN_IN);
   }
 
-  await forgetInvite();
   const user = await db.user.findUniqueOrThrow({
     where: { id: userId },
     select: { id: true, email: true },
   });
   const outcome = await acceptInvite(user, invite, new Date());
+  await forgetInvite();
   if (outcome.status === "accepted") {
     return redirect(`/w/${outcome.slug}`);
   }
