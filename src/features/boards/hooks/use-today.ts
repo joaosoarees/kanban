@@ -22,8 +22,8 @@ function startClock() {
   let timer = 0;
   const armMidnight = () => {
     timer = window.setTimeout(() => {
-      notifyListeners();
       armMidnight();
+      notifyListeners();
     }, msUntilTomorrow(new Date()));
   };
 
