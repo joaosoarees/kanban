@@ -15,7 +15,7 @@ const emailField = z
       .max(254, "E-mail longo demais."),
   );
 
-const newPasswordField = z
+export const newPasswordField = z
   .string()
   .min(8, "Use pelo menos 8 caracteres.")
   .refine((password) => byteLength(password) <= PASSWORD_MAX_BYTES, {
