@@ -191,6 +191,24 @@ Invite (id, workspaceId, email, role: MEMBER | ADMIN, invitedById, tokenHash, se
 InviteSend (id, invitedById, sentAt)   @@index([invitedById, sentAt])
 ```
 
+Implementação em três PRs para a `release/slices-15-18`, depois do backend:
+
+1. Página do convite e aviso nas telas de entrada.
+   - A casca das telas de entrada vira um componente, usado por `(auth)` e por `/invite/[token]` (`nextjs-layouts-and-templates`, `nextjs-component-composition`).
+   - `/invite/[token]` mostra os quatro estados, com o carregamento dentro de `Suspense` (`nextjs-app-router-routing`, `nextjs-server-data-fetching`, `nextjs-loading-and-streaming`, `nextjs-metadata`).
+   - Aceitar e trocar de conta chamam as actions do backend (`nextjs-server-actions-in-client-components`, `nextjs-server-action-results`, `nextjs-redirects`).
+   - O aviso lê o cookie `pending_invite`; o cadastro recebe o e-mail travado; "Seguir sem o convite" apaga o cookie (`nextjs-auth-cookies`, `nextjs-jwt-session`, `react-hook-form-default-values`, `react-hook-form-zod`, `nextjs-server-actions`).
+   - O e-mail do convite ganha o endereço em texto abaixo do botão, também na versão em texto puro (`mime-email-messages`).
+2. Convidar e convites pendentes.
+   - `InviteForm` substitui `AddMemberForm` (`nextjs-server-action-forms`, `react-hook-form-zod`).
+   - `PendingInvites` reenvia e revoga, revogar de forma otimista (`react-query-optimistic-updates` como padrão, `react-concurrent-rendering`), só para OWNER e ADMIN (`tenant-role-authorization`, `role-based-access-control`).
+   - O prazo da linha ("vence em N dias", "vence hoje", "venceu em 20/11") é uma função pura com teste (`designing-testable-code`, `writing-unit-tests`).
+   - Sai o adicionar antigo: `addMemberAction`, a permissão `addMember` e o seu rate limit (`auditing-code-against-skills` para conferir que nada ficou usando).
+3. Proteção e documentação.
+   - Rate limit do Traefik para o `POST` de `/invite/*` no `compose.prod.yaml`.
+   - Conferir, só leitura, se a conta SES saiu do sandbox, senão o convite só chega a endereços verificados (`ses-sandbox-and-production-access`).
+   - Decisões no `DESIGN.md` e a fatia marcada aqui (`craft`).
+
 ### Perfil da conta (fatia 16)
 
 - Página `/account`, fora de qualquer workspace, aberta pelo item "Conta" do menu do usuário, com três blocos: nome, senha e e-mail. Excluir a conta fica de fora: esbarra em ser o único OWNER e pede uma fatia própria.
