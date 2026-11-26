@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTransition, type ReactNode } from "react";
 import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
@@ -16,6 +15,7 @@ const INVITE_FAILED = "Não foi possível continuar. Tente de novo.";
 
 type InviteButtonProps = {
   token: string;
+  onGone: () => void;
   intent: "accept" | "sign-in" | "sign-up";
   variant?: "default" | "outline";
   pendingLabel: string;
@@ -24,12 +24,12 @@ type InviteButtonProps = {
 
 export function InviteButton({
   token,
+  onGone,
   intent,
   variant = "default",
   pendingLabel,
   children,
 }: InviteButtonProps) {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const run = () => {
@@ -45,7 +45,7 @@ export function InviteButton({
         return;
       }
       if (result.gone === true) {
-        router.refresh();
+        onGone();
         return;
       }
       toast.error(result.message);
