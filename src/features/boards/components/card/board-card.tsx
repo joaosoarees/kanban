@@ -1,5 +1,3 @@
-"use client";
-
 import { AlignLeft, MessageSquare } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
