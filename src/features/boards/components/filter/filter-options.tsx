@@ -2,6 +2,7 @@
 
 import { Check, Search, UsersRound } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
+import { CheckBox } from "@/components/check-box";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
 import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
 import { comparable } from "@/features/boards/components/label/label-list";
@@ -155,17 +156,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                         }}
                         className="sr-only"
                       />
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "flex size-4 shrink-0 items-center justify-center rounded border border-border-control bg-card text-on-color",
-                          isChecked && "border-brand bg-brand",
-                        )}
-                      >
-                        {isChecked && (
-                          <Check className="size-3" strokeWidth={3} />
-                        )}
-                      </span>
+                      <CheckBox checked={isChecked} />
                       <LabelTag name={label.name} color={label.color} />
                     </label>
                   );
