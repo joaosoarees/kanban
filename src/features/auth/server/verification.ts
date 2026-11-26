@@ -113,6 +113,7 @@ export async function registerAccount(
         passwordChangedAt: now,
         ...UNLOCKED_PASSWORD,
       },
+      select: { id: true },
     });
     const resent = await resendCode(tx, verifyOwner(existing.id), now);
     return {
@@ -194,6 +195,7 @@ export async function verifyEmail(
     await tx.user.update({
       where: { id: pending.userId },
       data: { emailVerifiedAt: now },
+      select: { id: true },
     });
     return { status: "verified", passwordChangedAt: account.passwordChangedAt };
   });
