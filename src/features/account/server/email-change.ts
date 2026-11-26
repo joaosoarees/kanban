@@ -165,6 +165,7 @@ export async function confirmEmailChange(
     if (!isUniqueViolation(error)) {
       throw error;
     }
+    await cancelEmailChange(account.id, now);
     return { status: "taken" };
   }
 
