@@ -23,20 +23,27 @@ const GUARD_SELECT = {
   passwordLockedUntil: true,
 } as const;
 
-async function countFailure(userId: string, now: Date): Promise<void> {
-  await db.$transaction(async (tx) => {
+type Reservation =
+  | { status: "locked"; minutes: number }
+  | { status: "reserved"; passwordHash: string; lockedUntil: Date | null };
+
+async function reserveAttempt(userId: string, now: Date): Promise<Reservation> {
+  return db.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId}::uuid FOR NO KEY UPDATE`;
     const guard = await tx.user.findUniqueOrThrow({
       where: { id: userId },
       select: GUARD_SELECT,
     });
     if (isPasswordLocked(guard, now)) {
-      return;
+      return { status: "locked", minutes: minutesUntilUnlock(guard, now) };
     }
-    await tx.user.update({
-      where: { id: userId },
-      data: afterPasswordFailure(guard, now),
-    });
+    const next = afterPasswordFailure(guard, now);
+    await tx.user.update({ where: { id: userId }, data: next });
+    return {
+      status: "reserved",
+      passwordHash: guard.passwordHash,
+      lockedUntil: next.passwordLockedUntil,
+    };
   });
 }
 
@@ -45,25 +52,23 @@ export async function checkAccountPassword(
   password: string,
   now: Date,
 ): Promise<PasswordCheck> {
-  const guard = await db.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: GUARD_SELECT,
-  });
-  if (isPasswordLocked(guard, now)) {
+  const reservation = await reserveAttempt(userId, now);
+  if (reservation.status === "locked") {
     await verifyPassword(password);
-    return { status: "locked", minutes: minutesUntilUnlock(guard, now) };
+    return reservation;
   }
 
-  if (!(await verifyPassword(password, guard.passwordHash))) {
-    await countFailure(userId, now);
+  if (!(await verifyPassword(password, reservation.passwordHash))) {
     return { status: "wrong" };
   }
 
-  if (guard.failedPasswordAttempts > 0 || guard.passwordLockedUntil !== null) {
-    await db.user.updateMany({
-      where: { id: userId, passwordHash: guard.passwordHash },
-      data: UNLOCKED_PASSWORD,
-    });
-  }
-  return { status: "match", passwordHash: guard.passwordHash };
+  await db.user.updateMany({
+    where: {
+      id: userId,
+      passwordHash: reservation.passwordHash,
+      passwordLockedUntil: reservation.lockedUntil,
+    },
+    data: UNLOCKED_PASSWORD,
+  });
+  return { status: "match", passwordHash: reservation.passwordHash };
 }
