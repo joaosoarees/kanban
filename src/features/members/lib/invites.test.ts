@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { inviteDueLabel } from "@/features/members/lib/invites";
+import {
+  inviteDueLabel,
+  isInviteExpired,
+  secondsUntilInviteResend,
+  sendWindowStart,
+} from "@/features/members/lib/invites";
 
 const now = new Date("2026-11-26T15:00:00.000Z");
 
@@ -31,4 +36,39 @@ describe("inviteDueLabel", () => {
   it("should treat the exact end as expired", () => {
     expect(inviteDueLabel(now, now)).toBe("Venceu em 26/11");
   });
+});
+
+describe("isInviteExpired", () => {
+  it("should keep an invite valid until its last millisecond", () => {
+    const expiresAt = new Date(now.getTime() + 1);
+
+    expect(isInviteExpired(expiresAt, now)).toBe(false);
+  });
+
+  it("should expire an invite at the exact end", () => {
+    expect(isInviteExpired(now, now)).toBe(true);
+  });
+});
+
+describe("sendWindowStart", () => {
+  it("should start the daily send window 24 hours before now", () => {
+    expect(sendWindowStart(now)).toEqual(new Date("2026-11-25T15:00:00.000Z"));
+  });
+});
+
+describe("secondsUntilInviteResend", () => {
+  it.each([
+    { sentMsAgo: 0, expected: 60 },
+    { sentMsAgo: 1, expected: 60 },
+    { sentMsAgo: 59_001, expected: 1 },
+    { sentMsAgo: 60_000, expected: 0 },
+    { sentMsAgo: 3_600_000, expected: 0 },
+  ])(
+    "should wait $expected seconds when sent $sentMsAgo ms ago",
+    ({ sentMsAgo, expected }) => {
+      const sentAt = new Date(now.getTime() - sentMsAgo);
+
+      expect(secondsUntilInviteResend(sentAt, now)).toBe(expected);
+    },
+  );
 });
