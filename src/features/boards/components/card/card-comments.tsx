@@ -80,11 +80,11 @@ export function CardComments({
   return (
     <section
       aria-labelledby={`${cardId}-comments`}
-      className="flex flex-col gap-3"
+      className="flex shrink-0 flex-col gap-3"
     >
       <h3
         id={`${cardId}-comments`}
-        className="flex items-center gap-1.5 text-sm font-medium"
+        className="flex items-baseline gap-1.5 text-sm font-medium"
       >
         Comentários
         {comments.status === "ready" && count > 0 && (
