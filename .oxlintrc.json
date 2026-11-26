@@ -101,7 +101,10 @@
         "typescript/strict-boolean-expressions": "off",
         "typescript/promise-function-async": "off",
         "typescript/no-unnecessary-condition": "off",
-        "typescript/no-unsafe-type-assertion": "off"
+        "typescript/no-unsafe-type-assertion": "off",
+        "eslint/no-shadow": "off",
+        "eslint/curly": "off",
+        "react/no-unstable-nested-components": "off"
       }
     }
   ]
