@@ -7,6 +7,8 @@ export const INVITE_SEND_WINDOW_MS = DAY_MS;
 export const MAX_PENDING_INVITES = 50;
 export const MAX_DAILY_INVITE_SENDS = 20;
 
+export const INVITE_GONE_PARAM = { name: "invite", value: "gone" } as const;
+
 export const INVITE_GONE_MESSAGE =
   "Este convite não vale mais. Peça um novo a quem convidou.";
 
