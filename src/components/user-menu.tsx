@@ -9,7 +9,10 @@ import {
   Monitor,
   Moon,
   Sun,
+  UserRound,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTransition } from "react";
 import {
@@ -74,6 +77,7 @@ export function UserMenu({
 }: UserMenuProps) {
   const [isPending, startTransition] = useTransition();
   const { theme = "system", resolvedTheme, setTheme } = useTheme();
+  const isOnAccount = usePathname() === "/account";
 
   return (
     <DropdownMenu>
@@ -121,6 +125,15 @@ export function UserMenu({
             {email}
           </span>
         </div>
+        <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
+        <Menu.LinkItem
+          render={<Link href="/account" />}
+          aria-current={isOnAccount ? "page" : undefined}
+          className={cn(ITEM_CLASS, isOnAccount && "bg-muted")}
+        >
+          <UserRound aria-hidden className="size-4 text-fg-muted" />
+          Conta
+        </Menu.LinkItem>
         <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
         <DropdownMenuGroup>
           <DropdownMenuLabel className="px-2 pt-1.5 pb-1 text-[13px]/5 text-fg-muted">
