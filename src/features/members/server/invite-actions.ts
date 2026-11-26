@@ -50,7 +50,9 @@ export async function acceptInviteAction(
   }
 
   const outcome = await acceptInvite(user, parsed.data, new Date());
-  await forgetInvite();
+  if (outcome.status !== "other-email") {
+    await forgetInvite();
+  }
   if (outcome.status === "gone") {
     return INVITE_GONE;
   }
