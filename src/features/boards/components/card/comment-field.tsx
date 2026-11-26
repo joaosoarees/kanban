@@ -6,6 +6,10 @@ import { COMMENT_MAX_LENGTH } from "@/features/boards/lib/comment-schemas";
 import { codePointLength } from "@/lib/text";
 import { cn } from "@/lib/utils";
 
+export type CommentFormState = { isDirty: boolean; isPending: boolean };
+
+export const IDLE_FORM: CommentFormState = { isDirty: false, isPending: false };
+
 const COUNTER_FROM = 4500;
 const numberFormat = new Intl.NumberFormat("pt-BR");
 

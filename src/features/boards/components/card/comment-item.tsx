@@ -20,7 +20,11 @@ import type { ActionResult } from "@/lib/action-result";
 import { initialsOf } from "@/lib/initials";
 import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
-import { CommentField } from "./comment-field";
+import {
+  CommentField,
+  IDLE_FORM,
+  type CommentFormState,
+} from "./comment-field";
 
 type CommentRef = { workspaceId: string; boardId: string; cardId: string };
 
@@ -28,7 +32,8 @@ type CommentItemProps = CommentRef & {
   comment: CardComment;
   onSaved: (comment: CardComment) => void;
   onRemoved: (commentId: string) => void;
-  onEditingChange: (commentId: string, isEditing: boolean) => void;
+  onDeleted: (commentId: string) => void;
+  onEditStateChange: (commentId: string, state: CommentFormState) => void;
 };
 
 const DONE: ActionResult = { status: "success", data: undefined };
@@ -44,11 +49,13 @@ function CommentEditor({
   onSaved,
   onGone,
   onCancel,
+  onStateChange,
 }: CommentRef & {
   comment: CardComment;
   onSaved: (comment: CardComment) => void;
   onGone: () => void;
   onCancel: () => void;
+  onStateChange: (state: CommentFormState) => void;
 }) {
   const { form, submit, isPending } = useActionForm({
     schema: commentSchema,
@@ -65,7 +72,20 @@ function CommentEditor({
     },
   });
   const body = useWatch({ control: form.control, name: "body" });
-  const { errors } = form.formState;
+  const { errors, isDirty } = form.formState;
+  const reportState = useEffectEvent(onStateChange);
+
+  useEffect(() => {
+    reportState({ isDirty, isPending });
+  }, [isDirty, isPending]);
+
+  useEffect(
+    () => () => {
+      reportState(IDLE_FORM);
+    },
+    [],
+  );
+
   const field = form.register("body", {
     onChange: () => {
       form.clearErrors("root");
@@ -119,26 +139,14 @@ export function CommentItem({
   comment,
   onSaved,
   onRemoved,
-  onEditingChange,
+  onDeleted,
+  onEditStateChange,
   ...ref
 }: CommentItemProps) {
   const today = useToday();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const editButtonRef = useRef<HTMLButtonElement>(null);
-  const reportEditing = useEffectEvent(onEditingChange);
-
-  useEffect(() => {
-    reportEditing(comment.id, isEditing);
-  }, [comment.id, isEditing]);
-
-  useEffect(
-    () => () => {
-      reportEditing(comment.id, false);
-    },
-    [comment.id],
-  );
-
   const stopEditing = () => {
     setIsEditing(false);
     requestAnimationFrame(() => editButtonRef.current?.focus());
@@ -210,6 +218,9 @@ export function CommentItem({
               onRemoved(comment.id);
             }}
             onCancel={stopEditing}
+            onStateChange={(state) => {
+              onEditStateChange(comment.id, state);
+            }}
           />
         ) : (
           <p className="mt-0.5 text-sm/[22px] wrap-anywhere whitespace-pre-wrap [grid-area:body]">
@@ -237,7 +248,7 @@ export function CommentItem({
           );
           setIsDeleting(false);
           if (result.status === "success" || result.gone === true) {
-            onRemoved(comment.id);
+            onDeleted(comment.id);
             return DONE;
           }
           toast.error("Não foi possível excluir o comentário.", {
