@@ -8,6 +8,7 @@ services:
       DATABASE_URL: postgresql://kanban:kanban@postgres:5432/kanban?schema=public
       SMTP_URL: smtp://mailpit:1025
       MAIL_FROM: Kanbanary <nao-responda@kanbanary.local>
+      APP_URL: http://localhost:3000
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
