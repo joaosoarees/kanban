@@ -10,7 +10,7 @@ import { useActionForm } from "@/hooks/use-action-form";
 
 const SIGN_IN_FAILED = "Não foi possível entrar. Tente de novo.";
 
-export function SignInForm() {
+export function SignInForm({ invitedEmail }: { invitedEmail?: string }) {
   const {
     form: {
       control,
@@ -21,7 +21,7 @@ export function SignInForm() {
     isPending,
   } = useActionForm({
     schema: signInSchema,
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: invitedEmail ?? "", password: "" },
     action: signInAction,
     failure: SIGN_IN_FAILED,
   });
