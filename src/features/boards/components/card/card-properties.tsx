@@ -1,4 +1,5 @@
 import { AssigneePicker } from "@/features/boards/components/card/assignee-picker";
+import { CompletionToggle } from "@/features/boards/components/card/completion-toggle";
 import { LabelPicker } from "@/features/boards/components/label/label-picker";
 import type {
   BoardCard,
@@ -34,6 +35,15 @@ export function CardProperties({
         card={card}
         onUpdateCard={onUpdateCard}
       />
+      <span aria-hidden className="max-sm:hidden" />
+      <div className="mt-2 sm:mt-0">
+        <CompletionToggle
+          workspaceId={workspaceId}
+          boardId={boardId}
+          card={card}
+          onUpdateCard={onUpdateCard}
+        />
+      </div>
       <span className={cn(PROPERTY_LABEL, "mt-1.5 sm:mt-0")}>Etiquetas</span>
       <LabelPicker
         workspaceId={workspaceId}
