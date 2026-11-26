@@ -1,6 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
+import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
@@ -13,9 +14,11 @@ import {
 import { verifyCodeSchema } from "@/features/auth/lib/email-code";
 import { useActionForm } from "@/hooks/use-action-form";
 import type { ActionResult } from "@/lib/action-result";
+import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
 
 const CONFIRM_FAILED = "Não foi possível confirmar. Tente de novo.";
+const SWITCH_FAILED = "Não foi possível voltar ao e-mail. Tente de novo.";
 
 type CodeFormProps = {
   action: (values: { code: string }) => Promise<ActionResult>;
@@ -26,6 +29,7 @@ type CodeFormProps = {
   onExpired: (message?: string) => void;
   onSuccess?: () => void;
   layout?: "page" | "card";
+  focusOnMount?: boolean;
 };
 
 export function CodeForm({
@@ -37,11 +41,13 @@ export function CodeForm({
   onExpired,
   onSuccess,
   layout = "page",
+  focusOnMount = false,
 }: CodeFormProps) {
   const [isSwitching, startSwitch] = useTransition();
   const {
     form: {
       register,
+      setFocus,
       formState: { errors },
     },
     submit,
@@ -59,9 +65,29 @@ export function CodeForm({
     },
   });
 
+  useEffect(() => {
+    if (focusOnMount) {
+      setFocus("code");
+    }
+  }, [focusOnMount, setFocus]);
+
   const expire = () => {
     onExpired();
   };
+
+  const switchEmail = () => {
+    startSwitch(async () => {
+      const result = await runAction(async () => {
+        await switchAction();
+        return { status: "success", data: undefined };
+      }, SWITCH_FAILED);
+      if (result.status === "error") {
+        toast.error(result.message);
+      }
+    });
+  };
+
+  const isBusy = isPending || isSwitching;
 
   const codeField = (
     <TextField
@@ -88,7 +114,7 @@ export function CodeForm({
         className="flex flex-col gap-4"
       >
         <fieldset
-          disabled={isPending}
+          disabled={isBusy}
           className="m-0 flex min-w-0 flex-col border-0 p-0"
         >
           {codeField}
@@ -98,17 +124,14 @@ export function CodeForm({
             <ResendButton
               action={resendAction}
               initialWait={initialWait}
-              onExpired={expire}
+              onExpired={onExpired}
+              disabled={isBusy}
             />
             <Button
               type="button"
               variant="ghost"
-              disabled={isSwitching}
-              onClick={() => {
-                startSwitch(async () => {
-                  await switchAction();
-                });
-              }}
+              disabled={isBusy}
+              onClick={switchEmail}
               className="h-10 px-3 hover:bg-muted"
             >
               Usar outro e-mail
@@ -118,6 +141,7 @@ export function CodeForm({
             type="submit"
             isPending={isPending}
             pendingLabel="Confirmando…"
+            disabled={isSwitching}
             className={cn("h-10 w-full sm:w-35", primaryButton)}
           >
             {submitLabel}
