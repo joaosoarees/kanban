@@ -26,7 +26,6 @@ type UseCardDescriptionOptions = {
   workspaceId: string;
   boardId: string;
   cardId: string;
-  onDirtyChange: (isDirty: boolean) => void;
   onLoadFailed: (message: string, isGone: boolean) => void;
 };
 
@@ -34,7 +33,6 @@ export function useCardDescription({
   workspaceId,
   boardId,
   cardId,
-  onDirtyChange,
   onLoadFailed,
 }: UseCardDescriptionOptions) {
   const [saved, setSaved] = useState<string | null>();
@@ -72,7 +70,6 @@ export function useCardDescription({
   const isDirty = isEditing && value !== (saved ?? "");
 
   const reportLoadFailure = useEffectEvent(onLoadFailed);
-  const reportDirty = useEffectEvent(onDirtyChange);
 
   useEffect(() => {
     let isCurrent = true;
@@ -105,10 +102,6 @@ export function useCardDescription({
       isCurrent = false;
     };
   }, [isLoading, workspaceId, boardId, cardId]);
-
-  useEffect(() => {
-    reportDirty(isDirty);
-  }, [isDirty]);
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {

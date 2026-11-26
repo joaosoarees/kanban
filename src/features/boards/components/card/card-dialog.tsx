@@ -2,16 +2,18 @@
 
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { CardComments } from "@/features/boards/components/card/card-comments";
 import {
   CardDescription,
   CardDescriptionActions,
@@ -68,11 +70,11 @@ export function CardDialog({
   const router = useRouter();
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [hasCommentDraft, setHasCommentDraft] = useState(false);
   const description = useCardDescription({
     workspaceId,
     boardId,
     cardId: card.id,
-    onDirtyChange,
     onLoadFailed: (message, isGone) => {
       toast.error(message);
       onClose();
@@ -82,6 +84,13 @@ export function CardDialog({
     },
   });
 
+  const isDirty = description.isDirty || hasCommentDraft;
+  const reportDirty = useEffectEvent(onDirtyChange);
+
+  useEffect(() => {
+    reportDirty(isDirty);
+  }, [isDirty]);
+
   return (
     <Dialog
       open
@@ -89,7 +98,7 @@ export function CardDialog({
         if (open || description.isSaving) {
           return;
         }
-        if (description.isDirty) {
+        if (isDirty) {
           setIsDiscarding(true);
           return;
         }
@@ -138,6 +147,16 @@ export function CardDialog({
 
         <CardDescription cardId={card.id} state={description} />
 
+        <CardComments
+          workspaceId={workspaceId}
+          boardId={boardId}
+          cardId={card.id}
+          count={card.commentCount}
+          onDirtyChange={setHasCommentDraft}
+        />
+
+        <Separator />
+
         <div className="flex items-center justify-between gap-2">
           <Button
             variant="outline"
@@ -175,7 +194,11 @@ export function CardDialog({
             }
           }}
           title="Descartar as alterações?"
-          description="A descrição editada ainda não foi salva e será perdida."
+          description={
+            description.isDirty
+              ? "A descrição editada ainda não foi salva e será perdida."
+              : "O comentário escrito ainda não foi enviado e será perdido."
+          }
           confirmLabel="Descartar"
           pendingLabel="Descartando…"
           cancelLabel="Continuar editando"
