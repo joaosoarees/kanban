@@ -71,6 +71,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
         ? filter.labelIds.filter((id) => id !== labelId)
         : [...filter.labelIds, labelId],
       assignee: filter.assignee,
+      due: filter.due,
     });
   };
 
@@ -91,6 +92,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                     labelIds: filter.labelIds,
                     assignee:
                       person.value === ANY_ASSIGNEE ? null : person.value,
+                    due: filter.due,
                   });
                 }}
                 className="sr-only"
