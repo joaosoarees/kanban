@@ -3,6 +3,7 @@ import { inviteMail } from "@/features/members/emails/invite";
 import { newInviteToken } from "@/features/members/server/invite-token";
 import {
   inviteExpiresAt,
+  isInviteExpired,
   MAX_DAILY_INVITE_SENDS,
   MAX_PENDING_INVITES,
   secondsUntilInviteResend,
@@ -91,6 +92,22 @@ async function claimDailySend(
   return { inviterName: inviter.name };
 }
 
+async function pendingCapReached(
+  tx: Prisma.TransactionClient,
+  workspaceId: string,
+  now: Date,
+): Promise<ActionError | null> {
+  const pending = await tx.invite.count({
+    where: { workspaceId, expiresAt: { gt: now } },
+  });
+  if (pending < MAX_PENDING_INVITES) {
+    return null;
+  }
+  return fieldError(
+    `O workspace já tem ${MAX_PENDING_INVITES} convites pendentes. Revogue algum antes de convidar mais.`,
+  );
+}
+
 async function workspaceName(
   tx: Prisma.TransactionClient,
   workspaceId: string,
@@ -125,21 +142,18 @@ export async function inviteMember(
 
     const current = await tx.invite.findUnique({
       where: { workspaceId_email: { workspaceId: actor.workspaceId, email } },
-      select: { id: true, sentAt: true },
+      select: { sentAt: true, expiresAt: true },
     });
     if (current) {
       const waitSeconds = secondsUntilInviteResend(current.sentAt, now);
       if (waitSeconds > 0) {
         return waitError(waitSeconds);
       }
-    } else {
-      const pending = await tx.invite.count({
-        where: { workspaceId: actor.workspaceId, expiresAt: { gt: now } },
-      });
-      if (pending >= MAX_PENDING_INVITES) {
-        return fieldError(
-          `O workspace já tem ${MAX_PENDING_INVITES} convites pendentes. Revogue algum antes de convidar mais.`,
-        );
+    }
+    if (current === null || isInviteExpired(current.expiresAt, now)) {
+      const capped = await pendingCapReached(tx, actor.workspaceId, now);
+      if (capped) {
+        return capped;
       }
     }
 
@@ -189,7 +203,7 @@ export async function resendInvite(
 
     const invite = await tx.invite.findFirst({
       where: { id: inviteId, workspaceId: actor.workspaceId },
-      select: { email: true, sentAt: true },
+      select: { email: true, sentAt: true, expiresAt: true },
     });
     if (!invite) {
       return INVITE_CHANGED;
@@ -197,6 +211,12 @@ export async function resendInvite(
     const waitSeconds = secondsUntilInviteResend(invite.sentAt, now);
     if (waitSeconds > 0) {
       return waitError(waitSeconds);
+    }
+    if (isInviteExpired(invite.expiresAt, now)) {
+      const capped = await pendingCapReached(tx, actor.workspaceId, now);
+      if (capped) {
+        return capped;
+      }
     }
 
     const claimed = await claimDailySend(tx, actor.userId, now);
