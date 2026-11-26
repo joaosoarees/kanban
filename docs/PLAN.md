@@ -168,6 +168,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 ## Convites, conta, prazo e comentários (fatias 15 a 18)
 
 - As quatro fatias formam um pacote: os PRs entram na branch `release/slices-15-18`, com o `check` do CI verde e merge por rebase, e ela vai para a `main` de uma vez no fim, com um único deploy.
+- Depois que o último PR da fatia 18 entrar na release, e antes do merge na `main`, uma auditoria da release inteira contra as skills (`auditing-code-against-skills`): primeiro só leitura, e as correções escolhidas entram em PRs pequenos para a release.
 - As telas novas passam pelo `craft` antes de serem implementadas: `/invite/[token]`, os convites pendentes em membros, `/account`, o prazo e o "concluído" no card e no diálogo, e os comentários no diálogo.
 - Os únicos e-mails novos são o convite, o código de troca de e-mail e o aviso ao endereço antigo. Comentários e prazos não mandam e-mail.
 
