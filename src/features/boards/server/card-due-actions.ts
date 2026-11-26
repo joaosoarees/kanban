@@ -74,7 +74,7 @@ export async function setCardCompletionAction(
   const count = await db.$executeRaw`
     UPDATE cards AS card
     SET "completedAt" = CASE
-      WHEN ${completed} THEN COALESCE(card."completedAt", now())
+      WHEN ${completed}::boolean THEN COALESCE(card."completedAt", now())
       ELSE NULL
     END
     FROM columns AS board_column
