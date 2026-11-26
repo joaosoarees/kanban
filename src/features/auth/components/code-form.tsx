@@ -1,9 +1,12 @@
 "use client";
 
+import { useTransition } from "react";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
+import { Button } from "@/components/ui/button";
 import {
+  ResendButton,
   ResendCode,
   type ResendAction,
 } from "@/features/auth/components/resend-code";
@@ -20,7 +23,9 @@ type CodeFormProps = {
   switchAction: () => Promise<void>;
   submitLabel: string;
   initialWait: number;
-  onExpired: () => void;
+  onExpired: (message?: string) => void;
+  onSuccess?: () => void;
+  layout?: "page" | "card";
 };
 
 export function CodeForm({
@@ -30,7 +35,10 @@ export function CodeForm({
   submitLabel,
   initialWait,
   onExpired,
+  onSuccess,
+  layout = "page",
 }: CodeFormProps) {
+  const [isSwitching, startSwitch] = useTransition();
   const {
     form: {
       register,
@@ -43,12 +51,81 @@ export function CodeForm({
     defaultValues: { code: "" },
     action,
     failure: CONFIRM_FAILED,
+    onSuccess,
     onError: (error) => {
       if (error.gone === true) {
-        onExpired();
+        onExpired(error.message);
       }
     },
   });
+
+  const expire = () => {
+    onExpired();
+  };
+
+  const codeField = (
+    <TextField
+      id="code"
+      required
+      label="Código"
+      inputMode="numeric"
+      autoComplete="one-time-code"
+      autoCapitalize="none"
+      spellCheck={false}
+      inputClassName="text-[15px] tracking-[0.12em] tabular-nums md:text-[15px]"
+      hint="Confira também a caixa de spam."
+      error={errors.code?.message ?? errors.root?.message}
+      {...register("code")}
+    />
+  );
+
+  if (layout === "card") {
+    return (
+      <form
+        onSubmit={submit}
+        noValidate
+        aria-busy={isPending}
+        className="flex flex-col gap-4"
+      >
+        <fieldset
+          disabled={isPending}
+          className="m-0 flex min-w-0 flex-col border-0 p-0"
+        >
+          {codeField}
+        </fieldset>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <ResendButton
+              action={resendAction}
+              initialWait={initialWait}
+              onExpired={expire}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={isSwitching}
+              onClick={() => {
+                startSwitch(async () => {
+                  await switchAction();
+                });
+              }}
+              className="h-10 px-3 hover:bg-muted"
+            >
+              Usar outro e-mail
+            </Button>
+          </div>
+          <PendingButton
+            type="submit"
+            isPending={isPending}
+            pendingLabel="Confirmando…"
+            className={cn("h-10 w-full sm:w-35", primaryButton)}
+          >
+            {submitLabel}
+          </PendingButton>
+        </div>
+      </form>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -62,19 +139,7 @@ export function CodeForm({
           disabled={isPending}
           className="m-0 flex min-w-0 flex-col gap-4 border-0 p-0"
         >
-          <TextField
-            id="code"
-            required
-            label="Código"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            autoCapitalize="none"
-            spellCheck={false}
-            inputClassName="text-[15px] tracking-[0.12em] tabular-nums md:text-[15px]"
-            hint="Confira também a caixa de spam."
-            error={errors.code?.message ?? errors.root?.message}
-            {...register("code")}
-          />
+          {codeField}
         </fieldset>
         <PendingButton
           type="submit"
@@ -88,7 +153,7 @@ export function CodeForm({
       <ResendCode
         action={resendAction}
         initialWait={initialWait}
-        onExpired={onExpired}
+        onExpired={expire}
       />
       <form
         action={switchAction}
