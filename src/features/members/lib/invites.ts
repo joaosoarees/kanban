@@ -4,6 +4,7 @@ const DAY_MS = 24 * 60 * MINUTE_MS;
 export const INVITE_LIFETIME_MS = 7 * DAY_MS;
 export const INVITE_RESEND_INTERVAL_MS = MINUTE_MS;
 export const INVITE_SEND_WINDOW_MS = DAY_MS;
+export const EXPIRED_INVITE_RETENTION_MS = 30 * DAY_MS;
 export const MAX_PENDING_INVITES = 50;
 export const MAX_DAILY_INVITE_SENDS = 20;
 
@@ -18,6 +19,10 @@ export function inviteExpiresAt(sentAt: Date): Date {
 
 export function isInviteExpired(expiresAt: Date, now: Date): boolean {
   return now.getTime() >= expiresAt.getTime();
+}
+
+export function expiredInviteCutoff(now: Date): Date {
+  return new Date(now.getTime() - EXPIRED_INVITE_RETENTION_MS);
 }
 
 export function sendWindowStart(now: Date): Date {
