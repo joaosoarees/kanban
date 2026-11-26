@@ -28,6 +28,7 @@ model User {
 enum EmailCodePurpose {
   VERIFY_EMAIL
   RESET_PASSWORD
+  CHANGE_EMAIL
 }
 
 model EmailCode {
@@ -37,6 +38,7 @@ model EmailCode {
   sentAt    DateTime         @db.Timestamptz(3)
   expiresAt DateTime         @db.Timestamptz(3)
   attempts  Int              @default(0)
+  newEmail  String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
