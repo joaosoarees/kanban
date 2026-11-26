@@ -9,7 +9,8 @@ export type WorkspaceAction =
   | "leaveWorkspace"
   | "manageBoards"
   | "manageColumns"
-  | "manageCards";
+  | "manageCards"
+  | "deleteAnyComment";
 
 export type MemberTarget = { role: Role; isSelf: boolean };
 
@@ -37,6 +38,7 @@ const RULES: Record<WorkspaceAction, Rule> = {
   manageBoards: canManage,
   manageColumns: () => true,
   manageCards: () => true,
+  deleteAnyComment: canManage,
 };
 
 export function can(

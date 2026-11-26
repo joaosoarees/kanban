@@ -24,6 +24,12 @@ describe("can", () => {
     expect(can("MEMBER", "manageCards")).toBe(true);
   });
 
+  it("lets owners and admins delete comments from others, but not members", () => {
+    expect(can("OWNER", "deleteAnyComment")).toBe(true);
+    expect(can("ADMIN", "deleteAnyComment")).toBe(true);
+    expect(can("MEMBER", "deleteAnyComment")).toBe(false);
+  });
+
   it("lets owners and admins invite members and rename, but not members", () => {
     expect(can("OWNER", "inviteMember")).toBe(true);
     expect(can("ADMIN", "inviteMember")).toBe(true);
