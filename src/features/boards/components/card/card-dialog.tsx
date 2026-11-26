@@ -203,9 +203,11 @@ export function CardDialog({
           description={
             description.isDirty
               ? "A descrição editada ainda não foi salva e será perdida."
-              : commentsState.unsaved === "edit"
-                ? "A edição do comentário ainda não foi salva e será perdida."
-                : "O comentário escrito ainda não foi enviado e será perdido."
+              : commentsState.unsaved === "both"
+                ? "Há comentários escritos ou editados que ainda não foram salvos e serão perdidos."
+                : commentsState.unsaved === "edit"
+                  ? "A edição do comentário ainda não foi salva e será perdida."
+                  : "O comentário escrito ainda não foi enviado e será perdido."
           }
           confirmLabel="Descartar"
           pendingLabel="Descartando…"
