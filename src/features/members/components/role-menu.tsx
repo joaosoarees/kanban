@@ -21,7 +21,7 @@ export function isAssignableRole(role: unknown): role is AssignableRole {
 const ROLE_OPTIONS: { role: AssignableRole; description: string }[] = [
   {
     role: "ADMIN",
-    description: "Adiciona e remove membros e renomeia o workspace.",
+    description: "Convida e remove membros e renomeia o workspace.",
   },
   { role: "MEMBER", description: "Usa os quadros do workspace." },
 ];
