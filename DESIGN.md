@@ -129,6 +129,10 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-26 — Aviso do convite: faixa na cor de destaque acima do título de entrar, criar conta e confirmar o e-mail, com "Seguir sem o convite" — lembra por que a pessoa está ali e dá uma saída. No cadastro, o e-mail vem travado, em cinza com cadeado.
 - 2026-11-26 — O e-mail do convite tem um botão "Ver convite" e o endereço em texto embaixo, exceção à regra dos e-mails sem links — o convite precisa abrir em outro navegador ou aparelho, e não traz código.
 - 2026-11-26 — "Convites pendentes" fica entre "Convidar" e a lista de membros, que ganha o título "Membros"; some quando vazio; revogar não pede confirmação — convidar de novo desfaz o engano. A linha começa pelo prazo ("Vence em 6 dias · enviado por…"), que é o que importa quando o texto é cortado.
+- 2026-11-26 — Página `/account` desenhada no canvas da fatia 16 (https://claude.ai/artifact/3ZwoX5NK5dGgN6JXViQttf, pranchas 16.1 a 16.5), aprovada — três cartões (Nome, Senha, E-mail) numa coluna de 672px, com o cabeçalho do início; entra pelo item "Conta" do menu da conta, marcado quando a página está aberta.
+- 2026-11-26 — A troca de e-mail acontece dentro do próprio cartão, em dois passos (e-mail novo e senha, depois o código), e volta ao passo do código ao recarregar — sem rota nova, e quem saiu no meio continua de onde parou.
+- 2026-11-26 — Dentro de um cartão, o passo do código põe "Reenviar" e "Usar outro e-mail" à esquerda e "Confirmar" à direita; as telas de entrada mantêm o botão na largura toda e os links embaixo — o mesmo formulário com duas disposições, para os erros e o reenvio ficarem num lugar só.
+- 2026-11-26 — O código errado mostra uma só mensagem, "Código inválido ou vencido. Peça um novo.", e não as tentativas restantes do canvas — igual às outras telas de código.
 
 ## Perguntas abertas
 
