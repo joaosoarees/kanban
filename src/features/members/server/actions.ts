@@ -13,6 +13,7 @@ import {
   revalidateWorkspace,
   WORKSPACE_GONE,
 } from "@/features/workspaces/server/access";
+import { can } from "@/features/workspaces/lib/permissions";
 import type { Prisma, Role } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
@@ -48,6 +49,7 @@ async function removeMembership(
     where: { assigneeId: userId, column: { board: { workspaceId } } },
     data: { assigneeId: null },
   });
+  await tx.invite.deleteMany({ where: { workspaceId, invitedById: userId } });
   return null;
 }
 
@@ -94,7 +96,15 @@ export async function changeRoleAction(
       where: { userId, workspaceId: actor.workspaceId, role: target.role },
       data: { role },
     });
-    return count === 0 ? MEMBER_CHANGED : null;
+    if (count === 0) {
+      return MEMBER_CHANGED;
+    }
+    if (!can(role, "inviteMember")) {
+      await tx.invite.deleteMany({
+        where: { workspaceId: actor.workspaceId, invitedById: userId },
+      });
+    }
+    return null;
   });
 
   revalidateWorkspace(actor.slug);
