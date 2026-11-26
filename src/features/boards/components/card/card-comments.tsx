@@ -135,7 +135,9 @@ export function CardComments({
         fieldRef={composerRef}
         onStateChange={setComposer}
       />
-      {comments.status === "loading" && <CommentsSkeleton />}
+      {comments.status === "loading" && comments.comments.length === 0 && (
+        <CommentsSkeleton />
+      )}
       {comments.status === "failed" && (
         <div
           role="alert"
@@ -156,7 +158,7 @@ export function CardComments({
       {comments.status === "ready" && comments.comments.length === 0 && (
         <p className="text-[13px] text-fg-muted">Nenhum comentário ainda.</p>
       )}
-      {comments.status === "ready" && comments.comments.length > 0 && (
+      {comments.comments.length > 0 && (
         <ul className="flex flex-col gap-4">
           {comments.comments.map((comment) => (
             <CommentItem
