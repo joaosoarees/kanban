@@ -23,7 +23,7 @@ export async function enter(userId: string): Promise<never> {
     return redirect(`/w/${outcome.slug}`);
   }
   if (outcome.status === "other-email") {
-    return redirect(`/invite/${invite}`);
+    return redirect(`/invite#${invite}`);
   }
   return redirect(
     `${AFTER_SIGN_IN}?${INVITE_GONE_PARAM.name}=${INVITE_GONE_PARAM.value}`,
