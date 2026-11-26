@@ -12,6 +12,8 @@ type CardRow = {
   hasDescription: boolean;
   assigneeId: string | null;
   labelIds: string[];
+  dueOn: string | null;
+  completed: boolean;
 };
 
 export async function getBoards(workspaceId: string) {
@@ -52,6 +54,8 @@ export const requireBoard = cache(
         card.title,
         card.description IS NOT NULL AS "hasDescription",
         card."assigneeId",
+        card."dueOn"::text AS "dueOn",
+        card."completedAt" IS NOT NULL AS completed,
         ARRAY(
           SELECT applied."labelId"::text
           FROM card_labels applied
