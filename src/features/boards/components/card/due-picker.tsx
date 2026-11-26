@@ -13,6 +13,7 @@ import type {
   BoardCard,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import { useIsPhone } from "@/hooks/use-is-phone";
 import { useToday } from "@/features/boards/hooks/use-today";
 import {
   dayToDate,
@@ -25,6 +26,12 @@ import { cn } from "@/lib/utils";
 
 const DUE_FAILED =
   "Não foi possível salvar o prazo. Desfizemos a mudança. Tente de novo.";
+
+const TRIGGER =
+  "inline-flex h-11 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-md border border-border pr-2.5 pl-2 text-sm font-[450] outline-hidden transition-colors duration-150 hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:border-accent-border aria-expanded:bg-accent data-popup-open:border-accent-border data-popup-open:bg-accent motion-reduce:transition-none sm:h-8 sm:flex-none sm:border-transparent sm:pr-2 sm:pl-1";
+
+const TODAY =
+  "rounded-(--cell-radius) font-semibold text-brand-fg after:pointer-events-none after:absolute after:bottom-1 after:left-1/2 after:z-20 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-current";
 
 type DuePickerProps = {
   workspaceId: string;
@@ -55,6 +62,7 @@ export function DuePicker({
   onUpdateCard,
 }: DuePickerProps) {
   const today = useToday();
+  const isPhone = useIsPhone();
   const [isOpen, setIsOpen] = useState(false);
   const { text, tone } = dueLabel(card, today);
   const selected = card.dueOn === null ? undefined : dayToDate(card.dueOn);
@@ -72,56 +80,82 @@ export function DuePicker({
     });
   };
 
+  const label = (
+    <>
+      <span
+        className={cn(
+          "flex size-[22px] shrink-0 items-center justify-center",
+          tone || "text-muted-foreground",
+        )}
+      >
+        <CalendarDays aria-hidden className="size-[15px]" />
+      </span>
+      <span className={cn("min-w-0 truncate text-left", tone)}>{text}</span>
+    </>
+  );
+
+  const calendar = (
+    <Calendar
+      mode="single"
+      locale={ptBR}
+      selected={selected}
+      defaultMonth={selected ?? (today === null ? undefined : dayToDate(today))}
+      onSelect={(date) => {
+        if (date) {
+          save(localDay(date));
+        }
+        setIsOpen(false);
+      }}
+      className="[--cell-size:--spacing(10)] sm:[--cell-size:--spacing(9)]"
+      classNames={{ today: TODAY }}
+    />
+  );
+
   return (
-    <div className="flex w-full items-center gap-1 sm:w-fit">
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger
-          aria-label={`Prazo: ${text}. Alterar`}
-          className="inline-flex h-11 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-md border border-border pr-2.5 pl-2 text-sm font-[450] outline-hidden transition-colors duration-150 hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:border-accent-border data-popup-open:bg-accent motion-reduce:transition-none sm:h-8 sm:flex-none sm:border-transparent sm:pr-2 sm:pl-1"
-        >
-          <span
-            className={cn(
-              "flex size-[22px] shrink-0 items-center justify-center",
-              tone || "text-muted-foreground",
-            )}
+    <div className="w-full sm:w-fit">
+      <div className="flex items-center gap-1">
+        {isPhone ? (
+          <button
+            type="button"
+            aria-label={`Prazo: ${text}. Alterar`}
+            aria-expanded={isOpen}
+            onClick={() => {
+              setIsOpen(!isOpen);
+            }}
+            className={TRIGGER}
           >
-            <CalendarDays aria-hidden className="size-[15px]" />
-          </span>
-          <span className={cn("min-w-0 truncate text-left", tone)}>{text}</span>
-        </PopoverTrigger>
-        <PopoverContent align="start" className="w-auto p-1.5">
-          <Calendar
-            mode="single"
-            locale={ptBR}
-            selected={selected}
-            defaultMonth={
-              selected ?? (today === null ? undefined : dayToDate(today))
-            }
-            onSelect={(date) => {
-              if (date) {
-                save(localDay(date));
-              }
-              setIsOpen(false);
+            {label}
+          </button>
+        ) : (
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger
+              aria-label={`Prazo: ${text}. Alterar`}
+              className={TRIGGER}
+            >
+              {label}
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto p-1.5">
+              {calendar}
+            </PopoverContent>
+          </Popover>
+        )}
+        {card.dueOn !== null && (
+          <button
+            type="button"
+            aria-label="Remover prazo"
+            onClick={() => {
+              save(null);
             }}
-            className="[--cell-size:--spacing(9)]"
-            classNames={{
-              today:
-                "rounded-(--cell-radius) font-semibold text-brand-fg after:pointer-events-none after:absolute after:bottom-1 after:left-1/2 after:z-20 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-current",
-            }}
-          />
-        </PopoverContent>
-      </Popover>
-      {card.dueOn !== null && (
-        <button
-          type="button"
-          aria-label="Remover prazo"
-          onClick={() => {
-            save(null);
-          }}
-          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground outline-hidden transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:size-7"
-        >
-          <X aria-hidden className="size-4 sm:size-3.5" />
-        </button>
+            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground outline-hidden transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none sm:size-7"
+          >
+            <X aria-hidden className="size-4 sm:size-3.5" />
+          </button>
+        )}
+      </div>
+      {isPhone && isOpen && (
+        <div className="mt-2 flex justify-center rounded-lg border border-border p-1">
+          {calendar}
+        </div>
       )}
     </div>
   );
