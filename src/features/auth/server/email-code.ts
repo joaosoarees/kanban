@@ -33,6 +33,7 @@ export async function issueCode(
   tx: Prisma.TransactionClient,
   owner: Owner,
   now: Date,
+  newEmail?: string,
 ): Promise<string> {
   const code = randomInt(0, 10 ** CODE_LENGTH)
     .toString()
@@ -42,6 +43,7 @@ export async function issueCode(
     sentAt: now,
     expiresAt: codeExpiresAt(now),
     attempts: 0,
+    ...(newEmail === undefined ? {} : { newEmail }),
   };
   await tx.emailCode.upsert({
     where: { userId_purpose: owner },
