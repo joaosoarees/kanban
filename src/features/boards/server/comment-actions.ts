@@ -17,13 +17,13 @@ import {
   recheckActor,
   revalidateWorkspace,
 } from "@/features/workspaces/server/access";
-import { Prisma } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
   invalidFields,
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
+import { isForeignKeyViolation } from "@/server/prisma-errors";
 
 function cardScope(
   ref: { boardId: string; cardId: string },
@@ -72,10 +72,7 @@ export async function createCommentAction(
     revalidateWorkspace(actor.slug);
     return { status: "success", data: toCardComment(actor, comment) };
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2003"
-    ) {
+    if (isForeignKeyViolation(error, "comments_cardId_fkey")) {
       return CARD_GONE;
     }
     throw error;
