@@ -1,16 +1,20 @@
 import "server-only";
 import { cookies } from "next/headers";
 import {
+  deleteInviteCookie,
   deletePendingCookie,
   deleteResetCookie,
   deleteSessionCookie,
+  INVITE_COOKIE,
   PENDING_COOKIE,
   RESET_COOKIE,
+  writeInviteCookie,
   writePendingCookie,
   writeResetCookie,
   writeSessionCookie,
 } from "@/server/session/cookie";
 import {
+  createInviteToken,
   createPendingToken,
   createResetGrant,
   createResetToken,
@@ -20,6 +24,7 @@ import {
   type ResetGrant,
   type ResetToken,
   type SessionOwner,
+  verifyInviteToken,
   verifyPendingToken,
   verifyResetGrant,
   verifyResetToken,
@@ -85,4 +90,23 @@ export async function getPasswordResetGrant(): Promise<ResetGrant | null> {
 
 export async function endPasswordReset(): Promise<void> {
   await deleteResetCookie();
+}
+
+export async function rememberInvite(
+  invite: string,
+  expiresAt: Date,
+): Promise<void> {
+  await writeInviteCookie(
+    await createInviteToken(invite, expiresAt),
+    expiresAt,
+  );
+}
+
+export async function getRememberedInvite(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return verifyInviteToken(cookieStore.get(INVITE_COOKIE)?.value);
+}
+
+export async function forgetInvite(): Promise<void> {
+  await deleteInviteCookie();
 }

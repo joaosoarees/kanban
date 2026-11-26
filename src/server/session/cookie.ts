@@ -9,6 +9,7 @@ import {
 export const SESSION_COOKIE = "session";
 export const PENDING_COOKIE = "pending_verification";
 export const RESET_COOKIE = "password_reset";
+export const INVITE_COOKIE = "pending_invite";
 
 const sessionCookieOptions = {
   httpOnly: true,
@@ -65,6 +66,27 @@ export async function deleteResetCookie(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(RESET_COOKIE, "", {
     ...resetCookieOptions,
+    maxAge: undefined,
+    expires: new Date(0),
+  });
+}
+
+export async function writeInviteCookie(
+  token: string,
+  expiresAt: Date,
+): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set(INVITE_COOKIE, token, {
+    ...sessionCookieOptions,
+    maxAge: undefined,
+    expires: expiresAt,
+  });
+}
+
+export async function deleteInviteCookie(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set(INVITE_COOKIE, "", {
+    ...sessionCookieOptions,
     maxAge: undefined,
     expires: new Date(0),
   });
