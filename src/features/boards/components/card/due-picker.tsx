@@ -63,7 +63,9 @@ export function DuePicker({
 }: DuePickerProps) {
   const today = useToday();
   const isPhone = useIsPhone();
-  const [isOpen, setIsOpen] = useState(false);
+  const [openIn, setOpenIn] = useState<"popover" | "inline" | null>(null);
+  const isPopoverOpen = openIn === "popover" && !isPhone;
+  const isInlineOpen = openIn === "inline" && isPhone;
   const { text, tone } = dueLabel(card, today);
   const selected = card.dueOn === null ? undefined : dayToDate(card.dueOn);
 
@@ -104,7 +106,7 @@ export function DuePicker({
         if (date) {
           save(localDay(date));
         }
-        setIsOpen(false);
+        setOpenIn(null);
       }}
       className="[--cell-size:--spacing(10)] sm:[--cell-size:--spacing(9)]"
       classNames={{ today: TODAY }}
@@ -118,16 +120,21 @@ export function DuePicker({
           <button
             type="button"
             aria-label={`Prazo: ${text}. Alterar`}
-            aria-expanded={isOpen}
+            aria-expanded={isInlineOpen}
             onClick={() => {
-              setIsOpen(!isOpen);
+              setOpenIn(isInlineOpen ? null : "inline");
             }}
             className={TRIGGER}
           >
             {label}
           </button>
         ) : (
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <Popover
+            open={isPopoverOpen}
+            onOpenChange={(open) => {
+              setOpenIn(open ? "popover" : null);
+            }}
+          >
             <PopoverTrigger
               aria-label={`Prazo: ${text}. Alterar`}
               className={TRIGGER}
@@ -152,7 +159,7 @@ export function DuePicker({
           </button>
         )}
       </div>
-      {isPhone && isOpen && (
+      {isInlineOpen && (
         <div className="mt-2 flex justify-center rounded-lg border border-border p-1">
           {calendar}
         </div>
