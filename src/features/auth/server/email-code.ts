@@ -75,15 +75,20 @@ export async function consumeCode(
   owner: Owner,
   code: string,
   now: Date,
-): Promise<boolean> {
+): Promise<{ newEmail: string | null } | null> {
   await lockUser(tx, owner.userId);
   const where = { userId_purpose: owner };
   const stored = await tx.emailCode.findUnique({
     where,
-    select: { codeHash: true, expiresAt: true, attempts: true },
+    select: {
+      codeHash: true,
+      expiresAt: true,
+      attempts: true,
+      newEmail: true,
+    },
   });
   if (!stored || !isCodeUsable(stored, now)) {
-    return false;
+    return null;
   }
 
   const matches = timingSafeEqual(
@@ -98,5 +103,5 @@ export async function consumeCode(
       data: { attempts: stored.attempts + 1 },
     });
   }
-  return matches;
+  return matches ? { newEmail: stored.newEmail } : null;
 }

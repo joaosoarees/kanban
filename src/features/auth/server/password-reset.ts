@@ -80,8 +80,8 @@ export async function checkResetCode(
     if (user === undefined) {
       return null;
     }
-    const valid = await consumeCode(tx, resetOwner(user.id), code, now);
-    return valid ? { userId: user.id } : null;
+    const consumed = await consumeCode(tx, resetOwner(user.id), code, now);
+    return consumed === null ? null : { userId: user.id };
   });
 }
 
