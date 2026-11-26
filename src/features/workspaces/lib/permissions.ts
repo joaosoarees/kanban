@@ -1,7 +1,6 @@
 import type { Role } from "@/generated/prisma/enums";
 
 export type WorkspaceAction =
-  | "addMember"
   | "inviteMember"
   | "changeRole"
   | "removeMember"
@@ -29,7 +28,6 @@ const canManageMember: Rule = (actor, target) => {
 };
 
 const RULES: Record<WorkspaceAction, Rule> = {
-  addMember: canManage,
   inviteMember: canManage,
   renameWorkspace: canManage,
   deleteWorkspace: (actor) => actor === "OWNER",
