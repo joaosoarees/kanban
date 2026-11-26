@@ -1,6 +1,5 @@
 "use server";
 
-import * as z from "zod";
 import {
   cardDescriptionSchema,
   cardTitleSchema,
@@ -13,6 +12,7 @@ import {
   CARD_GONE,
   COLUMN_GONE,
   lockBoard,
+  parseCardRef,
 } from "@/features/boards/server/access";
 import {
   loadActorAllowedTo,
@@ -31,15 +31,6 @@ const MEMBER_GONE: ActionError = {
   status: "error",
   message: "Essa pessoa não faz mais parte do workspace.",
 };
-
-function parseCardRef(boardId: unknown, cardId: unknown) {
-  const board = z.uuid().safeParse(boardId);
-  const card = z.uuid().safeParse(cardId);
-  if (!board.success || !card.success) {
-    return null;
-  }
-  return { boardId: board.data, cardId: card.data };
-}
 
 export async function createCardAction(
   workspaceId: unknown,
