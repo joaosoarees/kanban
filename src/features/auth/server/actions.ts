@@ -41,6 +41,7 @@ import {
   endPasswordReset,
   endPendingVerification,
   endSession,
+  forgetInvite,
   getPasswordReset,
   getPasswordResetGrant,
   getPendingVerification,
@@ -110,6 +111,7 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 
 export async function signOutAction(): Promise<void> {
   await endSession();
+  await forgetInvite();
   return redirect("/sign-in");
 }
 
