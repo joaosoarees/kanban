@@ -16,6 +16,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 30s
+      start_interval: 1s
 
   migrate:
     build:
@@ -76,6 +78,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+      start_interval: 1s
 
   db-dump:
     image: postgres:18
@@ -88,11 +91,13 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
+        trap 'exit 0' TERM
         while true; do
           pg_dump --format=custom --file=/dumps/kanban.dump.partial \
             && mv /dumps/kanban.dump.partial /dumps/kanban.dump \
             || echo "db-dump: pg_dump failed" >&2
-          sleep 3600
+          sleep 3600 &
+          wait $$!
         done
     volumes:
       - dumps:/dumps
