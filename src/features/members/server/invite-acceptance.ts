@@ -3,10 +3,13 @@ import {
   INVITE_GONE_MESSAGE,
   isInviteExpired,
 } from "@/features/members/lib/invites";
+import { inviteTokenSchema } from "@/features/members/lib/schemas";
 import { hashInviteToken } from "@/features/members/server/invite-token";
 import { recheckActor } from "@/features/workspaces/server/access";
+import type { Role } from "@/generated/prisma/enums";
 import type { ActionError } from "@/lib/action-result";
 import { db } from "@/server/db";
+import { getRememberedInvite } from "@/server/session";
 
 export const INVITE_GONE: ActionError = {
   status: "error",
@@ -16,7 +19,9 @@ export const INVITE_GONE: ActionError = {
 
 export type InvitePreview = {
   email: string;
+  role: Role;
   workspaceName: string;
+  workspaceSlug: string;
   inviterName: string;
   expiresAt: Date;
 };
@@ -29,8 +34,9 @@ export async function loadInvite(
     where: { tokenHash: hashInviteToken(token) },
     select: {
       email: true,
+      role: true,
       expiresAt: true,
-      workspace: { select: { name: true } },
+      workspace: { select: { name: true, slug: true } },
       invitedBy: { select: { name: true } },
     },
   });
@@ -39,10 +45,23 @@ export async function loadInvite(
   }
   return {
     email: invite.email,
+    role: invite.role,
     workspaceName: invite.workspace.name,
+    workspaceSlug: invite.workspace.slug,
     inviterName: invite.invitedBy.name,
     expiresAt: invite.expiresAt,
   };
+}
+
+export async function previewInvite(
+  token: unknown,
+): Promise<InvitePreview | null> {
+  const parsed = inviteTokenSchema.safeParse(token);
+  return parsed.success ? loadInvite(parsed.data, new Date()) : null;
+}
+
+export async function loadRememberedInvite(): Promise<InvitePreview | null> {
+  return previewInvite(await getRememberedInvite());
 }
 
 export type Acceptance =
