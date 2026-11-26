@@ -9,7 +9,7 @@ Kanban por workspaces para times pequenos (2 a 10 pessoas). O time entra num wor
 - Hierarquia: Workspace → Quadro → Coluna → Card (título, descrição, responsável, etiquetas). Papéis fixos: Dono, Admin, Membro.
 - Entrada com e-mail e senha, sem login social. Quem administra convida pelo e-mail, e a pessoa entra depois de aceitar, com ou sem conta.
 - Sem tempo real: o que outras pessoas mudam aparece ao recarregar ou navegar. Mover uma coluna aparece na hora, antes de o servidor confirmar, e um erro desfaz o movimento com uma mensagem clara. Criar, renomear e excluir aparecem quando o servidor confirma.
-- Fora do escopo por enquanto: comentários, anexos, data de entrega, histórico de atividade, busca.
+- Fora do escopo por enquanto: comentários, anexos, histórico de atividade, busca.
 - Princípios: o quadro é o produto, e tudo o mais serve para chegar a ele rápido; simplicidade antes de recurso.
 - Não há logo além da marca de barras, ilustrações, depoimentos nem dados reais: nenhuma tela inventa clientes, números ou depoimentos.
 
@@ -133,6 +133,11 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-26 — A troca de e-mail acontece dentro do próprio cartão, em dois passos (e-mail novo e senha, depois o código), e volta ao passo do código ao recarregar — sem rota nova, e quem saiu no meio continua de onde parou.
 - 2026-11-26 — Dentro de um cartão, o passo do código põe "Reenviar" e "Usar outro e-mail" à esquerda e "Confirmar" à direita; as telas de entrada mantêm o botão na largura toda e os links embaixo — o mesmo formulário com duas disposições, para os erros e o reenvio ficarem num lugar só.
 - 2026-11-26 — O código errado mostra uma só mensagem, "Código inválido ou vencido. Peça um novo.", e não as tentativas restantes do canvas — igual às outras telas de código.
+- 2026-11-26 — Prazo no card desenhado no canvas da fatia 17 (https://claude.ai/artifact/69GUz4Hss9diKNZjCCktZY, peças 17.0 e telas 17.1 a 17.5, claro e escuro), aprovado — o prazo é um dia, sem hora, comparado com o dia de quem vê; "Concluído" é uma marca do card, separada da coluna.
+- 2026-11-26 — No card do quadro, o selo de prazo vem primeiro na linha de baixo, com a forma da etiqueta: neutro, "Hoje" em destaque, atrasado em vermelho e "✓ Concluído" em verde no lugar da data. Os tokens `success-fg` e `success-bg` entram para o verde.
+- 2026-11-26 — No diálogo, Prazo e Concluído ficam entre Responsável e Etiquetas. O campo de prazo é o botão de propriedade do responsável; a data atrasada lê "24 nov 2026 · atrasado" e a de hoje "Hoje, 26 nov". A caixa "Concluído" é o checkbox de 16px do filtro, sem rótulo de linha.
+- 2026-11-26 — O calendário abre em popover sob o campo no desktop e dentro do diálogo, em largura total e com dias de 40px, no celular. Escolher um dia salva e fecha; não há atalhos; a semana começa no domingo; um "×" ao lado do campo remove o prazo.
+- 2026-11-26 — O filtro ganha o grupo "Prazo", de escolha única, entre Responsável e Etiquetas: Qualquer prazo, Atrasados, Vencem em 7 dias e Sem prazo. Todo membro edita prazo e conclusão, então não há estado só leitura.
 
 ## Perguntas abertas
 
