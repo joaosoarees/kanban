@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as z from "zod";
+import { newestFirst, withPage } from "@/features/boards/lib/comment-list";
 import type {
   CardComment,
   CommentPage,
@@ -30,23 +31,6 @@ const pageResponseSchema = z.discriminatedUnion("status", [
 
 type ListStatus = "loading" | "failed" | "ready";
 type OlderStatus = "idle" | "loading" | "failed";
-
-function newestFirst(comments: CardComment[]) {
-  const byId = new Map(comments.map((comment) => [comment.id, comment]));
-  return [...byId.values()].toSorted((a, b) => (a.id < b.id ? 1 : -1));
-}
-
-function withPage(
-  current: CardComment[],
-  page: CardComment[],
-  removed: ReadonlySet<string>,
-) {
-  const known = new Set(current.map((comment) => comment.id));
-  const fresh = page.filter(
-    (comment) => !known.has(comment.id) && !removed.has(comment.id),
-  );
-  return newestFirst([...current, ...fresh]);
-}
 
 async function fetchCommentPage(
   url: string,
