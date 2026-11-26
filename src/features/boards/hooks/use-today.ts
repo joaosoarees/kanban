@@ -1,5 +1,3 @@
-"use client";
-
 import { useSyncExternalStore } from "react";
 import { localDay, msUntilTomorrow } from "@/features/boards/lib/card-due";
 

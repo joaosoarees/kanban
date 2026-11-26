@@ -1,5 +1,3 @@
-"use client";
-
 import { CalendarDays, Check } from "lucide-react";
 import { useToday } from "@/features/boards/hooks/use-today";
 import {
