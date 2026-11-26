@@ -99,13 +99,12 @@ export function DuePicker({
   const calendar = (
     <Calendar
       mode="single"
+      required
       locale={ptBR}
       selected={selected}
       defaultMonth={selected ?? (today === null ? undefined : dayToDate(today))}
       onSelect={(date) => {
-        if (date) {
-          save(localDay(date));
-        }
+        save(localDay(date));
         setOpenIn(null);
       }}
       className="[--cell-size:--spacing(10)] sm:[--cell-size:--spacing(9)]"
