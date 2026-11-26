@@ -1,11 +1,12 @@
 "use client";
 
 import { CircleAlert, Loader2, RefreshCw } from "lucide-react";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCardComments } from "@/features/boards/hooks/use-card-comments";
 import { CommentComposer } from "./comment-composer";
+import { IDLE_FORM, type CommentFormState } from "./comment-field";
 import { CommentItem } from "./comment-item";
 
 type CardCommentsProps = {
@@ -13,7 +14,12 @@ type CardCommentsProps = {
   boardId: string;
   cardId: string;
   count: number;
-  onDirtyChange: (isDirty: boolean) => void;
+  onStateChange: (state: CommentsState) => void;
+};
+
+export type CommentsState = {
+  unsaved: "comment" | "edit" | null;
+  isBusy: boolean;
 };
 
 const SKELETON_ROWS = [
@@ -51,17 +57,25 @@ export function CardComments({
   boardId,
   cardId,
   count,
-  onDirtyChange,
+  onStateChange,
 }: CardCommentsProps) {
   const comments = useCardComments(workspaceId, boardId, cardId);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [editing, setEditing] = useState<ReadonlySet<string>>(new Set());
-  const isDirty = hasDraft || editing.size > 0;
-  const reportDirty = useEffectEvent(onDirtyChange);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
+  const [composer, setComposer] = useState(IDLE_FORM);
+  const [edits, setEdits] = useState<ReadonlyMap<string, CommentFormState>>(
+    new Map(),
+  );
+  const editStates = [...edits.values()];
+  const hasEdit = editStates.some((state) => state.isDirty);
+  const unsaved = composer.isDirty ? "comment" : hasEdit ? "edit" : null;
+  const isDirty = unsaved !== null;
+  const isBusy =
+    composer.isPending || editStates.some((state) => state.isPending);
+  const reportState = useEffectEvent(onStateChange);
 
   useEffect(() => {
-    reportDirty(isDirty);
-  }, [isDirty]);
+    reportState({ unsaved, isBusy });
+  }, [unsaved, isBusy]);
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
@@ -96,7 +110,8 @@ export function CardComments({
       <CommentComposer
         {...ref}
         onCreated={comments.put}
-        onDraftChange={setHasDraft}
+        fieldRef={composerRef}
+        onStateChange={setComposer}
       />
       {comments.status === "loading" && <CommentsSkeleton />}
       {comments.status === "failed" && (
@@ -128,14 +143,15 @@ export function CardComments({
               comment={comment}
               onSaved={comments.put}
               onRemoved={comments.remove}
-              onEditingChange={(commentId, isEditing) => {
-                setEditing((current) => {
-                  if (current.has(commentId) === isEditing) {
-                    return current;
-                  }
-                  const next = new Set(current);
-                  if (isEditing) {
-                    next.add(commentId);
+              onDeleted={(commentId) => {
+                comments.remove(commentId);
+                requestAnimationFrame(() => composerRef.current?.focus());
+              }}
+              onEditStateChange={(commentId, state) => {
+                setEdits((current) => {
+                  const next = new Map(current);
+                  if (state.isDirty || state.isPending) {
+                    next.set(commentId, state);
                   } else {
                     next.delete(commentId);
                   }
