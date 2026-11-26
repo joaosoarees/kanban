@@ -51,7 +51,7 @@ async function deliver(delivery: InviteDelivery): Promise<boolean> {
         to: delivery.to,
         inviterName: delivery.inviterName,
         workspaceName: delivery.workspaceName,
-        link: appUrl(`/invite/${delivery.token}`),
+        link: appUrl(`/invite#${delivery.token}`),
       }),
     );
   } catch (error) {
