@@ -10,7 +10,9 @@ import {
 import {
   acceptInvite,
   INVITE_GONE,
+  type InvitePreview,
   loadInvite,
+  previewInvite,
 } from "@/features/members/server/invite-acceptance";
 import {
   type InviteSent,
@@ -36,6 +38,12 @@ import {
   rememberInvite,
 } from "@/server/session";
 
+export async function previewInviteAction(
+  token: unknown,
+): Promise<InvitePreview | null> {
+  return previewInvite(token);
+}
+
 export async function acceptInviteAction(
   token: unknown,
 ): Promise<ActionResult> {
@@ -46,7 +54,7 @@ export async function acceptInviteAction(
 
   const user = await getCurrentUser();
   if (!user) {
-    return redirect(`/invite/${parsed.data}`);
+    return redirect(`/invite#${parsed.data}`);
   }
 
   const outcome = await acceptInvite(user, parsed.data, new Date());

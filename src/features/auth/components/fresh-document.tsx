@@ -8,10 +8,11 @@ const AUTH_PATHS = new Set([
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  "/invite",
 ]);
 
 function isAuthPath(pathname: string) {
-  return AUTH_PATHS.has(pathname) || pathname.startsWith("/invite/");
+  return AUTH_PATHS.has(pathname);
 }
 
 export function FreshDocument() {

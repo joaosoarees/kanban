@@ -1,9 +1,16 @@
+import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { linkButton, textLink } from "@/components/button-styles";
+import {
+  linkButton,
+  primaryButton,
+  textLink,
+} from "@/components/button-styles";
+import { Button } from "@/components/ui/button";
 import { InviteButton } from "@/features/members/components/invite-button";
 import type { InvitePreview } from "@/features/members/server/invite-acceptance";
 import { WorkspaceTile } from "@/features/workspaces/components/workspace-tile";
+import { cn } from "@/lib/utils";
 
 const validUntil = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -65,9 +72,11 @@ function Footnote({ children }: { children: ReactNode }) {
 export function InviteForGuest({
   token,
   invite,
+  onGone,
 }: {
   token: string;
   invite: InvitePreview;
+  onGone: () => void;
 }) {
   return (
     <>
@@ -79,11 +88,17 @@ export function InviteForGuest({
         </Lead>
       </InviteHeading>
       <div className="flex flex-col gap-3">
-        <InviteButton token={token} intent="sign-up" pendingLabel="Abrindo…">
+        <InviteButton
+          token={token}
+          onGone={onGone}
+          intent="sign-up"
+          pendingLabel="Abrindo…"
+        >
           Criar conta
         </InviteButton>
         <InviteButton
           token={token}
+          onGone={onGone}
           intent="sign-in"
           variant="outline"
           pendingLabel="Abrindo…"
@@ -101,9 +116,11 @@ export function InviteForGuest({
 export function InviteForMember({
   token,
   invite,
+  onGone,
 }: {
   token: string;
   invite: InvitePreview;
+  onGone: () => void;
 }) {
   return (
     <>
@@ -113,7 +130,12 @@ export function InviteForMember({
           Você está conectado como <Strong>{invite.email}</Strong>.
         </Lead>
       </InviteHeading>
-      <InviteButton token={token} intent="accept" pendingLabel="Entrando…">
+      <InviteButton
+        token={token}
+        onGone={onGone}
+        intent="accept"
+        pendingLabel="Entrando…"
+      >
         Aceitar convite
       </InviteButton>
       <div className="mt-5">
@@ -131,10 +153,12 @@ export function InviteForOtherAccount({
   token,
   invite,
   email,
+  onGone,
 }: {
   token: string;
   invite: InvitePreview;
   email: string;
+  onGone: () => void;
 }) {
   return (
     <>
@@ -148,7 +172,12 @@ export function InviteForOtherAccount({
           Você está conectado como <Strong>{email}</Strong>.
         </Lead>
       </InviteHeading>
-      <InviteButton token={token} intent="sign-in" pendingLabel="Saindo…">
+      <InviteButton
+        token={token}
+        onGone={onGone}
+        intent="sign-in"
+        pendingLabel="Saindo…"
+      >
         Trocar de conta
       </InviteButton>
       <div className="mt-5">
@@ -197,5 +226,29 @@ export function InviteGone({ isSignedIn }: { isSignedIn: boolean }) {
         </>
       )}
     </>
+  );
+}
+
+export function InviteLoadFailed({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div role="alert">
+      <div className="mb-8 flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-balance">
+          Não foi possível carregar o convite
+        </h1>
+        <Lead>
+          Confira a sua conexão e tente de novo. Se continuar, abra outra vez o
+          link do e-mail do convite.
+        </Lead>
+      </div>
+      <Button
+        type="button"
+        onClick={onRetry}
+        className={cn("h-10 w-full", primaryButton)}
+      >
+        <RotateCcw aria-hidden="true" />
+        Tentar de novo
+      </Button>
+    </div>
   );
 }
