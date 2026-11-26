@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarDays, X } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ptBR } from "react-day-picker/locale";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -63,6 +63,7 @@ export function DuePicker({
 }: DuePickerProps) {
   const today = useToday();
   const isPhone = useIsPhone();
+  const calendarId = `${useId()}-calendar`;
   const [openIn, setOpenIn] = useState<"popover" | "inline" | null>(null);
   const isPopoverOpen = openIn === "popover" && !isPhone;
   const isInlineOpen = openIn === "inline" && isPhone;
@@ -120,6 +121,7 @@ export function DuePicker({
             type="button"
             aria-label={`Prazo: ${text}. Alterar`}
             aria-expanded={isInlineOpen}
+            aria-controls={calendarId}
             onClick={() => {
               setOpenIn(isInlineOpen ? null : "inline");
             }}
@@ -159,7 +161,10 @@ export function DuePicker({
         )}
       </div>
       {isInlineOpen && (
-        <div className="mt-2 flex justify-center rounded-lg border border-border p-1">
+        <div
+          id={calendarId}
+          className="mt-2 flex justify-center rounded-lg border border-border p-1"
+        >
           {calendar}
         </div>
       )}
