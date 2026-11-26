@@ -5,7 +5,7 @@ const PASSWORD_MAX_BYTES = 72;
 
 const byteLength = (text: string) => new TextEncoder().encode(text).length;
 
-const emailField = z
+export const emailField = z
   .string()
   .trim()
   .toLowerCase()
