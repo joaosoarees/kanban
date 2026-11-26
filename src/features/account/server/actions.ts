@@ -18,7 +18,11 @@ import {
   RESEND_INTERVAL_MS,
   verifyCodeSchema,
 } from "@/features/auth/lib/email-code";
-import { hashPassword, verifyPassword } from "@/features/auth/server/password";
+import { hashPassword } from "@/features/auth/server/password";
+import {
+  checkAccountPassword,
+  type PasswordCheck,
+} from "@/features/auth/server/password-check";
 import {
   invalidFields,
   type ActionError,
@@ -59,15 +63,15 @@ function waitForCode(waitSeconds: number): ActionError {
   };
 }
 
-async function matchingPasswordHash(
-  userId: string,
-  password: string,
-): Promise<string | null> {
-  const { passwordHash } = await db.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: { passwordHash: true },
-  });
-  return (await verifyPassword(password, passwordHash)) ? passwordHash : null;
+function passwordRefused(
+  check: Exclude<PasswordCheck, { status: "match" }>,
+  field: "currentPassword" | "password",
+): ActionError {
+  const message =
+    check.status === "locked"
+      ? `Muitas tentativas com a senha errada. Tente de novo em ${check.minutes} min.`
+      : WRONG_PASSWORD;
+  return { status: "error", message, fieldErrors: { [field]: [message] } };
 }
 
 export async function changePasswordAction(
@@ -80,20 +84,20 @@ export async function changePasswordAction(
   }
 
   const { currentPassword, newPassword } = parsed.data;
-  const currentHash = await matchingPasswordHash(user.id, currentPassword);
-  if (currentHash === null) {
-    return {
-      status: "error",
-      message: WRONG_PASSWORD,
-      fieldErrors: { currentPassword: [WRONG_PASSWORD] },
-    };
+  const check = await checkAccountPassword(
+    user.id,
+    currentPassword,
+    new Date(),
+  );
+  if (check.status !== "match") {
+    return passwordRefused(check, "currentPassword");
   }
 
   const passwordChangedAt = new Date();
   const passwordHash = await hashPassword(newPassword);
   const changed = await db.$transaction(async (tx) => {
     const { count } = await tx.user.updateMany({
-      where: { id: user.id, passwordHash: currentHash },
+      where: { id: user.id, passwordHash: check.passwordHash },
       data: { passwordHash, passwordChangedAt },
     });
     if (count === 0) {
@@ -128,12 +132,9 @@ export async function requestEmailChangeAction(
     const message = "Este já é o seu e-mail.";
     return { status: "error", message, fieldErrors: { newEmail: [message] } };
   }
-  if ((await matchingPasswordHash(user.id, password)) === null) {
-    return {
-      status: "error",
-      message: WRONG_PASSWORD,
-      fieldErrors: { password: [WRONG_PASSWORD] },
-    };
+  const check = await checkAccountPassword(user.id, password, new Date());
+  if (check.status !== "match") {
+    return passwordRefused(check, "password");
   }
 
   const request = await requestEmailChange(user, newEmail, new Date());
