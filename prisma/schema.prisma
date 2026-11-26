@@ -19,6 +19,8 @@ model User {
   memberships   Membership[]
   assignedCards Card[]
   emailCodes    EmailCode[]
+  sentInvites   Invite[]
+  inviteSends   InviteSend[]
 
   @@map("users")
 }
@@ -56,6 +58,7 @@ model Workspace {
 
   memberships Membership[]
   boards      Board[]
+  invites     Invite[]
 
   @@map("workspaces")
 }
@@ -72,6 +75,34 @@ model Membership {
   @@id([userId, workspaceId])
   @@index([workspaceId])
   @@map("memberships")
+}
+
+model Invite {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  workspaceId String   @db.Uuid
+  email       String
+  role        Role
+  invitedById String   @db.Uuid
+  tokenHash   String   @unique
+  sentAt      DateTime @db.Timestamptz(3)
+  expiresAt   DateTime @db.Timestamptz(3)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy User      @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, email])
+  @@map("invites")
+}
+
+model InviteSend {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  invitedById String   @db.Uuid
+  sentAt      DateTime @db.Timestamptz(3)
+
+  invitedBy User @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([invitedById, sentAt])
+  @@map("invite_sends")
 }
 
 model Board {
