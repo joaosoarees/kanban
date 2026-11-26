@@ -1,3 +1,5 @@
+"use client";
+
 import { CalendarDays, Check } from "lucide-react";
 import { useToday } from "@/features/boards/hooks/use-today";
 import {
@@ -25,7 +27,7 @@ const STATUS_SUFFIX: Record<DueStatus, string> = {
 export function DueBadge({ card }: { card: DueCard }) {
   const today = useToday();
   const status = dueStatus(card, today);
-  if (status === null) {
+  if (status === null || (today === null && status !== "done")) {
     return null;
   }
 
