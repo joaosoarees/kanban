@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   addDays,
   dueStatus,
@@ -12,14 +12,32 @@ import {
 const TODAY = "2026-11-26";
 
 describe("localDay", () => {
-  it.each([
-    { now: new Date(2026, 10, 26, 23, 30), expected: "2026-11-26" },
-    { now: new Date(2026, 0, 5, 0, 10), expected: "2026-01-05" },
-  ])("reads $expected from the local clock, not UTC", ({ now, expected }) => {
-    const day = localDay(now);
+  const originalTimezone = process.env.TZ;
 
-    expect(day).toBe(expected);
+  beforeAll(() => {
+    process.env.TZ = "America/Sao_Paulo";
   });
+
+  afterAll(() => {
+    if (originalTimezone === undefined) {
+      delete process.env.TZ;
+    } else {
+      process.env.TZ = originalTimezone;
+    }
+  });
+
+  it.each([
+    { instant: "2026-11-27T02:30:00Z", expected: "2026-11-26" },
+    { instant: "2026-01-05T02:10:00Z", expected: "2026-01-04" },
+    { instant: "2026-01-05T03:10:00Z", expected: "2026-01-05" },
+  ])(
+    "should read $expected from the local clock at $instant",
+    ({ instant, expected }) => {
+      const day = localDay(new Date(instant));
+
+      expect(day).toBe(expected);
+    },
+  );
 });
 
 describe("addDays", () => {
@@ -126,5 +144,27 @@ describe("msUntilTomorrow", () => {
     const now = new Date(2026, 10, 26, 0, 0, 0);
 
     expect(msUntilTomorrow(now)).toBe(24 * 60 * 60 * 1000 + 1000);
+  });
+});
+
+describe("msUntilTomorrow across a daylight saving change", () => {
+  const originalTimezone = process.env.TZ;
+
+  beforeAll(() => {
+    process.env.TZ = "America/New_York";
+  });
+
+  afterAll(() => {
+    if (originalTimezone === undefined) {
+      delete process.env.TZ;
+    } else {
+      process.env.TZ = originalTimezone;
+    }
+  });
+
+  it("should wait 25 hours and one second on the day clocks fall back", () => {
+    const now = new Date("2026-11-01T04:00:00Z");
+
+    expect(msUntilTomorrow(now)).toBe(25 * 60 * 60 * 1000 + 1000);
   });
 });
