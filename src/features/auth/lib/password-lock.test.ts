@@ -89,7 +89,12 @@ describe("afterPasswordMatch", () => {
       passwordLockedUntil: later(15 * 60_000),
     };
 
-    const next = afterPasswordMatch({ ...reserved }, reserved);
+    const current = {
+      failedPasswordAttempts: 0,
+      passwordLockedUntil: later(15 * 60_000),
+    };
+
+    const next = afterPasswordMatch(current, reserved);
 
     expect(next).toEqual({
       failedPasswordAttempts: 0,
@@ -97,7 +102,7 @@ describe("afterPasswordMatch", () => {
     });
   });
 
-  it("should keep failures counted after this attempt, minus this attempt", () => {
+  it("should keep later failures and take back only this attempt", () => {
     const reserved = { failedPasswordAttempts: 2, passwordLockedUntil: null };
     const current = { failedPasswordAttempts: 4, passwordLockedUntil: null };
 
@@ -114,6 +119,18 @@ describe("afterPasswordMatch", () => {
     const current = {
       failedPasswordAttempts: 0,
       passwordLockedUntil: later(15 * 60_000),
+    };
+
+    const next = afterPasswordMatch(current, reserved);
+
+    expect(next).toEqual(current);
+  });
+
+  it("should not count below zero when the count was cleared meanwhile", () => {
+    const reserved = { failedPasswordAttempts: 2, passwordLockedUntil: null };
+    const current = {
+      failedPasswordAttempts: 0,
+      passwordLockedUntil: later(10 * 60_000),
     };
 
     const next = afterPasswordMatch(current, reserved);
