@@ -21,6 +21,7 @@ model User {
   emailCodes    EmailCode[]
   sentInvites   Invite[]
   inviteSends   InviteSend[]
+  comments      Comment[]
 
   @@map("users")
 }
@@ -149,10 +150,27 @@ model Card {
   column   Column      @relation(fields: [columnId], references: [id], onDelete: Cascade)
   assignee User?       @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
   labels   CardLabel[]
+  comments Comment[]
 
   @@unique([columnId, position])
   @@index([assigneeId])
   @@map("cards")
+}
+
+model Comment {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  cardId    String    @db.Uuid
+  authorId  String    @db.Uuid
+  body      String
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  editedAt  DateTime? @db.Timestamptz(3)
+
+  card   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([cardId, id])
+  @@index([authorId])
+  @@map("comments")
 }
 
 enum LabelColor {
