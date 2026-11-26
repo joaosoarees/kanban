@@ -11,7 +11,7 @@ export type CardComment = {
   body: string;
   createdAt: string;
   editedAt: string | null;
-  author: { id: string; name: string };
+  author: { id: string; name: string } | null;
   canEdit: boolean;
   canDelete: boolean;
 };
@@ -34,14 +34,14 @@ type CommentRow = {
   body: string;
   createdAt: Date;
   editedAt: Date | null;
-  author: { id: string; name: string };
+  author: { id: string; name: string } | null;
 };
 
 export function toCardComment(
   viewer: CommentViewer,
   comment: CommentRow,
 ): CardComment {
-  const isAuthor = comment.author.id === viewer.userId;
+  const isAuthor = comment.author?.id === viewer.userId;
   return {
     id: comment.id,
     body: comment.body,
