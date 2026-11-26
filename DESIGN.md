@@ -7,7 +7,7 @@
 Kanban por workspaces para times pequenos (2 a 10 pessoas). O time entra num workspace, abre um quadro e move cards entre colunas ao longo do dia. Uso principal no navegador de desktop, com o quadro aberto o dia todo; o celular precisa funcionar, mas não é o cenário principal. Tarefa principal: ver quem está fazendo o quê e mover o trabalho sem atrito.
 
 - Hierarquia: Workspace → Quadro → Coluna → Card (título, descrição, responsável, etiquetas). Papéis fixos: Dono, Admin, Membro.
-- Entrada com e-mail e senha, sem login social nem convite por e-mail: um admin adiciona quem já tem conta.
+- Entrada com e-mail e senha, sem login social. Quem administra convida pelo e-mail, e a pessoa entra depois de aceitar, com ou sem conta.
 - Sem tempo real: o que outras pessoas mudam aparece ao recarregar ou navegar. Mover uma coluna aparece na hora, antes de o servidor confirmar, e um erro desfaz o movimento com uma mensagem clara. Criar, renomear e excluir aparecem quando o servidor confirma.
 - Fora do escopo por enquanto: comentários, anexos, data de entrega, histórico de atividade, busca.
 - Princípios: o quadro é o produto, e tudo o mais serve para chegar a ele rápido; simplicidade antes de recurso.
@@ -124,6 +124,11 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — A senha nova avisa que as outras sessões serão encerradas — explica por que outro aparelho pede login de novo.
 - 2026-11-25 — Texto tem no mínimo 13px; só etiquetas e contadores podem ter 12px — a referência pede evitar texto pequeno, e etiquetas e contadores precisam caber no card e na coluna.
 - 2026-11-25 — Sem preferência de densidade por enquanto — quadros de times pequenos têm poucos cards, e um modo compacto dobraria as versões do card nos dois temas.
+- 2026-11-26 — Telas de convite desenhadas no canvas da fatia 15 (https://claude.ai/artifact/E894WS7A1kDnbWz6WUePhz, pranchas 15.1 a 15.8, claro e escuro), aprovadas — `/invite/[token]` usa a casca das telas de entrada, fora do grupo `(auth)`, porque abre com ou sem sessão.
+- 2026-11-26 — Sem sessão, "Criar conta" é a ação principal do convite e "Entrar" a secundária — o caso comum é quem ainda não tem conta, e a tela não pode revelar se o e-mail já tem.
+- 2026-11-26 — Aviso do convite: faixa na cor de destaque acima do título de entrar, criar conta e confirmar o e-mail, com "Seguir sem o convite" — lembra por que a pessoa está ali e dá uma saída. No cadastro, o e-mail vem travado, em cinza com cadeado.
+- 2026-11-26 — O e-mail do convite tem um botão "Ver convite" e o endereço em texto embaixo, exceção à regra dos e-mails sem links — o convite precisa abrir em outro navegador ou aparelho, e não traz código.
+- 2026-11-26 — "Convites pendentes" fica entre "Convidar" e a lista de membros, que ganha o título "Membros"; some quando vazio; revogar não pede confirmação — convidar de novo desfaz o engano. A linha começa pelo prazo ("Vence em 6 dias · enviado por…"), que é o que importa quando o texto é cortado.
 
 ## Perguntas abertas
 
