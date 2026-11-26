@@ -13,7 +13,10 @@ import {
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { CardComments } from "@/features/boards/components/card/card-comments";
+import {
+  CardComments,
+  type CommentsState,
+} from "@/features/boards/components/card/card-comments";
 import {
   CardDescription,
   CardDescriptionActions,
@@ -70,7 +73,10 @@ export function CardDialog({
   const router = useRouter();
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [hasCommentDraft, setHasCommentDraft] = useState(false);
+  const [commentsState, setCommentsState] = useState<CommentsState>({
+    unsaved: null,
+    isBusy: false,
+  });
   const description = useCardDescription({
     workspaceId,
     boardId,
@@ -84,7 +90,7 @@ export function CardDialog({
     },
   });
 
-  const isDirty = description.isDirty || hasCommentDraft;
+  const isDirty = description.isDirty || commentsState.unsaved !== null;
   const reportDirty = useEffectEvent(onDirtyChange);
 
   useEffect(() => {
@@ -95,7 +101,7 @@ export function CardDialog({
     <Dialog
       open
       onOpenChange={(open) => {
-        if (open || description.isSaving) {
+        if (open || description.isSaving || commentsState.isBusy) {
           return;
         }
         if (isDirty) {
@@ -152,7 +158,7 @@ export function CardDialog({
           boardId={boardId}
           cardId={card.id}
           count={card.commentCount}
-          onDirtyChange={setHasCommentDraft}
+          onStateChange={setCommentsState}
         />
 
         <Separator />
@@ -197,7 +203,9 @@ export function CardDialog({
           description={
             description.isDirty
               ? "A descrição editada ainda não foi salva e será perdida."
-              : "O comentário escrito ainda não foi enviado e será perdido."
+              : commentsState.unsaved === "edit"
+                ? "A edição do comentário ainda não foi salva e será perdida."
+                : "O comentário escrito ainda não foi enviado e será perdido."
           }
           confirmLabel="Descartar"
           pendingLabel="Descartando…"

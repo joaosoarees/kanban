@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useEffectEvent, type RefObject } from "react";
 import { useWatch } from "react-hook-form";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
@@ -10,14 +10,15 @@ import type { CardComment } from "@/features/boards/server/comment-queries";
 import { createCommentAction } from "@/features/boards/server/comment-actions";
 import { hasVisibleText } from "@/lib/text";
 import { cn } from "@/lib/utils";
-import { CommentField } from "./comment-field";
+import { CommentField, type CommentFormState } from "./comment-field";
 
 type CommentComposerProps = {
   workspaceId: string;
   boardId: string;
   cardId: string;
   onCreated: (comment: CardComment) => void;
-  onDraftChange: (hasDraft: boolean) => void;
+  fieldRef: RefObject<HTMLTextAreaElement | null>;
+  onStateChange: (state: CommentFormState) => void;
 };
 
 const KBD =
@@ -28,7 +29,8 @@ export function CommentComposer({
   boardId,
   cardId,
   onCreated,
-  onDraftChange,
+  fieldRef,
+  onStateChange,
 }: CommentComposerProps) {
   const { form, submit, isPending } = useActionForm({
     schema: commentSchema,
@@ -44,11 +46,11 @@ export function CommentComposer({
   const body = useWatch({ control: form.control, name: "body" });
   const { errors } = form.formState;
   const hasDraft = hasVisibleText(body);
-  const reportDraft = useEffectEvent(onDraftChange);
+  const reportState = useEffectEvent(onStateChange);
 
   useEffect(() => {
-    reportDraft(hasDraft);
-  }, [hasDraft]);
+    reportState({ isDirty: hasDraft, isPending });
+  }, [hasDraft, isPending]);
 
   const field = form.register("body", {
     onChange: () => {
@@ -60,6 +62,10 @@ export function CommentComposer({
     <form onSubmit={submit} noValidate>
       <CommentField
         {...field}
+        ref={(element) => {
+          field.ref(element);
+          fieldRef.current = element;
+        }}
         value={body}
         aria-label="Novo comentário"
         placeholder="Escreva um comentário…"
