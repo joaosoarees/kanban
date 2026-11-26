@@ -16,6 +16,7 @@ import {
   verifyCodeSchema,
 } from "@/features/auth/lib/email-code";
 import { verifyPassword } from "@/features/auth/server/password";
+import { checkAccountPassword } from "@/features/auth/server/password-check";
 import { enter } from "@/features/auth/server/enter";
 import {
   checkResetCode,
@@ -73,22 +74,19 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 
   const user = await db.user.findUnique({
     where: { email: parsed.data.email },
-    select: {
-      id: true,
-      passwordHash: true,
-      passwordChangedAt: true,
-      emailVerifiedAt: true,
-    },
+    select: { id: true, passwordChangedAt: true, emailVerifiedAt: true },
   });
 
-  const matches = await verifyPassword(
-    parsed.data.password,
-    user?.passwordHash,
-  );
-  if (!user || !matches) {
+  const matches =
+    user === null
+      ? await verifyPassword(parsed.data.password)
+      : (await checkAccountPassword(user.id, parsed.data.password, new Date()))
+          .status === "match";
+  if (user === null || !matches) {
     return {
       status: "error",
-      message: "E-mail ou senha incorretos. Confira e tente de novo.",
+      message:
+        "E-mail ou senha incorretos, ou muitas tentativas seguidas. Confira e tente de novo em alguns minutos.",
     };
   }
 

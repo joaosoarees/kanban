@@ -1,4 +1,5 @@
 import "server-only";
+import { UNLOCKED_PASSWORD } from "@/features/auth/server/password-check";
 import { signUpAttemptMail } from "@/features/auth/emails/sign-up-attempt";
 import { verifyEmailMail } from "@/features/auth/emails/verify-email";
 import {
@@ -105,7 +106,13 @@ export async function registerAccount(
 
     await tx.user.update({
       where: { id: existing.id },
-      data: { name, passwordHash, createdAt: now, passwordChangedAt: now },
+      data: {
+        name,
+        passwordHash,
+        createdAt: now,
+        passwordChangedAt: now,
+        ...UNLOCKED_PASSWORD,
+      },
     });
     const resent = await resendCode(tx, verifyOwner(existing.id), now);
     return {
