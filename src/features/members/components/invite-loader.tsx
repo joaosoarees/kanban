@@ -36,8 +36,18 @@ function noHashOnServer() {
 export function InviteLoader({ viewerEmail }: { viewerEmail: string | null }) {
   const hash = useSyncExternalStore(subscribeToHash, readHash, noHashOnServer);
   const [attempt, setAttempt] = useState(0);
+  const [isSettled, setIsSettled] = useState(false);
 
-  if (hash === null) {
+  useEffect(() => {
+    const settleTimer = setTimeout(() => {
+      setIsSettled(true);
+    }, 0);
+    return () => {
+      clearTimeout(settleTimer);
+    };
+  }, []);
+
+  if (hash === null || (hash === "" && !isSettled)) {
     return <InviteSkeleton />;
   }
   if (!inviteTokenSchema.safeParse(hash).success) {
