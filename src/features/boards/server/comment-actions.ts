@@ -121,6 +121,7 @@ export async function editCommentAction(
     RETURNING comment.id
   `;
   if (edited.length === 0) {
+    revalidateWorkspace(actor.slug);
     return COMMENT_GONE;
   }
 
@@ -129,6 +130,7 @@ export async function editCommentAction(
     select: COMMENT_SELECT,
   });
   if (!comment) {
+    revalidateWorkspace(actor.slug);
     return COMMENT_GONE;
   }
 
@@ -174,7 +176,7 @@ export async function deleteCommentAction(
     return count === 0 ? COMMENT_GONE : { status: "success", data: undefined };
   });
 
-  if (result.status === "success") {
+  if (result.status === "success" || result.gone === true) {
     revalidateWorkspace(actor.slug);
   }
   return result;
