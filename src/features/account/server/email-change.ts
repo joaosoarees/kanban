@@ -138,12 +138,14 @@ export async function confirmEmailChange(
   try {
     outcome = await db.$transaction(async (tx) => {
       await lockAccount(tx, account.id);
-      const current = await loadCode(tx, account.id);
-      const newEmail = current?.newEmail ?? null;
+      const consumed = await consumeCode(
+        tx,
+        changeOwner(account.id),
+        code,
+        now,
+      );
+      const newEmail = consumed?.newEmail ?? null;
       if (newEmail === null) {
-        return { status: "invalid" } as const;
-      }
-      if (!(await consumeCode(tx, changeOwner(account.id), code, now))) {
         return { status: "invalid" } as const;
       }
       if (await emailBelongsToSomeone(tx, newEmail)) {
