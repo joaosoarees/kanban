@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as z from "zod";
 import type {
   CardComment,
@@ -36,6 +36,18 @@ function newestFirst(comments: CardComment[]) {
   return [...byId.values()].toSorted((a, b) => (a.id < b.id ? 1 : -1));
 }
 
+function withPage(
+  current: CardComment[],
+  page: CardComment[],
+  removed: ReadonlySet<string>,
+) {
+  const known = new Set(current.map((comment) => comment.id));
+  const fresh = page.filter(
+    (comment) => !known.has(comment.id) && !removed.has(comment.id),
+  );
+  return newestFirst([...current, ...fresh]);
+}
+
 async function fetchCommentPage(
   url: string,
   before: string | null,
@@ -64,6 +76,7 @@ export function useCardComments(
   const [comments, setComments] = useState<CardComment[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [older, setOlder] = useState<OlderStatus>("idle");
+  const removedIds = useRef(new Set<string>());
 
   const isLoading = status === "loading";
 
@@ -78,7 +91,8 @@ export function useCardComments(
         setStatus("failed");
         return;
       }
-      setComments((current) => newestFirst([...current, ...page.comments]));
+      const removed = new Set(removedIds.current);
+      setComments((current) => withPage(current, page.comments, removed));
       setNextCursor(page.nextCursor);
       setStatus("ready");
     };
@@ -108,7 +122,8 @@ export function useCardComments(
         setOlder("failed");
         return;
       }
-      setComments((current) => newestFirst([...current, ...page.comments]));
+      const removed = new Set(removedIds.current);
+      setComments((current) => withPage(current, page.comments, removed));
       setNextCursor(page.nextCursor);
       setOlder("idle");
     },
@@ -116,6 +131,7 @@ export function useCardComments(
       setComments((current) => newestFirst([...current, comment]));
     },
     remove: (commentId: string) => {
+      removedIds.current.add(commentId);
       setComments((current) =>
         current.filter((comment) => comment.id !== commentId),
       );
