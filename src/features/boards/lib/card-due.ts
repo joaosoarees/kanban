@@ -62,6 +62,16 @@ export function formatDueDay(dueOn: string, today: string | null) {
     : `${label} ${year}`;
 }
 
+export function formatDueDate(dueOn: string) {
+  const { year, month, date } = parseDay(dueOn);
+  return `${date} ${MONTHS[month - 1] ?? ""} ${year}`;
+}
+
+export function dayToDate(day: string) {
+  const { year, month, date } = parseDay(day);
+  return new Date(year, month - 1, date);
+}
+
 export function isOverdue(card: DueCard, today: string) {
   return dueStatus(card, today) === "overdue";
 }
