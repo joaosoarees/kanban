@@ -209,6 +209,11 @@ Implementação em três PRs para a `release/slices-15-18`, depois do backend:
    - Conferir, só leitura, se a conta SES saiu do sandbox, senão o convite só chega a endereços verificados (`ses-sandbox-and-production-access`).
    - Decisões no `DESIGN.md` e a fatia marcada aqui (`craft`).
 
+Os três PRs entraram na `release/slices-15-18` (#61, #62 e o de proteção). A fatia é marcada como feita quando a release entrar na `main`.
+
+- SES conferido em 2026-11-26: a conta em `sa-east-1` saiu do sandbox e o domínio está verificado, então o convite chega a qualquer endereço.
+- Fica para depois: convites vencidos continuam na lista até alguém revogar ou reenviar, e nada apaga os vencidos antigos.
+
 ### Perfil da conta (fatia 16)
 
 - Página `/account`, fora de qualquer workspace, aberta pelo item "Conta" do menu do usuário, com três blocos: nome, senha e e-mail. Excluir a conta fica de fora: esbarra em ser o único OWNER e pede uma fatia própria.
