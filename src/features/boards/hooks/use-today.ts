@@ -9,22 +9,43 @@ function msUntilTomorrow(now: Date) {
   return tomorrow.getTime() - now.getTime();
 }
 
-function subscribe(onChange: () => void) {
+const listeners = new Set<() => void>();
+let stopClock: (() => void) | null = null;
+
+function notifyListeners() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+function startClock() {
   let timer = 0;
   const armMidnight = () => {
     timer = window.setTimeout(() => {
-      onChange();
+      notifyListeners();
       armMidnight();
     }, msUntilTomorrow(new Date()));
   };
 
   armMidnight();
-  window.addEventListener("focus", onChange);
-  document.addEventListener("visibilitychange", onChange);
+  window.addEventListener("focus", notifyListeners);
+  document.addEventListener("visibilitychange", notifyListeners);
   return () => {
     window.clearTimeout(timer);
-    window.removeEventListener("focus", onChange);
-    document.removeEventListener("visibilitychange", onChange);
+    window.removeEventListener("focus", notifyListeners);
+    document.removeEventListener("visibilitychange", notifyListeners);
+  };
+}
+
+function subscribe(onChange: () => void) {
+  listeners.add(onChange);
+  stopClock ??= startClock();
+  return () => {
+    listeners.delete(onChange);
+    if (listeners.size === 0) {
+      stopClock?.();
+      stopClock = null;
+    }
   };
 }
 
