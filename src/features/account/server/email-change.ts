@@ -103,7 +103,11 @@ export async function resendEmailChange(
   const result = await db.$transaction(async (tx) => {
     await lockAccount(tx, account.id);
     const current = await loadCode(tx, account.id);
-    if (current?.newEmail === null || current === null) {
+    if (
+      current?.newEmail === null ||
+      current === null ||
+      current.expiresAt.getTime() <= now.getTime()
+    ) {
       return { status: "gone" } as const;
     }
     const { newEmail } = current;
@@ -181,10 +185,21 @@ export async function confirmEmailChange(
   return outcome;
 }
 
-export async function cancelEmailChange(userId: string): Promise<void> {
+export async function cancelEmailChange(
+  userId: string,
+  now: Date,
+): Promise<void> {
   await db.$transaction(async (tx) => {
     await lockAccount(tx, userId);
-    await tx.emailCode.deleteMany({ where: changeOwner(userId) });
+    const current = await loadCode(tx, userId);
+    if (current === null || current.expiresAt.getTime() <= now.getTime()) {
+      return;
+    }
+    const expiresAt = Math.max(now.getTime(), current.sentAt.getTime() + 1);
+    await tx.emailCode.update({
+      where: { userId_purpose: changeOwner(userId) },
+      data: { expiresAt: new Date(expiresAt) },
+    });
   });
 }
 
