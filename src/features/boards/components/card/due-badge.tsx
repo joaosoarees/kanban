@@ -27,7 +27,7 @@ const STATUS_SUFFIX: Record<DueStatus, string> = {
 export function DueBadge({ card }: { card: DueCard }) {
   const today = useToday();
   const status = dueStatus(card, today);
-  if (status === null || (today === null && status !== "done")) {
+  if (status === null) {
     return null;
   }
 
@@ -45,6 +45,7 @@ export function DueBadge({ card }: { card: DueCard }) {
       className={cn(
         "inline-flex h-[22px] shrink-0 items-center gap-1 rounded-[5px] pr-[7px] pl-1.5 text-[13px]/[22px] font-medium whitespace-nowrap",
         STATUS_CLASSES[status],
+        today === null && status !== "done" && "invisible",
       )}
     >
       <Icon aria-hidden className="size-3" strokeWidth={2.25} />
