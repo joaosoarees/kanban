@@ -1,5 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { INVITE_GONE_PARAM } from "@/features/members/lib/invites";
 import { acceptInvite } from "@/features/members/server/invite-acceptance";
 import { db } from "@/server/db";
 import { forgetInvite, getRememberedInvite } from "@/server/session";
@@ -21,5 +22,10 @@ export async function enter(userId: string): Promise<never> {
   if (outcome.status === "accepted") {
     return redirect(`/w/${outcome.slug}`);
   }
-  return redirect(`/invite/${invite}`);
+  if (outcome.status === "other-email") {
+    return redirect(`/invite/${invite}`);
+  }
+  return redirect(
+    `${AFTER_SIGN_IN}?${INVITE_GONE_PARAM.name}=${INVITE_GONE_PARAM.value}`,
+  );
 }
