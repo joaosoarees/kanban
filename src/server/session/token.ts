@@ -179,3 +179,36 @@ export async function verifyResetGrant(
     return null;
   }
 }
+
+const INVITE_AUDIENCE = "pending-invite";
+
+export async function createInviteToken(
+  invite: string,
+  expiresAt: Date,
+): Promise<string> {
+  return new SignJWT({ inv: invite })
+    .setProtectedHeader({ alg: ALGORITHM })
+    .setAudience(INVITE_AUDIENCE)
+    .setIssuedAt()
+    .setExpirationTime(expiresAt)
+    .sign(getKey());
+}
+
+export async function verifyInviteToken(
+  token: string | undefined,
+): Promise<string | null> {
+  if (token === undefined || token === "") {
+    return null;
+  }
+
+  try {
+    const { payload } = await jwtVerify(token, getKey(), {
+      algorithms: [ALGORITHM],
+      audience: INVITE_AUDIENCE,
+      requiredClaims: ["exp", "aud", "inv"],
+    });
+    return typeof payload.inv === "string" ? payload.inv : null;
+  } catch {
+    return null;
+  }
+}
