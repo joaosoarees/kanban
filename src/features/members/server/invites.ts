@@ -103,6 +103,7 @@ export async function inviteMember(
   now: Date,
 ): Promise<InviteSent | ActionError> {
   const { email, role } = input;
+  appUrl("/");
   const result = await db.$transaction(async (tx) => {
     const denied = await recheckActor(tx, actor, "inviteMember");
     if (denied) {
@@ -128,7 +129,7 @@ export async function inviteMember(
       }
     } else {
       const pending = await tx.invite.count({
-        where: { workspaceId: actor.workspaceId },
+        where: { workspaceId: actor.workspaceId, expiresAt: { gt: now } },
       });
       if (pending >= MAX_PENDING_INVITES) {
         return fieldError(
@@ -174,6 +175,7 @@ export async function resendInvite(
   inviteId: string,
   now: Date,
 ): Promise<InviteSent | ActionError> {
+  appUrl("/");
   const result = await db.$transaction(async (tx) => {
     const denied = await recheckActor(tx, actor, "inviteMember");
     if (denied) {
