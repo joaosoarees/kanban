@@ -1,3 +1,5 @@
+"use client";
+
 import { useSyncExternalStore } from "react";
 
 const PHONE_QUERY = "(max-width: 39.99rem)";
