@@ -219,9 +219,9 @@ describe("matchesFilter by due date", () => {
   });
 
   it.each(["overdue", "week"] as const)(
-    "ignores the %s filter before the viewer's day is known",
+    "matches no card with the %s filter before the viewer's day is known",
     (due) => {
-      expect(shown(due, null)).toEqual(["1", "2", "3", "4", "5"]);
+      expect(shown(due, null)).toEqual([]);
     },
   );
 
