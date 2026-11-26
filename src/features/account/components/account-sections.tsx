@@ -10,9 +10,9 @@ export async function AccountSections() {
 
   return (
     <div className="flex flex-col gap-6">
-      <NameForm key={user.name} name={user.name} />
+      <NameForm name={user.name} />
       <PasswordForm />
-      <EmailCard key={user.email} email={user.email} change={change} />
+      <EmailCard email={user.email} change={change} />
     </div>
   );
 }
