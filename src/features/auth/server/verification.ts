@@ -182,8 +182,13 @@ export async function verifyEmail(
     if (account.emailVerifiedAt !== null) {
       return { status: "invalid" };
     }
-    const valid = await consumeCode(tx, verifyOwner(pending.userId), code, now);
-    if (!valid) {
+    const consumed = await consumeCode(
+      tx,
+      verifyOwner(pending.userId),
+      code,
+      now,
+    );
+    if (consumed === null) {
       return { status: "invalid" };
     }
     await tx.user.update({
