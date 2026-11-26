@@ -54,7 +54,7 @@ services:
       AWS_ACCESS_KEY_ID: ${MAIL_AWS_ACCESS_KEY_ID:?}
       AWS_SECRET_ACCESS_KEY: ${MAIL_AWS_SECRET_ACCESS_KEY:?}
     labels:
-      - traefik.http.routers.kanban-auth.rule=Host(`${SERVICE_FQDN_APP}`) && Method(`POST`) && (Path(`/sign-in`) || Path(`/sign-up`) || Path(`/verify-email`) || Path(`/forgot-password`) || Path(`/reset-password`))
+      - traefik.http.routers.kanban-auth.rule=Host(`${SERVICE_FQDN_APP}`) && Method(`POST`) && (Path(`/sign-in`) || Path(`/sign-up`) || Path(`/verify-email`) || Path(`/forgot-password`) || Path(`/reset-password`) || PathPrefix(`/invite/`))
       - traefik.http.routers.kanban-auth.priority=1000
       - traefik.http.routers.kanban-auth.entrypoints=https
       - traefik.http.routers.kanban-auth.tls=true
