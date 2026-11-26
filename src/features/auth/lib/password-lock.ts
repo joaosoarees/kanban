@@ -37,18 +37,22 @@ export const UNLOCKED_PASSWORD: PasswordGuard = {
   passwordLockedUntil: null,
 };
 
-function sameLock(a: Date | null, b: Date | null): boolean {
-  return a?.getTime() === b?.getTime();
+function sameGuard(a: PasswordGuard, b: PasswordGuard): boolean {
+  return (
+    a.failedPasswordAttempts === b.failedPasswordAttempts &&
+    a.passwordLockedUntil?.getTime() === b.passwordLockedUntil?.getTime()
+  );
 }
 
 export function afterPasswordMatch(
   current: PasswordGuard,
   reserved: PasswordGuard,
 ): PasswordGuard {
-  return sameLock(current.passwordLockedUntil, reserved.passwordLockedUntil)
-    ? UNLOCKED_PASSWORD
-    : {
-        failedPasswordAttempts: current.failedPasswordAttempts,
-        passwordLockedUntil: current.passwordLockedUntil,
-      };
+  if (sameGuard(current, reserved)) {
+    return UNLOCKED_PASSWORD;
+  }
+  return {
+    failedPasswordAttempts: Math.max(current.failedPasswordAttempts - 1, 0),
+    passwordLockedUntil: current.passwordLockedUntil,
+  };
 }
