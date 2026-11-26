@@ -101,18 +101,18 @@ describe("cardDescriptionSchema", () => {
 });
 
 describe("cardDueSchema", () => {
-  it("takes a calendar day or null", () => {
-    expect(cardDueSchema.safeParse({ dueOn: "2026-11-12" }).success).toBe(true);
-    expect(cardDueSchema.safeParse({ dueOn: null }).success).toBe(true);
+  it.each(["2026-11-12", null])("accepts %s", (dueOn) => {
+    const parsed = cardDueSchema.safeParse({ dueOn });
+
+    expect(parsed.success).toBe(true);
   });
 
-  it("refuses a time, an impossible day and a missing key", () => {
-    expect(
-      cardDueSchema.safeParse({ dueOn: "2026-11-12T10:00:00Z" }).success,
-    ).toBe(false);
-    expect(cardDueSchema.safeParse({ dueOn: "2026-02-30" }).success).toBe(
-      false,
-    );
-    expect(cardDueSchema.safeParse({}).success).toBe(false);
-  });
+  it.each(["2026-11-12T10:00:00Z", "2026-02-30", "12/11/2026", undefined])(
+    "refuses %s",
+    (dueOn) => {
+      const parsed = cardDueSchema.safeParse({ dueOn });
+
+      expect(parsed.success).toBe(false);
+    },
+  );
 });
