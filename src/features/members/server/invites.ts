@@ -43,14 +43,19 @@ function waitError(waitSeconds: number): ActionError {
 }
 
 async function deliver(delivery: InviteDelivery): Promise<boolean> {
-  return sendMail(
-    await inviteMail({
-      to: delivery.to,
-      inviterName: delivery.inviterName,
-      workspaceName: delivery.workspaceName,
-      link: appUrl(`/invite/${delivery.token}`),
-    }),
-  );
+  try {
+    return await sendMail(
+      await inviteMail({
+        to: delivery.to,
+        inviterName: delivery.inviterName,
+        workspaceName: delivery.workspaceName,
+        link: appUrl(`/invite/${delivery.token}`),
+      }),
+    );
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }
 
 async function claimDailySend(
