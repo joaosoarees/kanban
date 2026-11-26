@@ -1,5 +1,6 @@
 import { AssigneePicker } from "@/features/boards/components/card/assignee-picker";
 import { CompletionToggle } from "@/features/boards/components/card/completion-toggle";
+import { DuePicker } from "@/features/boards/components/card/due-picker";
 import { LabelPicker } from "@/features/boards/components/label/label-picker";
 import type {
   BoardCard,
@@ -30,6 +31,13 @@ export function CardProperties({
     <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-y-1 sm:grid-cols-[96px_minmax(0,1fr)] sm:gap-x-2 sm:gap-y-1.5">
       <span className={PROPERTY_LABEL}>Responsável</span>
       <AssigneePicker
+        workspaceId={workspaceId}
+        boardId={boardId}
+        card={card}
+        onUpdateCard={onUpdateCard}
+      />
+      <span className={cn(PROPERTY_LABEL, "mt-1.5 sm:mt-0")}>Prazo</span>
+      <DuePicker
         workspaceId={workspaceId}
         boardId={boardId}
         card={card}
