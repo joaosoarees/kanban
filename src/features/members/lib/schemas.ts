@@ -11,6 +11,14 @@ export const addMemberSchema = z.object({
   role: assignableRoleSchema,
 });
 
+export const inviteMemberSchema = addMemberSchema;
+
+export const inviteIdSchema = z.object({
+  inviteId: z.uuid(),
+});
+
+export const inviteTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/u);
+
 export const changeRoleSchema = z.object({
   userId: z.uuid(),
   role: assignableRoleSchema,
