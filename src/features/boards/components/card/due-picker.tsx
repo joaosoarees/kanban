@@ -69,6 +69,7 @@ export function DuePicker({
   const isInlineOpen = openIn === "inline" && isPhone;
   const { text, tone } = dueLabel(card, today);
   const selected = card.dueOn === null ? undefined : dayToDate(card.dueOn);
+  const todayDate = today === null ? undefined : dayToDate(today);
 
   const save = (dueOn: string | null) => {
     if (dueOn === card.dueOn) {
@@ -102,8 +103,9 @@ export function DuePicker({
       mode="single"
       required
       locale={ptBR}
+      today={todayDate}
       selected={selected}
-      defaultMonth={selected ?? (today === null ? undefined : dayToDate(today))}
+      defaultMonth={selected ?? todayDate}
       onSelect={(date) => {
         save(localDay(date));
         setOpenIn(null);
