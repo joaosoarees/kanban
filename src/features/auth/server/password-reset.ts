@@ -1,5 +1,5 @@
 import "server-only";
-import { UNLOCKED_PASSWORD } from "@/features/auth/server/password-check";
+import { UNLOCKED_PASSWORD } from "@/features/auth/lib/password-lock";
 import { resetPasswordMail } from "@/features/auth/emails/reset-password";
 import {
   RESEND_INTERVAL_MS,

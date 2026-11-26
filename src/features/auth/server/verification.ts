@@ -1,5 +1,5 @@
 import "server-only";
-import { UNLOCKED_PASSWORD } from "@/features/auth/server/password-check";
+import { UNLOCKED_PASSWORD } from "@/features/auth/lib/password-lock";
 import { signUpAttemptMail } from "@/features/auth/emails/sign-up-attempt";
 import { verifyEmailMail } from "@/features/auth/emails/verify-email";
 import {
