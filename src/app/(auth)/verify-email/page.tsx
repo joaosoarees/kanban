@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { VerifyEmail } from "@/features/auth/components/verify-email";
 import { VerifyEmailExpired } from "@/features/auth/components/verify-email-expired";
 import { loadPendingVerification } from "@/features/auth/server/verification";
+import { InviteNote } from "@/features/members/components/invite-note";
+import { loadRememberedInvite } from "@/features/members/server/invite-acceptance";
 import { getPendingVerification } from "@/server/session";
 
 export const metadata: Metadata = { title: "Confirmar e-mail" };
@@ -16,7 +18,10 @@ export default function VerifyEmailPage() {
 }
 
 async function PendingVerification() {
-  const pending = await getPendingVerification();
+  const [pending, invite] = await Promise.all([
+    getPendingVerification(),
+    loadRememberedInvite(),
+  ]);
   const screen =
     pending === null ? null : await loadPendingVerification(pending);
 
@@ -24,5 +29,10 @@ async function PendingVerification() {
     return <VerifyEmailExpired />;
   }
 
-  return <VerifyEmail email={screen.email} initialWait={screen.waitSeconds} />;
+  return (
+    <>
+      {invite && <InviteNote invite={invite} />}
+      <VerifyEmail email={screen.email} initialWait={screen.waitSeconds} />
+    </>
+  );
 }

@@ -83,6 +83,10 @@ export async function continueWithInviteAction(
   return redirect(next === "sign-up" ? "/sign-up" : "/sign-in");
 }
 
+export async function dismissInviteAction(): Promise<void> {
+  await forgetInvite();
+}
+
 const INVITE_NOT_DELIVERED =
   "O convite foi salvo, mas não conseguimos enviar o e-mail. Use “Reenviar” em instantes.";
 
