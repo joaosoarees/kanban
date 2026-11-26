@@ -144,6 +144,8 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-26 — A data do comentário é "hoje, 18h30", "ontem, 9h12" ou "20/11, 18h30", com o ano só fora do ano atual — sem "há 5 min", para o texto não mudar sozinho com a tela aberta.
 - 2026-11-26 — "Editar" e "Excluir" ficam no cabeçalho do comentário, sempre visíveis; no celular descem para baixo do texto. O autor edita e exclui; ADMIN e OWNER só excluem os dos outros. Excluir pede confirmação.
 - 2026-11-26 — No card do quadro, o número de comentários vem com o ícone `MessageSquare` em 12px ao lado do avatar e some quando é zero.
+- 2026-11-26 — O link do convite é `/invite#<token>`: o token fica fora do log de acesso, e o navegador busca a prévia. Enquanto carrega, um esqueleto do tamanho da tela de convidado; depois de 2 s, a linha de baixo vira "Ainda carregando o convite…".
+- 2026-11-26 — Se a prévia do convite não carrega, a tela diz "Não foi possível carregar o convite" com "Tentar de novo", no layout de "Este convite não vale mais", e não chama de inválido um link que pode estar certo. Sem token ou com token mal formado, vale a tela "Este convite não vale mais"; o link antigo `/invite/<token>` redireciona para `/invite#<token>`.
 
 ## Perguntas abertas
 
