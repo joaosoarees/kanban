@@ -1,4 +1,5 @@
 import "server-only";
+import { connection } from "next/server";
 import {
   INVITE_GONE_MESSAGE,
   isInviteExpired,
@@ -57,7 +58,11 @@ export async function previewInvite(
   token: unknown,
 ): Promise<InvitePreview | null> {
   const parsed = inviteTokenSchema.safeParse(token);
-  return parsed.success ? loadInvite(parsed.data, new Date()) : null;
+  if (!parsed.success) {
+    return null;
+  }
+  await connection();
+  return loadInvite(parsed.data, new Date());
 }
 
 export async function loadRememberedInvite(): Promise<InvitePreview | null> {
