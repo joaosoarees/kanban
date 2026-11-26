@@ -14,6 +14,7 @@ type CardRow = {
   labelIds: string[];
   dueOn: string | null;
   completed: boolean;
+  commentCount: number;
 };
 
 export async function getBoards(workspaceId: string) {
@@ -60,7 +61,12 @@ export const requireBoard = cache(
           SELECT applied."labelId"::text
           FROM card_labels applied
           WHERE applied."cardId" = card.id
-        ) AS "labelIds"
+        ) AS "labelIds",
+        (
+          SELECT count(*)::int
+          FROM comments comment
+          WHERE comment."cardId" = card.id
+        ) AS "commentCount"
       FROM cards card
       JOIN columns board_column ON board_column.id = card."columnId"
       WHERE board_column."boardId" = ${board.id}::uuid
