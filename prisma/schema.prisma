@@ -136,13 +136,15 @@ model Column {
 }
 
 model Card {
-  id          String   @id @default(uuid(7)) @db.Uuid
-  columnId    String   @db.Uuid
-  assigneeId  String?  @db.Uuid
+  id          String    @id @default(uuid(7)) @db.Uuid
+  columnId    String    @db.Uuid
+  assigneeId  String?   @db.Uuid
   title       String
   description String?
   position    String
-  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  dueOn       DateTime? @db.Date
+  completedAt DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
 
   column   Column      @relation(fields: [columnId], references: [id], onDelete: Cascade)
   assignee User?       @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
