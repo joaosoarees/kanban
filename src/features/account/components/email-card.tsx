@@ -236,7 +236,11 @@ function EmailCodeStep({
   onChanged,
 }: EmailCodeStepProps) {
   const restart = async () => {
-    await cancelEmailChangeAction();
+    const result = await cancelEmailChangeAction();
+    if (result.status === "error") {
+      toast.error(result.message);
+      return;
+    }
     onRestart();
   };
 
