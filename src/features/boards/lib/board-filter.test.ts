@@ -218,8 +218,14 @@ describe("matchesFilter by due date", () => {
     ).toBe(false);
   });
 
-  it("shows no dated match before the viewer's day is known", () => {
-    expect(shown("overdue", null)).toEqual([]);
+  it.each(["overdue", "week"] as const)(
+    "ignores the %s filter before the viewer's day is known",
+    (due) => {
+      expect(shown(due, null)).toEqual(["1", "2", "3", "4", "5"]);
+    },
+  );
+
+  it("keeps cards without a due date before the viewer's day is known", () => {
     expect(shown("none", null)).toEqual(["5"]);
   });
 });
