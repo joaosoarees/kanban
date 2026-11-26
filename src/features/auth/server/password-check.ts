@@ -60,11 +60,11 @@ async function settleMatch(
 ): Promise<void> {
   await db.$transaction(async (tx) => {
     await lockUser(tx, userId);
-    const current = await tx.user.findUniqueOrThrow({
+    const current = await tx.user.findUnique({
       where: { id: userId },
       select: GUARD_SELECT,
     });
-    if (current.passwordHash !== passwordHash) {
+    if (current?.passwordHash !== passwordHash) {
       return;
     }
     await tx.user.update({
