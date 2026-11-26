@@ -17,7 +17,7 @@ type Notice = { tone: "info" | "error"; text: string };
 type ResendOptions = {
   action: ResendAction;
   initialWait: number;
-  onExpired: () => void;
+  onExpired: (message?: string) => void;
   onNotice: (notice: Notice | null) => void;
 };
 
@@ -58,7 +58,7 @@ function useResendCode({
         return;
       }
       if (result.gone === true) {
-        onExpired();
+        onExpired(result.message);
         return;
       }
       onNotice({ tone: "error", text: result.message });
@@ -122,7 +122,10 @@ function toastNotice(notice: Notice | null) {
   toast.success(notice.text);
 }
 
-export function ResendButton(props: ResendProps) {
+export function ResendButton({
+  disabled = false,
+  ...props
+}: ResendProps & { disabled?: boolean }) {
   const { wait, isPending, resend } = useResendCode({
     ...props,
     onNotice: toastNotice,
@@ -132,7 +135,7 @@ export function ResendButton(props: ResendProps) {
     <Button
       type="button"
       variant="outline"
-      disabled={isPending || wait > 0}
+      disabled={disabled || isPending || wait > 0}
       aria-busy={isPending || undefined}
       onClick={resend}
       className="h-10 w-full px-4 tabular-nums enabled:hover:bg-muted sm:w-42"
