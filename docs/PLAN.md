@@ -76,7 +76,7 @@ Deletes em cascata de Workspace até Card.
 - Postgres no mesmo compose, sem porta publicada. Migrations num serviço `migrate` que roda antes do `app`; elas são sempre compatíveis com a versão anterior do código.
 - Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura no repositório.
 - Backup: `pg_dump` a cada hora e envio diário ao S3 com 7 dias de retenção.
-- Rate limit no Traefik para `POST` de login, cadastro e adicionar membro.
+- Rate limit no Traefik para o `POST` das telas de entrada e de conta (ver as fatias 13 e 15).
 - Rollback por `git revert` em PR.
 
 ## Reorganização (fatias 10 e 11)
@@ -165,6 +165,75 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 - As telas passam pelo `craft`.
 - Skills: `cognito-password-reset` (fluxo), `nextjs-jwt-session`, `password-hashing`, `craft`.
 
+## Convites, conta, prazo e comentários (fatias 15 a 18)
+
+- As quatro fatias formam um pacote: os PRs entram na branch `release/slices-15-18`, com o `check` do CI verde e merge por rebase, e ela vai para a `main` de uma vez no fim, com um único deploy.
+- As telas novas passam pelo `craft` antes de serem implementadas: `/invite/[token]`, os convites pendentes em membros, `/account`, o prazo e o "concluído" no card e no diálogo, e os comentários no diálogo.
+- Os únicos e-mails novos são o convite, o código de troca de e-mail e o aviso ao endereço antigo. Comentários e prazos não mandam e-mail.
+
+### Convites com aceite (fatia 15)
+
+- O convite substitui o "adicionar pelo e-mail". OWNER e ADMIN convidam com o papel MEMBER ou ADMIN, nunca OWNER. A resposta é sempre "Convite enviado para x", com ou sem conta, e o rate limit de enumeração do adicionar sai junto. A única recusa é para quem já é membro ("Esta pessoa já faz parte do workspace"), que quem convida já vê na lista.
+- O link `/invite/<token>` leva um token de 32 bytes aleatórios. O banco guarda só o SHA-256: com essa entropia, um hash rápido basta. O convite vale por 7 dias e uma vez só.
+- Aceitar exige estar logado com o e-mail convidado, já verificado. Com outra conta aberta, a tela diz "Este convite é para outro e-mail" e oferece trocar de conta.
+- Sem sessão, a página mostra o workspace e quem convidou, com "Entrar" e "Criar conta"; o cadastro vem com o e-mail preenchido e travado. O token fica num cookie `pending_invite` (JWT com `aud` próprio e a validade do convite), e o aceite acontece depois do login ou da verificação do e-mail, levando ao workspace.
+- Token errado, vencido ou revogado caem na mesma tela: "Este convite não vale mais. Peça um novo a quem convidou."
+- O aceite roda numa transação com a linha do workspace travada (`recheckActor`): quem convidou ainda precisa ser OWNER ou ADMIN e o papel ainda precisa ser permitido. Aceitar cria o membership e apaga o convite. Quem já é membro só vê o convite sumir e entra no workspace.
+- A página de membros ganha "Convites pendentes", só para OWNER e ADMIN, com reenviar e revogar. Reenviar gera um token novo e mais 7 dias; revogar apaga. O vencido continua na lista até um dos dois. Convidar de novo o mesmo e-mail substitui o convite anterior.
+- Limites contra spam saindo do domínio no SES: 50 convites pendentes por workspace, 60 s entre reenvios do mesmo convite e 20 envios por dia por quem convida. Os envios do dia são contados numa tabela própria, para que revogar não devolva a cota.
+- O rate limit do Traefik passa a cobrir também o `POST` de `/invite/<token>` e `/account`.
+- Skills: `multi-tenant-data-model`, `tenant-role-authorization`, `role-based-access-control`, `relational-keys-and-column-types`, `postgres-constraints-and-keys`, `defining-access-patterns`, `postgres-indexes-and-explain`, `prisma-transactions`, `postgres-locking-and-isolation`, `password-hashing` (quando um hash rápido basta), `nextjs-jwt-session`, `nextjs-auth-cookies`, `nextjs-redirects`, `ses-sandbox-and-production-access`, `cognito-sign-up-and-confirmation` (fluxo), `craft`.
+
+```
+Invite (id, workspaceId, email, role: MEMBER | ADMIN, invitedById, tokenHash, sentAt, expiresAt)
+  UNIQUE (workspaceId, email), UNIQUE (tokenHash), onDelete: Cascade
+  CHECK (email = lower(email)), CHECK (expiresAt > sentAt), CHECK (tokenHash ~ '^[0-9a-f]{64}$')
+InviteSend (id, invitedById, sentAt)   @@index([invitedById, sentAt])
+```
+
+### Perfil da conta (fatia 16)
+
+- Página `/account`, fora de qualquer workspace, aberta pelo item "Conta" do menu do usuário, com três blocos: nome, senha e e-mail. Excluir a conta fica de fora: esbarra em ser o único OWNER e pede uma fatia própria.
+- Nome: troca simples.
+- Senha: pede a atual. A troca atualiza `password_changed_at`, o que derruba as outras sessões; a sessão atual recebe um token novo.
+- E-mail: começar a troca pede a senha atual. Um código `CHANGE_EMAIL` vai para o endereço novo, com as regras dos outros códigos (8 dígitos, 15 minutos, 5 tentativas, 60 s entre envios), e o e-mail só muda depois do código certo. O endereço antigo recebe um aviso. As sessões continuam.
+- Um e-mail novo que já tem conta recebe a mesma resposta ("Enviamos um código"), mas nenhum código sai. A unicidade é conferida de novo na confirmação.
+- Skills: `password-hashing`, `nextjs-jwt-session`, `nextjs-auth-cookies`, `cognito-password-reset` (fluxo), `normalizing-relational-schemas`, `postgres-constraints-and-keys`, `prisma-schema-and-migrations`, `nextjs-server-action-forms`, `react-hook-form-zod`, `nextjs-app-router-routing`, `craft`.
+
+```
+EmailCodePurpose + CHANGE_EMAIL
+EmailCode + newEmail?   CHECK ((purpose = 'CHANGE_EMAIL') = (newEmail IS NOT NULL)), CHECK (newEmail = lower(newEmail))
+```
+
+### Prazo no card (fatia 17)
+
+- O prazo é só a data (`due_on date`), sem hora. "Atrasado" é uma data anterior a hoje no fuso de quem vê, calculado no cliente.
+- O card ganha `completed_at`, marcado por uma caixa no diálogo, com ou sem prazo. Card concluído nunca conta como atrasado e mostra o selo verde.
+- Qualquer membro define e remove o prazo e marca como concluído, salvando na hora, de forma otimista e idempotente, como as etiquetas.
+- O selo no card mostra "12 nov" ("12 nov 2027" em outro ano), vermelho se atrasado e destacado se vence hoje.
+- Filtro `?due=overdue|week|none`, combinado por "e" com etiquetas e responsável: `overdue` são os atrasados não concluídos, `week` os que vencem de hoje até 7 dias à frente, sem os concluídos, e `none` os sem prazo.
+- Skills: `relational-keys-and-column-types` (date contra timestamptz), `defining-access-patterns`, `prisma-schema-and-migrations`, `react-query-optimistic-updates` (padrão otimista), `craft`.
+
+```
+Card + dueOn? @db.Date, completedAt? @db.Timestamptz(3)
+```
+
+### Comentários no card (fatia 18)
+
+- Só comentários: autor, texto puro de até 5.000 caracteres e data, sem formatação nem menções. O histórico automático fica de fora, porque exigiria registrar eventos em todas as actions.
+- O autor edita e exclui os próprios comentários; ADMIN e OWNER excluem qualquer um. Comentário editado mostra "(editado)". Excluir pede confirmação.
+- Quem sai do workspace deixa os comentários, com o nome.
+- Os comentários carregam quando o diálogo abre, fora da consulta do quadro: os 30 mais recentes, e "Ver anteriores" busca mais com cursor pelo id (uuid v7, já em ordem).
+- O card no quadro mostra um ícone com o número de comentários, contado com `_count` na consulta do quadro, sem coluna de contador.
+- Comentário novo vai pelo `useActionForm` e aparece quando a action termina, com o botão em "enviando", sem ser otimista, para o texto não sumir numa falha. Editar e excluir chamam `runAction`.
+- Skills: `modeling-entity-relationships`, `postgres-constraints-and-keys`, `sql-cursor-pagination`, `prisma-read-queries`, `precomputed-counters` (por que não ter contador), `nextjs-server-action-forms`, `react-hook-form-zod`, `craft`.
+
+```
+Comment (id, cardId, authorId, body, createdAt, editedAt?)
+  @@index([cardId, id]), card onDelete: Cascade
+  CHECK (char_length(body) BETWEEN 1 AND 5000)
+```
+
 ## Processo
 
 - Commits pequenos, um assunto por commit.
@@ -187,3 +256,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 12. [x] Envio de e-mail: Mailpit, SES e templates
 13. [x] Verificação de e-mail
 14. [x] Esqueci a senha
+15. [ ] Convites com aceite
+16. [ ] Perfil da conta
+17. [ ] Prazo no card
+18. [ ] Comentários no card
