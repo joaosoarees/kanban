@@ -1,7 +1,13 @@
 "use client";
 
 import { CircleAlert, Loader2, RefreshCw } from "lucide-react";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCardComments } from "@/features/boards/hooks/use-card-comments";
@@ -65,9 +71,7 @@ export function CardComments({
   const [edits, setEdits] = useState<ReadonlyMap<string, CommentFormState>>(
     new Map(),
   );
-  const editStates = comments.comments.flatMap(
-    (comment) => edits.get(comment.id) ?? [],
-  );
+  const editStates = [...edits.values()];
   const hasEdit = editStates.some((state) => state.isDirty);
   const unsaved = composer.isDirty
     ? hasEdit
@@ -80,6 +84,16 @@ export function CardComments({
   const isBusy =
     composer.isPending || editStates.some((state) => state.isPending);
   const reportState = useEffectEvent(onStateChange);
+  const forgetEdit = useCallback((commentId: string) => {
+    setEdits((current) => {
+      if (!current.has(commentId)) {
+        return current;
+      }
+      const next = new Map(current);
+      next.delete(commentId);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     reportState({ unsaved, isBusy });
@@ -155,6 +169,7 @@ export function CardComments({
                 comments.remove(commentId);
                 requestAnimationFrame(() => composerRef.current?.focus());
               }}
+              onEditClosed={forgetEdit}
               onEditStateChange={(commentId, state) => {
                 setEdits((current) => {
                   const isOpen = state.isDirty || state.isPending;
