@@ -195,6 +195,6 @@ export async function confirmEmailChangeAction(
 
 export async function cancelEmailChangeAction(): Promise<ActionResult> {
   const user = await requireUser();
-  await cancelEmailChange(user.id);
+  await cancelEmailChange(user.id, new Date());
   return { status: "success", data: undefined };
 }
