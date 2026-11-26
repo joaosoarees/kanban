@@ -112,7 +112,7 @@ function matchesDue(
     return card.dueOn === null;
   }
   if (today === null) {
-    return true;
+    return false;
   }
   return due === "overdue"
     ? isOverdue(card, today)
