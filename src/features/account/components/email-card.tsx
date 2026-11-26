@@ -117,6 +117,7 @@ function EmailRequestForm({
   onCancel,
   onSent,
 }: EmailRequestFormProps) {
+  const [isTakenShown, setIsTakenShown] = useState(true);
   const {
     form: {
       register,
@@ -158,8 +159,16 @@ function EmailRequestForm({
           autoCapitalize="none"
           spellCheck={false}
           hint="Enviamos um código para o endereço novo."
-          error={errors.newEmail?.message ?? errors.root?.message ?? takenError}
-          {...register("newEmail")}
+          error={
+            errors.newEmail?.message ??
+            errors.root?.message ??
+            (isTakenShown ? takenError : undefined)
+          }
+          {...register("newEmail", {
+            onChange: () => {
+              setIsTakenShown(false);
+            },
+          })}
         />
         <TextField
           id="account-email-password"
