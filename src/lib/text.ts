@@ -16,3 +16,7 @@ export function hasNoNul(text: string) {
 export function hasNoLineBreak(text: string) {
   return !LINE_BREAK.test(text);
 }
+
+export function codePointLength(text: string) {
+  return Array.from(text).length;
+}
