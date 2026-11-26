@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
@@ -34,6 +34,19 @@ export function EmailCard({ email, change }: EmailCardProps) {
   const [step, setStep] = useState<Step>(
     change === null ? { kind: "idle" } : { kind: "code", ...change },
   );
+  const [hasMoved, setHasMoved] = useState(false);
+  const changeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (hasMoved && step.kind === "idle") {
+      changeButtonRef.current?.focus();
+    }
+  }, [hasMoved, step.kind]);
+
+  const go = (next: Step) => {
+    setHasMoved(true);
+    setStep(next);
+  };
 
   if (step.kind === "idle") {
     return (
@@ -49,8 +62,9 @@ export function EmailCard({ email, change }: EmailCardProps) {
           </div>
           <Button
             variant="outline"
+            ref={changeButtonRef}
             onClick={() => {
-              setStep({ kind: "request" });
+              go({ kind: "request" });
             }}
             className="h-10 w-full shrink-0 px-4 hover:bg-muted sm:w-36"
           >
@@ -67,10 +81,10 @@ export function EmailCard({ email, change }: EmailCardProps) {
         <EmailRequestForm
           takenError={step.error}
           onCancel={() => {
-            setStep({ kind: "idle" });
+            go({ kind: "idle" });
           }}
           onSent={(sent) => {
-            setStep({ kind: "code", ...sent });
+            go({ kind: "code", ...sent });
           }}
         />
       </AccountCard>
@@ -81,11 +95,12 @@ export function EmailCard({ email, change }: EmailCardProps) {
     <EmailCodeStep
       newEmail={step.newEmail}
       waitSeconds={step.waitSeconds}
+      focusOnMount={hasMoved}
       onRestart={(error) => {
-        setStep({ kind: "request", error });
+        go({ kind: "request", error });
       }}
       onChanged={() => {
-        setStep({ kind: "idle" });
+        go({ kind: "idle" });
       }}
     />
   );
@@ -105,6 +120,7 @@ function EmailRequestForm({
   const {
     form: {
       register,
+      setFocus,
       formState: { errors },
     },
     submit,
@@ -116,6 +132,10 @@ function EmailRequestForm({
     failure: REQUEST_FAILED,
     onSuccess: onSent,
   });
+
+  useEffect(() => {
+    setFocus("newEmail");
+  }, [setFocus]);
 
   return (
     <form
@@ -194,6 +214,7 @@ async function resend() {
 type EmailCodeStepProps = {
   newEmail: string;
   waitSeconds: number;
+  focusOnMount: boolean;
   onRestart: (error?: string) => void;
   onChanged: () => void;
 };
@@ -201,6 +222,7 @@ type EmailCodeStepProps = {
 function EmailCodeStep({
   newEmail,
   waitSeconds,
+  focusOnMount,
   onRestart,
   onChanged,
 }: EmailCodeStepProps) {
@@ -229,6 +251,7 @@ function EmailCodeStep({
         switchAction={restart}
         submitLabel="Confirmar"
         layout="card"
+        focusOnMount={focusOnMount}
         initialWait={waitSeconds}
         onExpired={onRestart}
         onSuccess={() => {
