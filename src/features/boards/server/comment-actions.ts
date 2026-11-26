@@ -105,17 +105,30 @@ export async function editCommentAction(
     return invalidFields(parsed.error);
   }
 
-  const updated = await db.comment.updateManyAndReturn({
-    where: {
-      id: id.data,
-      authorId: actor.userId,
-      card: cardScope(ref, actor.workspaceId),
-    },
-    data: { body: parsed.data.body, editedAt: new Date() },
+  const edited = await db.$queryRaw<{ id: string }[]>`
+    UPDATE comments AS comment
+    SET body = ${parsed.data.body},
+      "editedAt" = GREATEST(now(), comment."createdAt")
+    FROM cards card
+    JOIN columns board_column ON board_column.id = card."columnId"
+    JOIN boards board ON board.id = board_column."boardId"
+    WHERE comment.id = ${id.data}::uuid
+      AND comment."authorId" = ${actor.userId}::uuid
+      AND card.id = comment."cardId"
+      AND card.id = ${ref.cardId}::uuid
+      AND board_column."boardId" = ${ref.boardId}::uuid
+      AND board."workspaceId" = ${actor.workspaceId}::uuid
+    RETURNING comment.id
+  `;
+  if (edited.length === 0) {
+    return COMMENT_GONE;
+  }
+
+  const comment = await db.comment.findUnique({
+    where: { id: id.data },
     select: COMMENT_SELECT,
   });
-  const comment = updated.at(0);
-  if (comment === undefined) {
+  if (!comment) {
     return COMMENT_GONE;
   }
 
@@ -148,11 +161,13 @@ export async function deleteCommentAction(
       return COMMENT_GONE;
     }
 
-    if (comment.authorId !== actor.userId) {
-      const denied = await recheckActor(tx, actor, "deleteAnyComment");
-      if (denied) {
-        return denied;
-      }
+    const denied = await recheckActor(
+      tx,
+      actor,
+      comment.authorId === actor.userId ? "manageCards" : "deleteAnyComment",
+    );
+    if (denied) {
+      return denied;
     }
 
     const { count } = await tx.comment.deleteMany({ where: { id: id.data } });
