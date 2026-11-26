@@ -1,6 +1,7 @@
 import { AlignLeft } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import { DueBadge } from "@/features/boards/components/card/due-badge";
 import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
 import { LabelTag } from "@/features/boards/components/label/label-tag";
 import type { BoardCard as BoardCardData } from "@/features/boards/hooks/use-board-columns";
@@ -30,9 +31,13 @@ function CardContent({ card }: { card: BoardCardData }) {
           </span>
         )}
       </span>
-      {(cardLabels.length > 0 || assignee !== undefined) && (
+      {(cardLabels.length > 0 ||
+        assignee !== undefined ||
+        card.dueOn !== null ||
+        card.completed) && (
         <span className="flex w-full items-end justify-between gap-2">
           <span className="flex min-w-0 flex-wrap items-center gap-1">
+            <DueBadge card={card} />
             {cardLabels.slice(0, VISIBLE_LABELS).map(({ id, name, color }) => (
               <LabelTag key={id} name={name} color={color} />
             ))}
