@@ -2,11 +2,7 @@ import "server-only";
 import { emailChangeCodeMail } from "@/features/account/emails/email-change-code";
 import { emailChangedMail } from "@/features/account/emails/email-changed";
 import { secondsUntilResend } from "@/features/auth/lib/email-code";
-import {
-  consumeCode,
-  issueCode,
-  resendCode,
-} from "@/features/auth/server/email-code";
+import { consumeCode, issueCode } from "@/features/auth/server/email-code";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/server/db";
 import { sendMail } from "@/server/mail/send";
@@ -107,20 +103,19 @@ export async function resendEmailChange(
   const result = await db.$transaction(async (tx) => {
     await lockAccount(tx, account.id);
     const current = await loadCode(tx, account.id);
-    const newEmail = current?.newEmail ?? null;
-    if (newEmail === null) {
+    if (current?.newEmail === null || current === null) {
       return { status: "gone" } as const;
     }
-    const resent = await resendCode(tx, changeOwner(account.id), now);
-    if ("waitSeconds" in resent) {
-      return { status: "wait", waitSeconds: resent.waitSeconds } as const;
+    const { newEmail } = current;
+    const waitSeconds = secondsUntilResend(current.sentAt, now);
+    if (waitSeconds > 0) {
+      return { status: "wait", waitSeconds } as const;
     }
+    const code = await issueCode(tx, changeOwner(account.id), now, newEmail);
     const taken = await emailBelongsToSomeone(tx, newEmail);
     return {
       status: "sent",
-      delivery: taken
-        ? null
-        : { to: newEmail, name: account.name, code: resent.code },
+      delivery: taken ? null : { to: newEmail, name: account.name, code },
     } as const;
   });
 
@@ -138,6 +133,7 @@ export async function confirmEmailChange(
   let outcome: EmailChangeConfirmation;
   try {
     outcome = await db.$transaction(async (tx) => {
+      await lockAccount(tx, account.id);
       const current = await loadCode(tx, account.id);
       const newEmail = current?.newEmail ?? null;
       if (newEmail === null) {
@@ -152,6 +148,12 @@ export async function confirmEmailChange(
       await tx.user.update({
         where: { id: account.id },
         data: { email: newEmail },
+      });
+      await tx.emailCode.deleteMany({
+        where: {
+          userId: account.id,
+          purpose: { in: ["RESET_PASSWORD", "VERIFY_EMAIL"] },
+        },
       });
       return { status: "changed", email: newEmail } as const;
     });
@@ -180,7 +182,10 @@ export async function confirmEmailChange(
 }
 
 export async function cancelEmailChange(userId: string): Promise<void> {
-  await db.emailCode.deleteMany({ where: changeOwner(userId) });
+  await db.$transaction(async (tx) => {
+    await lockAccount(tx, userId);
+    await tx.emailCode.deleteMany({ where: changeOwner(userId) });
+  });
 }
 
 export async function loadEmailChange(
