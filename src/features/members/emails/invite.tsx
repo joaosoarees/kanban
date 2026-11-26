@@ -1,4 +1,4 @@
-import { Button } from "react-email";
+import { Button, Link } from "react-email";
 import { mailColors, MailLayout, MailText } from "@/server/mail/layout";
 import { renderMail } from "@/server/mail/render";
 
@@ -37,6 +37,16 @@ export function Invite({ to, inviterName, workspaceName, link }: InviteProps) {
       >
         Ver convite
       </Button>
+      <MailText small>
+        Se o botão não abrir, copie este endereço no navegador:
+        <br />
+        <Link
+          href={link}
+          style={{ color: mailColors.brand, wordBreak: "break-all" }}
+        >
+          {link}
+        </Link>
+      </MailText>
       <MailText small>
         O convite vale por 7 dias e só para este e-mail. Se você ainda não tem
         conta, pode criar uma pelo link.
