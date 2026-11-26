@@ -234,6 +234,14 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
   CHECK (char_length(body) BETWEEN 1 AND 5000)
 ```
 
+## Deploy sem queda (fatia 19)
+
+- Hoje o Coolify publica o `compose.prod.yaml` inteiro e, a cada deploy, para todos os contêineres antes de subir os novos: o app fica fora enquanto o Postgres reinicia, o `migrate` roda e o app novo passa no healthcheck.
+- O app sai do compose e vira um Application de Dockerfile no Coolify, com rolling update: o contêiner novo sobe, passa no healthcheck e só então o antigo sai. Postgres, `db-dump` e backup ficam no compose e deixam de reiniciar a cada deploy.
+- O `migrate` roda antes do app novo, com o antigo ainda no ar. Isso já é a regra deste plano: migrations sempre compatíveis com a versão anterior do código.
+- A conferir antes de começar: em que contêiner o Coolify roda o comando de pré-deploy, como o app alcança o Postgres de outro recurso pela rede, e como ficam os labels de rate limit do Traefik e o job `deploy` do CI.
+- Skills: `ci-cd-pipeline-fundamentals`, `github-actions-ci-workflow`, `prisma-schema-and-migrations` (`migrate deploy`).
+
 ## Processo
 
 - Commits pequenos, um assunto por commit.
@@ -260,3 +268,4 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 16. [ ] Perfil da conta
 17. [ ] Prazo no card
 18. [ ] Comentários no card
+19. [ ] Deploy sem queda
