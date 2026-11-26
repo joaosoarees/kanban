@@ -22,13 +22,15 @@ const newPasswordField = z
     error: "Senha longa demais.",
   });
 
+export const userNameField = z
+  .string()
+  .trim()
+  .max(120, "Use no máximo 120 caracteres.")
+  .refine(hasVisibleText, "Digite seu nome.")
+  .refine(hasNoNul, INVALID_CHARACTER);
+
 export const signUpSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .max(120, "Use no máximo 120 caracteres.")
-    .refine(hasVisibleText, "Digite seu nome.")
-    .refine(hasNoNul, INVALID_CHARACTER),
+  name: userNameField,
   email: emailField,
   password: newPasswordField,
 });
