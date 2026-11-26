@@ -24,15 +24,14 @@ export function revalidateWorkspace(slug: string) {
   revalidatePath(`/w/${slug}`, "layout");
 }
 
-export async function loadActor(workspaceId: unknown) {
-  const user = await requireUser();
+async function actorOf(userId: string, workspaceId: unknown) {
   const id = z.uuid().safeParse(workspaceId);
   if (!id.success) {
     return null;
   }
 
   const membership = await db.membership.findUnique({
-    where: { userId_workspaceId: { userId: user.id, workspaceId: id.data } },
+    where: { userId_workspaceId: { userId, workspaceId: id.data } },
     select: { role: true, workspace: { select: { slug: true, name: true } } },
   });
   if (!membership) {
@@ -40,7 +39,7 @@ export async function loadActor(workspaceId: unknown) {
   }
 
   return {
-    userId: user.id,
+    userId,
     workspaceId: id.data,
     role: membership.role,
     slug: membership.workspace.slug,
@@ -48,15 +47,30 @@ export async function loadActor(workspaceId: unknown) {
   };
 }
 
+type Actor = NonNullable<Awaited<ReturnType<typeof actorOf>>>;
+
+function allowedTo(actor: Actor | null, action: WorkspaceAction) {
+  return actor && can(actor.role, action) ? actor : null;
+}
+
+export async function loadActor(workspaceId: unknown) {
+  const user = await requireUser();
+  return actorOf(user.id, workspaceId);
+}
+
 export async function loadActorAllowedTo(
   workspaceId: unknown,
   action: WorkspaceAction,
 ) {
-  const actor = await loadActor(workspaceId);
-  if (!actor || !can(actor.role, action)) {
-    return null;
-  }
-  return actor;
+  return allowedTo(await loadActor(workspaceId), action);
+}
+
+export async function loadActorFor(
+  user: { id: string },
+  workspaceId: unknown,
+  action: WorkspaceAction,
+) {
+  return allowedTo(await actorOf(user.id, workspaceId), action);
 }
 
 export async function recheckActor(
