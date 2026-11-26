@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +29,7 @@ export function TextField({
 }: TextFieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = type === "password";
+  const isReadOnly = props.readOnly === true;
   const hasError = error !== undefined;
   const messageId =
     hasError || hint !== undefined ? `${id}-message` : undefined;
@@ -49,11 +50,17 @@ export function TextField({
           aria-describedby={messageId}
           className={cn(
             "h-10 enabled:hover:border-border-strong aria-invalid:enabled:hover:border-destructive",
-            isPassword && "pr-11",
+            (isPassword || isReadOnly) && "pr-11",
+            isReadOnly && "bg-muted text-fg-secondary dark:bg-muted",
             inputClassName,
           )}
           {...props}
         />
+        {isReadOnly && (
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground">
+            <Lock aria-hidden className="size-4" />
+          </span>
+        )}
         {isPassword && (
           <button
             type="button"
