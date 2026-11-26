@@ -20,11 +20,7 @@ import type { ActionResult } from "@/lib/action-result";
 import { initialsOf } from "@/lib/initials";
 import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
-import {
-  CommentField,
-  IDLE_FORM,
-  type CommentFormState,
-} from "./comment-field";
+import { CommentField, type CommentFormState } from "./comment-field";
 
 type CommentRef = { workspaceId: string; boardId: string; cardId: string };
 
@@ -34,6 +30,7 @@ type CommentItemProps = CommentRef & {
   onRemoved: (commentId: string) => void;
   onDeleted: (commentId: string) => void;
   onEditStateChange: (commentId: string, state: CommentFormState) => void;
+  onEditClosed: (commentId: string) => void;
 };
 
 const DONE: ActionResult = { status: "success", data: undefined };
@@ -134,6 +131,7 @@ export function CommentItem({
   onRemoved,
   onDeleted,
   onEditStateChange,
+  onEditClosed,
   ...ref
 }: CommentItemProps) {
   const today = useToday();
@@ -141,15 +139,22 @@ export function CommentItem({
   const [isDeleting, setIsDeleting] = useState(false);
   const editButtonRef = useRef<HTMLButtonElement>(null);
   const wasEditing = useRef(false);
-  const reportEditState = useEffectEvent(onEditStateChange);
 
   useEffect(() => {
     if (!isEditing && wasEditing.current) {
-      reportEditState(comment.id, IDLE_FORM);
       editButtonRef.current?.focus();
     }
     wasEditing.current = isEditing;
-  }, [comment.id, isEditing]);
+  }, [isEditing]);
+
+  useEffect(
+    () => () => {
+      if (isEditing) {
+        onEditClosed(comment.id);
+      }
+    },
+    [comment.id, isEditing, onEditClosed],
+  );
 
   const stopEditing = () => {
     setIsEditing(false);
