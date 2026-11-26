@@ -27,3 +27,34 @@ export function secondsUntilInviteResend(sentAt: Date, now: Date): number {
     sentAt.getTime() + INVITE_RESEND_INTERVAL_MS - now.getTime();
   return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
 }
+
+const saoPauloDay = new Intl.DateTimeFormat("en-CA", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
+const saoPauloDate = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
+function calendarDay(instant: Date): number {
+  return Date.parse(`${saoPauloDay.format(instant)}T00:00:00Z`) / DAY_MS;
+}
+
+export function inviteDueLabel(expiresAt: Date, now: Date): string {
+  if (isInviteExpired(expiresAt, now)) {
+    return `Venceu em ${saoPauloDate.format(expiresAt)}`;
+  }
+  const days = calendarDay(expiresAt) - calendarDay(now);
+  if (days === 0) {
+    return "Vence hoje";
+  }
+  if (days === 1) {
+    return "Vence amanhã";
+  }
+  return `Vence em ${days} dias`;
+}
