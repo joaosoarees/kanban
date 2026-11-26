@@ -41,6 +41,7 @@ export function CommentComposer({
     onSuccess: (comment) => {
       form.reset({ body: "" });
       onCreated(comment);
+      requestAnimationFrame(() => fieldRef.current?.focus());
     },
   });
   const body = useWatch({ control: form.control, name: "body" });

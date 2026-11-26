@@ -147,9 +147,17 @@ export function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const editButtonRef = useRef<HTMLButtonElement>(null);
+  const wasEditing = useRef(false);
+
+  useEffect(() => {
+    if (!isEditing && wasEditing.current) {
+      editButtonRef.current?.focus();
+    }
+    wasEditing.current = isEditing;
+  }, [isEditing]);
+
   const stopEditing = () => {
     setIsEditing(false);
-    requestAnimationFrame(() => editButtonRef.current?.focus());
   };
 
   const authorName = comment.author?.name ?? "Ex-membro";
