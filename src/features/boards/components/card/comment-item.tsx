@@ -1,80 +1,44 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { useWatch } from "react-hook-form";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
-import { useActionForm } from "@/hooks/use-action-form";
+import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
 import { useToday } from "@/features/boards/hooks/use-today";
 import { formatCommentDate } from "@/features/boards/lib/comment-date";
-import { commentSchema } from "@/features/boards/lib/comment-schemas";
 import type { CardComment } from "@/features/boards/server/comment-queries";
-import {
-  deleteCommentAction,
-  editCommentAction,
-} from "@/features/boards/server/comment-actions";
+import { deleteCommentAction } from "@/features/boards/server/comment-actions";
 import type { ActionResult } from "@/lib/action-result";
 import { initialsOf } from "@/lib/initials";
 import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
-import { CommentField, type CommentFormState } from "./comment-field";
+import { CommentField } from "./comment-field";
 
 type CommentRef = { workspaceId: string; boardId: string; cardId: string };
 
 type CommentItemProps = CommentRef & {
   comment: CardComment;
-  onSaved: (comment: CardComment) => void;
-  onRemoved: (commentId: string) => void;
+  edit: CommentFormsState["edit"];
   onDeleted: (commentId: string) => void;
-  onEditStateChange: (commentId: string, state: CommentFormState) => void;
-  onEditClosed: (commentId: string) => void;
 };
 
 const DONE: ActionResult = { status: "success", data: undefined };
 
 const TEXT_BUTTON =
-  "inline-flex h-9 items-center rounded-md px-2 text-[13px] font-medium text-fg-secondary outline-hidden hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:h-7";
+  "inline-flex h-9 items-center rounded-md px-2 text-[13px] font-medium text-fg-secondary outline-hidden hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 sm:h-7";
 
 function CommentEditor({
-  workspaceId,
-  boardId,
-  cardId,
   comment,
-  onSaved,
-  onGone,
-  onCancel,
-  onStateChange,
-}: CommentRef & {
+  edit,
+}: {
   comment: CardComment;
-  onSaved: (comment: CardComment) => void;
-  onGone: () => void;
-  onCancel: () => void;
-  onStateChange: (state: CommentFormState) => void;
+  edit: CommentFormsState["edit"];
 }) {
-  const { form, submit, isPending } = useActionForm({
-    schema: commentSchema,
-    defaultValues: { body: comment.body },
-    action: async (values) =>
-      editCommentAction(workspaceId, boardId, cardId, comment.id, values),
-    failure: "Não foi possível salvar.",
-    onSuccess: onSaved,
-    onError: (error) => {
-      if (error.gone === true) {
-        toast.error(error.message);
-        onGone();
-      }
-    },
-  });
-  const body = useWatch({ control: form.control, name: "body" });
-  const { errors, isDirty } = form.formState;
-  const reportState = useEffectEvent(onStateChange);
-
-  useEffect(() => {
-    reportState({ isDirty, isPending });
-  }, [isDirty, isPending]);
+  const { form, submit, isPending, body, cancel } = edit;
+  const { errors } = form.formState;
 
   const field = form.register("body", {
     onChange: () => {
@@ -99,7 +63,7 @@ function CommentEditor({
         onKeyDown={(event) => {
           if (event.key === "Escape" && !isPending) {
             event.stopPropagation();
-            onCancel();
+            cancel();
           }
         }}
       >
@@ -107,7 +71,7 @@ function CommentEditor({
           type="button"
           variant="ghost"
           disabled={isPending}
-          onClick={onCancel}
+          onClick={cancel}
           className="h-11 px-3.5 sm:h-9"
         >
           Cancelar
@@ -127,38 +91,22 @@ function CommentEditor({
 
 export function CommentItem({
   comment,
-  onSaved,
-  onRemoved,
+  edit,
   onDeleted,
-  onEditStateChange,
-  onEditClosed,
   ...ref
 }: CommentItemProps) {
   const today = useToday();
-  const [isEditing, setIsEditing] = useState(false);
+  const isEditing = edit.commentId === comment.id;
   const [isDeleting, setIsDeleting] = useState(false);
   const editButtonRef = useRef<HTMLButtonElement>(null);
   const wasEditing = useRef(false);
 
-  useEffect(() => {
-    if (!isEditing && wasEditing.current) {
+  useLayoutEffect(() => {
+    if (!isEditing && wasEditing.current && edit.commentId === null) {
       editButtonRef.current?.focus();
     }
     wasEditing.current = isEditing;
-  }, [isEditing]);
-
-  useEffect(
-    () => () => {
-      if (isEditing) {
-        onEditClosed(comment.id);
-      }
-    },
-    [comment.id, isEditing, onEditClosed],
-  );
-
-  const stopEditing = () => {
-    setIsEditing(false);
-  };
+  }, [isEditing, edit.commentId]);
 
   const authorName = comment.author?.name ?? "Ex-membro";
   const showActions = !isEditing && (comment.canEdit || comment.canDelete);
@@ -193,8 +141,9 @@ export function CommentItem({
               <button
                 ref={editButtonRef}
                 type="button"
+                disabled={edit.isPending && edit.commentId !== null}
                 onClick={() => {
-                  setIsEditing(true);
+                  edit.start(comment);
                 }}
                 className={TEXT_BUTTON}
               >
@@ -215,21 +164,7 @@ export function CommentItem({
           </div>
         )}
         {isEditing ? (
-          <CommentEditor
-            {...ref}
-            comment={comment}
-            onSaved={(saved) => {
-              onSaved(saved);
-              stopEditing();
-            }}
-            onGone={() => {
-              onRemoved(comment.id);
-            }}
-            onCancel={stopEditing}
-            onStateChange={(state) => {
-              onEditStateChange(comment.id, state);
-            }}
-          />
+          <CommentEditor comment={comment} edit={edit} />
         ) : (
           <p className="mt-0.5 text-sm/[22px] wrap-anywhere whitespace-pre-wrap [grid-area:body]">
             {comment.body}

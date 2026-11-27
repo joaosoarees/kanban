@@ -1,18 +1,13 @@
 "use client";
 
 import { CircleAlert, Loader2, RefreshCw } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCardComments } from "@/features/boards/hooks/use-card-comments";
+import type { CardCommentsState } from "@/features/boards/hooks/use-card-comments";
+import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
+import type { ActionResult } from "@/lib/action-result";
 import { CommentComposer } from "./comment-composer";
-import { IDLE_FORM, type CommentFormState } from "./comment-field";
 import { CommentItem } from "./comment-item";
 
 type CardCommentsProps = {
@@ -20,13 +15,11 @@ type CardCommentsProps = {
   boardId: string;
   cardId: string;
   count: number;
-  onStateChange: (state: CommentsState) => void;
+  comments: CardCommentsState;
+  forms: CommentFormsState;
 };
 
-export type CommentsState = {
-  unsaved: "comment" | "edit" | "both" | null;
-  isBusy: boolean;
-};
+const DISCARDED: ActionResult = { status: "success", data: undefined };
 
 const SKELETON_ROWS = [
   { id: "first", name: "w-[180px]", lines: ["w-[92%]", "w-[60%]"] },
@@ -63,54 +56,9 @@ export function CardComments({
   boardId,
   cardId,
   count,
-  onStateChange,
+  comments,
+  forms,
 }: CardCommentsProps) {
-  const comments = useCardComments(workspaceId, boardId, cardId);
-  const composerRef = useRef<HTMLTextAreaElement>(null);
-  const [composer, setComposer] = useState(IDLE_FORM);
-  const [edits, setEdits] = useState<ReadonlyMap<string, CommentFormState>>(
-    new Map(),
-  );
-  const editStates = [...edits.values()];
-  const hasEdit = editStates.some((state) => state.isDirty);
-  const unsaved = composer.isDirty
-    ? hasEdit
-      ? "both"
-      : "comment"
-    : hasEdit
-      ? "edit"
-      : null;
-  const isDirty = unsaved !== null;
-  const isBusy =
-    composer.isPending || editStates.some((state) => state.isPending);
-  const reportState = useEffectEvent(onStateChange);
-  const forgetEdit = useCallback((commentId: string) => {
-    setEdits((current) => {
-      if (!current.has(commentId)) {
-        return current;
-      }
-      const next = new Map(current);
-      next.delete(commentId);
-      return next;
-    });
-  }, []);
-
-  useEffect(() => {
-    reportState({ unsaved, isBusy });
-  }, [unsaved, isBusy]);
-
-  useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
-      if (isDirty) {
-        event.preventDefault();
-      }
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => {
-      window.removeEventListener("beforeunload", warn);
-    };
-  }, [isDirty]);
-
   const ref = { workspaceId, boardId, cardId };
 
   return (
@@ -129,12 +77,7 @@ export function CardComments({
           </span>
         )}
       </h3>
-      <CommentComposer
-        {...ref}
-        onCreated={comments.put}
-        fieldRef={composerRef}
-        onStateChange={setComposer}
-      />
+      <CommentComposer cardId={cardId} composer={forms.composer} />
       {comments.status === "loading" && comments.comments.length === 0 && (
         <CommentsSkeleton />
       )}
@@ -165,32 +108,12 @@ export function CardComments({
               key={comment.id}
               {...ref}
               comment={comment}
-              onSaved={comments.put}
-              onRemoved={comments.remove}
+              edit={forms.edit}
               onDeleted={(commentId) => {
                 comments.remove(commentId);
-                requestAnimationFrame(() => composerRef.current?.focus());
-              }}
-              onEditClosed={forgetEdit}
-              onEditStateChange={(commentId, state) => {
-                setEdits((current) => {
-                  const isOpen = state.isDirty || state.isPending;
-                  const known = current.get(commentId);
-                  if (
-                    (!isOpen && known === undefined) ||
-                    (known?.isDirty === state.isDirty &&
-                      known.isPending === state.isPending)
-                  ) {
-                    return current;
-                  }
-                  const next = new Map(current);
-                  if (isOpen) {
-                    next.set(commentId, state);
-                  } else {
-                    next.delete(commentId);
-                  }
-                  return next;
-                });
+                requestAnimationFrame(() =>
+                  forms.composer.fieldRef.current?.focus(),
+                );
               }}
             />
           ))}
@@ -227,6 +150,23 @@ export function CardComments({
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={forms.edit.nextComment !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            forms.edit.keepEditing();
+          }
+        }}
+        title="Descartar as alterações?"
+        description="A edição do comentário ainda não foi salva e será perdida."
+        confirmLabel="Descartar"
+        pendingLabel="Descartando…"
+        cancelLabel="Continuar editando"
+        onConfirm={() => {
+          forms.edit.discardForNext();
+          return DISCARDED;
+        }}
+      />
     </section>
   );
 }
