@@ -1,58 +1,22 @@
 "use client";
 
-import { useEffect, useEffectEvent, type RefObject } from "react";
-import { useWatch } from "react-hook-form";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
-import { useActionForm } from "@/hooks/use-action-form";
-import { commentSchema } from "@/features/boards/lib/comment-schemas";
-import type { CardComment } from "@/features/boards/server/comment-queries";
-import { createCommentAction } from "@/features/boards/server/comment-actions";
-import { hasVisibleText } from "@/lib/text";
+import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
 import { cn } from "@/lib/utils";
-import { CommentField, type CommentFormState } from "./comment-field";
+import { CommentField } from "./comment-field";
 
 type CommentComposerProps = {
-  workspaceId: string;
-  boardId: string;
   cardId: string;
-  onCreated: (comment: CardComment) => void;
-  fieldRef: RefObject<HTMLTextAreaElement | null>;
-  onStateChange: (state: CommentFormState) => void;
+  composer: CommentFormsState["composer"];
 };
 
 const KBD =
   "rounded-sm border border-b-2 px-1 font-sans text-xs text-fg-secondary";
 
-export function CommentComposer({
-  workspaceId,
-  boardId,
-  cardId,
-  onCreated,
-  fieldRef,
-  onStateChange,
-}: CommentComposerProps) {
-  const { form, submit, isPending } = useActionForm({
-    schema: commentSchema,
-    defaultValues: { body: "" },
-    action: async (values) =>
-      createCommentAction(workspaceId, boardId, cardId, values),
-    failure: "Não foi possível comentar. Tente de novo.",
-    onSuccess: (comment) => {
-      form.reset({ body: "" });
-      onCreated(comment);
-      requestAnimationFrame(() => fieldRef.current?.focus());
-    },
-  });
-  const body = useWatch({ control: form.control, name: "body" });
+export function CommentComposer({ cardId, composer }: CommentComposerProps) {
+  const { form, submit, isPending, body, hasDraft, fieldRef } = composer;
   const { errors } = form.formState;
-  const hasDraft = hasVisibleText(body);
-  const reportState = useEffectEvent(onStateChange);
-
-  useEffect(() => {
-    reportState({ isDirty: hasDraft, isPending });
-  }, [hasDraft, isPending]);
-
   const field = form.register("body", {
     onChange: () => {
       form.clearErrors("root");

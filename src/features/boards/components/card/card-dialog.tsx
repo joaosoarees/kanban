@@ -13,10 +13,7 @@ import {
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  CardComments,
-  type CommentsState,
-} from "@/features/boards/components/card/card-comments";
+import { CardComments } from "@/features/boards/components/card/card-comments";
 import {
   CardDescription,
   CardDescriptionActions,
@@ -29,7 +26,9 @@ import type {
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import { useCardComments } from "@/features/boards/hooks/use-card-comments";
 import { useCardDescription } from "@/features/boards/hooks/use-card-description";
+import { useCommentForms } from "@/features/boards/hooks/use-comment-forms";
 import { deleteCardAction } from "@/features/boards/server/card-actions";
 import type { ActionResult } from "@/lib/action-result";
 
@@ -73,10 +72,6 @@ export function CardDialog({
   const router = useRouter();
   const [isDiscarding, setIsDiscarding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [commentsState, setCommentsState] = useState<CommentsState>({
-    unsaved: null,
-    isBusy: false,
-  });
   const description = useCardDescription({
     workspaceId,
     boardId,
@@ -90,7 +85,15 @@ export function CardDialog({
     },
   });
 
-  const isDirty = description.isDirty || commentsState.unsaved !== null;
+  const comments = useCardComments(workspaceId, boardId, card.id);
+  const commentForms = useCommentForms({
+    workspaceId,
+    boardId,
+    cardId: card.id,
+    comments,
+  });
+
+  const isDirty = description.isDirty || commentForms.unsaved !== null;
   const reportDirty = useEffectEvent(onDirtyChange);
 
   useEffect(() => {
@@ -101,7 +104,7 @@ export function CardDialog({
     <Dialog
       open
       onOpenChange={(open) => {
-        if (open || description.isSaving || commentsState.isBusy) {
+        if (open || description.isSaving || commentForms.isBusy) {
           return;
         }
         if (isDirty) {
@@ -158,7 +161,8 @@ export function CardDialog({
           boardId={boardId}
           cardId={card.id}
           count={card.commentCount}
-          onStateChange={setCommentsState}
+          comments={comments}
+          forms={commentForms}
         />
 
         <Separator />
@@ -203,9 +207,9 @@ export function CardDialog({
           description={
             description.isDirty
               ? "A descrição editada ainda não foi salva e será perdida."
-              : commentsState.unsaved === "both"
+              : commentForms.unsaved === "both"
                 ? "Há comentários escritos ou editados que ainda não foram salvos e serão perdidos."
-                : commentsState.unsaved === "edit"
+                : commentForms.unsaved === "edit"
                   ? "A edição do comentário ainda não foi salva e será perdida."
                   : "O comentário escrito ainda não foi enviado e será perdido."
           }
