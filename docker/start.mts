@@ -13,6 +13,10 @@ const migration = spawnSync(
   { cwd: migratorDir, stdio: "inherit" },
 );
 
+if (migration.error) {
+  console.error("could not run prisma migrate deploy", migration.error);
+}
+
 if (migration.status !== 0) {
   process.exit(migration.status ?? 1);
 }
