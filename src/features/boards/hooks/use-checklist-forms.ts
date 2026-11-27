@@ -38,7 +38,7 @@ export function useChecklistForms({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nextEdit, setNextEdit] = useState<ChecklistEntry | null>(null);
   const [formsCardId, setFormsCardId] = useState(cardId);
-  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const refocusAddButton = useRef(false);
   const refocusTextOf = useRef<string | null>(null);
 
   if (formsCardId !== cardId) {
@@ -105,6 +105,7 @@ export function useChecklistForms({
     if (formsResetFor.current !== cardId) {
       formsResetFor.current = cardId;
       refocusTextOf.current = null;
+      refocusAddButton.current = false;
       addForm.reset({ text: "" });
       editForm.reset({ text: "" });
     }
@@ -128,10 +129,8 @@ export function useChecklistForms({
 
   const closeAdd = () => {
     add.form.reset({ text: "" });
+    refocusAddButton.current = true;
     setIsAdding(false);
-    requestAnimationFrame(() => {
-      addButtonRef.current?.focus();
-    });
   };
 
   return {
@@ -148,7 +147,10 @@ export function useChecklistForms({
       ...add,
       isOpen: isAdding,
       buttonRef: (node: HTMLButtonElement | null) => {
-        addButtonRef.current = node;
+        if (node !== null && refocusAddButton.current) {
+          refocusAddButton.current = false;
+          node.focus();
+        }
       },
       open: () => {
         setIsAdding(true);
