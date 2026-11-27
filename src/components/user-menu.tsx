@@ -14,7 +14,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +28,10 @@ import {
 import { signOutAction } from "@/features/auth/server/actions";
 import { initialsOf } from "@/lib/initials";
 import { revealTheme } from "@/lib/reveal-theme";
+import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
+
+const SIGN_OUT_FAILED = "Não foi possível sair. Tente de novo.";
 
 const THEME_OPTIONS = [
   { value: "light", label: "Claro", Icon: Sun },
@@ -76,6 +80,8 @@ export function UserMenu({
   side = "bottom",
 }: UserMenuProps) {
   const [isPending, startTransition] = useTransition();
+  const [isLeaving, setIsLeaving] = useState(false);
+  const isSigningOut = isPending || isLeaving;
   const { theme = "system", resolvedTheme, setTheme } = useTheme();
   const isOnAccount = usePathname() === "/account";
 
@@ -170,15 +176,21 @@ export function UserMenu({
         <DropdownMenuSeparator className="-mx-1.5 my-1.5" />
         <DropdownMenuItem
           closeOnClick={false}
-          disabled={isPending}
+          disabled={isSigningOut}
           onClick={() => {
             startTransition(async () => {
-              await signOutAction();
+              const result = await runAction(signOutAction, SIGN_OUT_FAILED);
+              if (result.status === "error") {
+                toast.error(result.message);
+                return;
+              }
+              setIsLeaving(true);
+              window.location.replace("/sign-in");
             });
           }}
           className="h-10 cursor-pointer gap-2.5 px-2 focus:bg-muted focus:text-foreground not-data-[variant=destructive]:focus:**:text-foreground data-disabled:cursor-wait"
         >
-          {isPending ? (
+          {isSigningOut ? (
             <Loader2
               aria-hidden
               className="animate-spin text-fg-muted motion-reduce:animate-none"
@@ -186,7 +198,7 @@ export function UserMenu({
           ) : (
             <LogOut aria-hidden className="text-fg-muted" />
           )}
-          {isPending ? "Saindo…" : "Sair"}
+          {isSigningOut ? "Saindo…" : "Sair"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
