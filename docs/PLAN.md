@@ -277,6 +277,37 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 - A virada, com duas janelas curtas avisadas antes: o PR 1 leva a imagem nova, que funciona nos dois modelos; um PR pequeno põe o `kanban-postgres` na rede `coolify`, e o deploy do merge é a janela 1; a Application sobe num subdomínio temporário e é medida; o domínio e o `COOLIFY_APP_UUID` passam para ela; o PR 2 tira o `app` e o `migrate` do compose; o banco é republicado (janela 2).
 - Skills: `ci-cd-pipeline-fundamentals`, `github-actions-ci-workflow`, `prisma-schema-and-migrations` (`migrate deploy`).
 
+## Checklist no card (fatia 20)
+
+- Um checklist por card, sem nome: os itens ficam direto no card. Vários checklists nomeados ficam de fora até um card pedir.
+- O item tem texto puro de até 200 caracteres, posição e `completed_at`. Concluir um item não conclui o card, e concluir o card não mexe nos itens.
+- Até 50 itens por card, contados sob o lock do card: nenhuma constraint conta linhas, e sem o lock duas requisições juntas passariam do limite.
+- Qualquer membro cria, edita, marca, reordena e exclui itens. Criar e editar o texto vão pelo `useActionForm` e aparecem quando a action termina, sem ser otimistas, para o texto não sumir numa falha, como nos comentários. Marcar, reordenar e excluir chamam `runAction` e salvam na hora, de forma otimista e idempotente, como as etiquetas. A posição usa a mesma chave de ordenação dos cards, com `COLLATE "C"` na migration.
+- O card no quadro mostra "3/5" quando tem itens, sem coluna de contador: a tabela é pequena, e um contador cobraria em toda escrita. O total vem do `_count` na consulta do quadro; os concluídos, de um `groupBy` por `cardId` com `completedAt` preenchido, porque o `_count` conta cada relação uma vez só.
+- Skills: `modeling-entity-relationships` (1:N com cascata, limite entre linhas sob lock), `precomputed-counters` (por que não ter contador), `prisma-schema-and-migrations`, `react-query-optimistic-updates`, `motion-reorder`, `craft`.
+
+```
+ChecklistItem (id, cardId, text, position, completedAt?)
+  @@unique([cardId, position]), card onDelete: Cascade
+  CHECK (char_length(text) BETWEEN 1 AND 200)
+```
+
+## Histórico do card (fatia 21)
+
+- O histórico é gravado pelas actions, não por trigger: o banco não sabe quem fez a mudança sem passar o usuário por `set_config` em toda transação, e as escritas do card já passam pelas actions de `boards/server`. Um `recordActivity(tx, …)` grava o evento na mesma transação da escrita.
+- Entram: card criado, movido de coluna, título alterado, descrição editada (sem o texto), prazo definido ou removido, concluído ou reaberto, responsável trocado, etiqueta adicionada ou removida e item do checklist concluído ou reaberto.
+- Ficam de fora: reordenar dentro da mesma coluna e os comentários, que já têm a lista deles.
+- Uma action idempotente que não muda nada, como reaplicar uma etiqueta que o card já tem, não grava evento.
+- O evento guarda um retrato do que mudou (nomes de colunas, etiquetas e pessoas na hora), para o histórico não mudar quando algo é renomeado ou excluído depois. O formato de `data` é uma união discriminada por `type`, validada com Zod em `lib/`.
+- O retrato guarda também o nome de quem fez a mudança, então o evento continua com o nome mesmo se a conta deixar de existir e o `actorId` virar nulo. Quem sai do workspace deixa os eventos. Os eventos caem com o card.
+- O histórico carrega quando o diálogo abre, fora da consulta do quadro: os 30 mais recentes, e "Ver anteriores" busca mais com cursor pelo id (uuid v7), como os comentários. Se ele aparece junto com os comentários ou numa seção à parte, o `craft` decide nas telas.
+- Skills: `postgres-triggers` (por que não trigger), `modeling-entity-relationships`, `sql-cursor-pagination`, `prisma-schema-and-migrations`, `craft`.
+
+```
+CardActivity (id, cardId, actorId?, type, data Json, createdAt)
+  @@index([cardId, id]), @@index([actorId]), card onDelete: Cascade, actor onDelete: SetNull
+```
+
 ## Processo
 
 - Commits pequenos, um assunto por commit.
@@ -304,3 +335,5 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 17. [x] Prazo no card
 18. [x] Comentários no card
 19. [x] Deploy sem queda
+20. [ ] Checklist no card
+21. [ ] Histórico do card
