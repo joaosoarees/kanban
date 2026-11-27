@@ -23,6 +23,21 @@ RUN chown -R node:node /app
 USER node
 CMD ["bunx", "prisma", "migrate", "deploy"]
 
+FROM deps AS migrator
+
+WORKDIR /migrator
+RUN node -e ' \
+    const version = (name) => require(`/app/node_modules/${name}/package.json`).version; \
+    const manifest = { \
+      private: true, \
+      dependencies: { prisma: version("prisma"), dotenv: version("dotenv") }, \
+      trustedDependencies: ["prisma", "@prisma/engines"], \
+    }; \
+    require("fs").writeFileSync("package.json", JSON.stringify(manifest)); \
+  ' \
+  && bun install --production \
+  && cp -r /app/prisma7.config.ts /app/prisma ./
+
 FROM deps AS build
 
 COPY . .
@@ -40,6 +55,8 @@ ENV NODE_ENV=production \
 COPY --from=build --chown=nonroot:nonroot /app/.next/standalone ./
 COPY --from=build --chown=nonroot:nonroot /app/.next/static ./.next/static
 COPY --from=build --chown=nonroot:nonroot /app/public ./public
+COPY --from=migrator --chown=nonroot:nonroot /migrator ./migrator
+COPY --chown=nonroot:nonroot docker/start.mts ./start.mts
 
 EXPOSE 3000
-CMD ["server.js"]
+CMD ["start.mts"]

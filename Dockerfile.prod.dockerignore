@@ -10,3 +10,4 @@
 !public
 !src
 src/generated
+!docker/start.mts
