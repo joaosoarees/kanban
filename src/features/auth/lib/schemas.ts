@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { hasNoNul, hasVisibleText, INVALID_CHARACTER } from "@/lib/text";
 
-const PASSWORD_MAX_BYTES = 72;
+export const PASSWORD_MAX_BYTES = 72;
 
 const byteLength = (text: string) => new TextEncoder().encode(text).length;
 
