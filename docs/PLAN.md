@@ -169,7 +169,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 
 - As quatro fatias formam um pacote: os PRs entram na branch `release/slices-15-18`, com o `check` do CI verde e merge por rebase, e ela vai para a `main` de uma vez no fim, com um único deploy.
 - Depois que o último PR da fatia 18 entrar na release, e antes do merge na `main`, uma auditoria da release inteira contra as skills (`auditing-code-against-skills`): primeiro só leitura, e as correções escolhidas entram em PRs pequenos para a release.
-- As telas novas passam pelo `craft` antes de serem implementadas: `/invite/[token]`, os convites pendentes em membros, `/account`, o prazo e o "concluído" no card e no diálogo, e os comentários no diálogo.
+- As telas novas passam pelo `craft` antes de serem implementadas: `/invite`, os convites pendentes em membros, `/account`, o prazo e o "concluído" no card e no diálogo, e os comentários no diálogo.
 - Os únicos e-mails novos são o convite, o código de troca de e-mail e o aviso ao endereço antigo. Comentários e prazos não mandam e-mail.
 
 ### Convites com aceite (fatia 15)
@@ -195,8 +195,8 @@ InviteSend (id, invitedById, sentAt)   @@index([invitedById, sentAt])
 Implementação em três PRs para a `release/slices-15-18`, depois do backend:
 
 1. Página do convite e aviso nas telas de entrada.
-   - A casca das telas de entrada vira um componente, usado por `(auth)` e por `/invite/[token]` (`nextjs-layouts-and-templates`, `nextjs-component-composition`).
-   - `/invite/[token]` mostra os quatro estados, com o carregamento dentro de `Suspense` (`nextjs-app-router-routing`, `nextjs-server-data-fetching`, `nextjs-loading-and-streaming`, `nextjs-metadata`).
+   - A casca das telas de entrada vira um componente, usado por `(auth)` e por `/invite` (`nextjs-layouts-and-templates`, `nextjs-component-composition`).
+   - `/invite` mostra os quatro estados, com o carregamento dentro de `Suspense` (`nextjs-app-router-routing`, `nextjs-server-data-fetching`, `nextjs-loading-and-streaming`, `nextjs-metadata`).
    - Aceitar e trocar de conta chamam as actions do backend (`nextjs-server-actions-in-client-components`, `nextjs-server-action-results`, `nextjs-redirects`).
    - O aviso lê o cookie `pending_invite`; o cadastro recebe o e-mail travado; "Seguir sem o convite" apaga o cookie (`nextjs-auth-cookies`, `nextjs-jwt-session`, `react-hook-form-default-values`, `react-hook-form-zod`, `nextjs-server-actions`).
    - O e-mail do convite ganha o endereço em texto abaixo do botão, também na versão em texto puro (`mime-email-messages`).
