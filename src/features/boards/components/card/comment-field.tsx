@@ -35,7 +35,7 @@ export function CommentField({
   children,
   ...props
 }: CommentFieldProps) {
-  const length = codePointLength(value);
+  const length = codePointLength(value.trim());
   const isOver = length > COMMENT_MAX_LENGTH;
   const message = isOver
     ? `Até 5.000 caracteres · ${counterOf(length)}`
