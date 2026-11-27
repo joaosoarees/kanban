@@ -8,6 +8,7 @@ import {
   COLUMN_GONE,
   lockBoard,
 } from "@/features/boards/server/access";
+import { recordActivity } from "@/features/boards/server/activity";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
@@ -49,7 +50,7 @@ export async function moveCardAction(
 
     const card = await tx.card.findUnique({
       where: { id: cardId, column: { boardId: lockedBoardId } },
-      select: { id: true },
+      select: { columnId: true, column: { select: { name: true } } },
     });
     if (!card) {
       return CARD_GONE;
@@ -59,6 +60,7 @@ export async function moveCardAction(
       where: { id: columnId, boardId: lockedBoardId },
       select: {
         id: true,
+        name: true,
         cards: {
           orderBy: { position: "asc" },
           select: { id: true, position: true },
@@ -78,6 +80,13 @@ export async function moveCardAction(
       where: { id: cardId },
       data: { columnId: column.id, position },
     });
+    if (card.columnId !== column.id) {
+      await recordActivity(tx, cardId, {
+        type: "CARD_MOVED",
+        from: card.column.name,
+        to: column.name,
+      });
+    }
     return null;
   });
 

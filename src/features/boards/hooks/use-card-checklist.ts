@@ -11,8 +11,8 @@ import {
 import {
   deleteChecklistItemAction,
   moveChecklistItemAction,
-  setChecklistItemCompletionAction,
 } from "@/features/boards/server/checklist-actions";
+import { setChecklistItemCompletionAction } from "@/features/boards/server/checklist-completion-actions";
 import type { ActionResult } from "@/lib/action-result";
 import { runAction } from "@/lib/run-action";
 

@@ -4,7 +4,13 @@ import {
   cardCompletionSchema,
   cardDueSchema,
 } from "@/features/boards/lib/card-schemas";
-import { CARD_GONE, parseCardRef } from "@/features/boards/server/access";
+import { isoDateOf } from "@/features/boards/lib/card-activity";
+import {
+  CARD_GONE,
+  lockCard,
+  parseCardRef,
+} from "@/features/boards/server/access";
+import { recordActivity } from "@/features/boards/server/activity";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
@@ -34,19 +40,34 @@ export async function setCardDueAction(
   }
   const { dueOn } = parsed.data;
 
-  const { count } = await db.card.updateMany({
-    where: {
-      id: ref.cardId,
-      column: {
-        boardId: ref.boardId,
-        board: { workspaceId: actor.workspaceId },
-      },
-    },
-    data: { dueOn: dueOn === null ? null : new Date(`${dueOn}T00:00:00Z`) },
+  const failure = await db.$transaction(async (tx) => {
+    if (!(await lockCard(tx, actor.workspaceId, ref))) {
+      return CARD_GONE;
+    }
+    const current = await tx.card.findUniqueOrThrow({
+      where: { id: ref.cardId },
+      select: { dueOn: true },
+    });
+    const previousDue = isoDateOf(current.dueOn);
+    if (previousDue === dueOn) {
+      return null;
+    }
+
+    await tx.card.update({
+      where: { id: ref.cardId },
+      data: { dueOn: dueOn === null ? null : new Date(`${dueOn}T00:00:00Z`) },
+      select: { id: true },
+    });
+    await recordActivity(tx, ref.cardId, {
+      type: "DUE_CHANGED",
+      from: previousDue,
+      to: dueOn,
+    });
+    return null;
   });
 
   revalidateWorkspace(actor.slug);
-  return count === 0 ? CARD_GONE : { status: "success", data: undefined };
+  return failure ?? { status: "success", data: undefined };
 }
 
 export async function setCardCompletionAction(
@@ -71,20 +92,30 @@ export async function setCardCompletionAction(
   }
   const { completed } = parsed.data;
 
-  const count = await db.$executeRaw`
-    UPDATE cards AS card
-    SET "completedAt" = CASE
-      WHEN ${completed}::boolean THEN COALESCE(card."completedAt", now())
-      ELSE NULL
-    END
-    FROM columns AS board_column
-    JOIN boards AS board ON board.id = board_column."boardId"
-    WHERE card.id = ${ref.cardId}::uuid
-      AND board_column.id = card."columnId"
-      AND board_column."boardId" = ${ref.boardId}::uuid
-      AND board."workspaceId" = ${actor.workspaceId}::uuid
-  `;
+  const failure = await db.$transaction(async (tx) => {
+    if (!(await lockCard(tx, actor.workspaceId, ref))) {
+      return CARD_GONE;
+    }
+    const current = await tx.card.findUniqueOrThrow({
+      where: { id: ref.cardId },
+      select: { completedAt: true },
+    });
+    if ((current.completedAt !== null) === completed) {
+      return null;
+    }
+
+    await tx.$executeRaw`
+      UPDATE cards
+      SET "completedAt" = CASE WHEN ${completed}::boolean THEN now() END
+      WHERE id = ${ref.cardId}::uuid
+    `;
+    await recordActivity(tx, ref.cardId, {
+      type: "COMPLETION_CHANGED",
+      completed,
+    });
+    return null;
+  });
 
   revalidateWorkspace(actor.slug);
-  return count === 0 ? CARD_GONE : { status: "success", data: undefined };
+  return failure ?? { status: "success", data: undefined };
 }

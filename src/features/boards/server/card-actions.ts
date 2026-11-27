@@ -6,14 +6,17 @@ import {
   createCardSchema,
 } from "@/features/boards/lib/card-schemas";
 import { cardAssigneeSchema } from "@/features/boards/lib/label-schemas";
+import type { CardActivityEvent } from "@/features/boards/lib/card-activity";
 import { positionAtEnd } from "@/features/boards/lib/position";
 import {
   BOARD_GONE,
   CARD_GONE,
   COLUMN_GONE,
   lockBoard,
+  lockCard,
   parseCardRef,
 } from "@/features/boards/server/access";
+import { recordActivity } from "@/features/boards/server/activity";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
@@ -55,7 +58,7 @@ export async function createCardAction(
 
     const column = await tx.column.findUnique({
       where: { id: parsed.data.columnId, boardId: lockedBoardId },
-      select: { id: true },
+      select: { id: true, name: true },
     });
     if (!column) {
       return COLUMN_GONE;
@@ -74,6 +77,10 @@ export async function createCardAction(
         position: positionAtEnd(lastCard ? [lastCard] : []),
       },
       select: { id: true },
+    });
+    await recordActivity(tx, card.id, {
+      type: "CARD_CREATED",
+      column: column.name,
     });
     return { status: "success" as const, data: card };
   });
@@ -105,19 +112,38 @@ async function updateCard(
     return data;
   }
 
-  const { count } = await db.card.updateMany({
-    where: {
-      id: ref.cardId,
-      column: {
-        boardId: ref.boardId,
-        board: { workspaceId: actor.workspaceId },
-      },
-    },
-    data,
+  const failure = await db.$transaction(async (tx) => {
+    if (!(await lockCard(tx, actor.workspaceId, ref))) {
+      return CARD_GONE;
+    }
+
+    const current = await tx.card.findUniqueOrThrow({
+      where: { id: ref.cardId },
+      select: { title: true, description: true },
+    });
+    const event: CardActivityEvent | null =
+      "title" in data
+        ? current.title === data.title
+          ? null
+          : { type: "TITLE_CHANGED", from: current.title, to: data.title }
+        : current.description === data.description
+          ? null
+          : { type: "DESCRIPTION_CHANGED" };
+    if (event === null) {
+      return null;
+    }
+
+    await tx.card.update({
+      where: { id: ref.cardId },
+      data,
+      select: { id: true },
+    });
+    await recordActivity(tx, ref.cardId, event);
+    return null;
   });
 
   revalidateWorkspace(actor.slug);
-  return count === 0 ? CARD_GONE : { status: "success", data: undefined };
+  return failure ?? { status: "success", data: undefined };
 }
 
 export async function renameCardAction(
@@ -167,29 +193,44 @@ export async function setCardAssigneeAction(
   const { assigneeId } = parsed.data;
 
   const failure = await db.$transaction(async (tx) => {
+    let assigneeName: string | null = null;
     if (assigneeId !== null) {
-      const member = await tx.$queryRaw<{ userId: string }[]>`
-        SELECT "userId" FROM memberships
-        WHERE "userId" = ${assigneeId}::uuid
-          AND "workspaceId" = ${actor.workspaceId}::uuid
-        FOR KEY SHARE
+      const members = await tx.$queryRaw<{ name: string }[]>`
+        SELECT member_user.name FROM memberships membership
+        JOIN users member_user ON member_user.id = membership."userId"
+        WHERE membership."userId" = ${assigneeId}::uuid
+          AND membership."workspaceId" = ${actor.workspaceId}::uuid
+        FOR KEY SHARE OF membership
       `;
-      if (member.length === 0) {
+      const member = members.at(0);
+      if (member === undefined) {
         return MEMBER_GONE;
       }
+      assigneeName = member.name;
     }
 
-    const { count } = await tx.card.updateMany({
-      where: {
-        id: ref.cardId,
-        column: {
-          boardId: ref.boardId,
-          board: { workspaceId: actor.workspaceId },
-        },
-      },
-      data: { assigneeId },
+    if (!(await lockCard(tx, actor.workspaceId, ref))) {
+      return CARD_GONE;
+    }
+    const current = await tx.card.findUniqueOrThrow({
+      where: { id: ref.cardId },
+      select: { assigneeId: true, assignee: { select: { name: true } } },
     });
-    return count === 0 ? CARD_GONE : null;
+    if (current.assigneeId === assigneeId) {
+      return null;
+    }
+
+    await tx.card.update({
+      where: { id: ref.cardId },
+      data: { assigneeId },
+      select: { id: true },
+    });
+    await recordActivity(tx, ref.cardId, {
+      type: "ASSIGNEE_CHANGED",
+      from: current.assignee?.name ?? null,
+      to: assigneeName,
+    });
+    return null;
   });
 
   revalidateWorkspace(actor.slug);

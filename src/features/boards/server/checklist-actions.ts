@@ -2,7 +2,6 @@
 
 import * as z from "zod";
 import {
-  checklistItemCompletionSchema,
   checklistItemSchema,
   MAX_CHECKLIST_ITEMS,
   moveChecklistItemSchema,
@@ -153,53 +152,6 @@ export async function updateChecklistItemAction(
     where: itemScope(ref, itemRef, actor.workspaceId),
     data: { text: parsed.data.text },
   });
-
-  revalidateWorkspace(actor.slug);
-  return count === 0 ? goneResult(ref, actor.workspaceId) : SUCCESS;
-}
-
-export async function setChecklistItemCompletionAction(
-  workspaceId: unknown,
-  boardId: unknown,
-  cardId: unknown,
-  itemId: unknown,
-  input: unknown,
-): Promise<ActionResult> {
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-
-  const ref = parseCardRef(boardId, cardId);
-  if (!ref) {
-    return CARD_GONE;
-  }
-  const itemRef = parseItemId(itemId);
-  if (itemRef === null) {
-    return CHECKLIST_ITEM_GONE;
-  }
-
-  const parsed = checklistItemCompletionSchema.safeParse(input);
-  if (!parsed.success) {
-    return INVALID;
-  }
-
-  const count = await db.$executeRaw`
-    UPDATE checklist_items AS item
-    SET "completedAt" = CASE
-      WHEN ${parsed.data.completed}::boolean
-        THEN COALESCE(item."completedAt", now())
-      ELSE NULL
-    END
-    FROM cards AS card
-    JOIN columns AS board_column ON board_column.id = card."columnId"
-    JOIN boards AS board ON board.id = board_column."boardId"
-    WHERE item.id = ${itemRef}::uuid
-      AND item."cardId" = ${ref.cardId}::uuid
-      AND card.id = item."cardId"
-      AND board_column."boardId" = ${ref.boardId}::uuid
-      AND board."workspaceId" = ${actor.workspaceId}::uuid
-  `;
 
   revalidateWorkspace(actor.slug);
   return count === 0 ? goneResult(ref, actor.workspaceId) : SUCCESS;
