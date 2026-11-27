@@ -108,6 +108,7 @@ export function useCommentForms({
   useLayoutEffect(() => {
     if (formsResetFor.current !== cardId) {
       formsResetFor.current = cardId;
+      refocusEditOf.current = null;
       composerForm.reset({ body: "" });
       editForm.reset({ body: "" });
     }
@@ -143,6 +144,7 @@ export function useCommentForms({
   }, [unsaved]);
 
   const openEdit = (comment: CardComment) => {
+    refocusEditOf.current = null;
     edit.form.reset({ body: comment.body });
     setNextEdit(null);
     setEditingId(comment.id);
@@ -152,6 +154,7 @@ export function useCommentForms({
     unsaved,
     isBusy,
     discard: () => {
+      refocusEditOf.current = null;
       composer.form.reset({ body: "" });
       setEditingId(null);
       setNextEdit(null);
