@@ -82,8 +82,11 @@ export function useCommentForms({
   const { form: composerForm } = composer;
   const { form: editForm } = edit;
 
+  const formsResetFor = useRef(cardId);
+
   useLayoutEffect(() => {
-    if (cardId !== null) {
+    if (formsResetFor.current !== cardId) {
+      formsResetFor.current = cardId;
       composerForm.reset({ body: "" });
       editForm.reset({ body: "" });
     }
