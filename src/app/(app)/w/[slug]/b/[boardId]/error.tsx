@@ -30,7 +30,12 @@ export default function BoardError({
       description="Confira sua conexão e tente de novo. Suas colunas continuam salvas."
       actions={
         <>
-          <Button onClick={retry} className={cn("h-10 px-4", primaryButton)}>
+          <Button
+            onClick={() => {
+              retry();
+            }}
+            className={cn("h-10 px-4", primaryButton)}
+          >
             <RefreshCw aria-hidden />
             Tentar de novo
           </Button>
