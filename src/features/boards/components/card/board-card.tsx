@@ -1,4 +1,4 @@
-import { AlignLeft, MessageSquare } from "lucide-react";
+import { AlignLeft, ListChecks, MessageSquare } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
 import { DueBadge } from "@/features/boards/components/card/due-badge";
@@ -34,6 +34,7 @@ function CardContent({ card }: { card: BoardCardData }) {
       {(cardLabels.length > 0 ||
         assignee !== undefined ||
         card.commentCount > 0 ||
+        card.checklistTotal > 0 ||
         card.dueOn !== null ||
         card.completed) && (
         <span className="flex w-full items-end justify-between gap-2">
@@ -54,6 +55,24 @@ function CardContent({ card }: { card: BoardCardData }) {
             )}
           </span>
           <span className="flex shrink-0 items-center gap-2">
+            {card.checklistTotal > 0 && (
+              <span
+                className={cn(
+                  "relative flex h-[22px] items-center gap-[3px] text-xs font-medium tabular-nums",
+                  card.checklistDone === card.checklistTotal
+                    ? "rounded-[5px] bg-success-bg pr-1.5 pl-[5px] text-success-fg"
+                    : "text-fg-muted",
+                )}
+              >
+                <ListChecks aria-hidden className="size-3.5" />
+                <span aria-hidden>
+                  {card.checklistDone}/{card.checklistTotal}
+                </span>
+                <span className="sr-only">
+                  {card.checklistDone} de {card.checklistTotal} itens concluídos
+                </span>
+              </span>
+            )}
             {card.commentCount > 0 && (
               <span className="relative flex h-[22px] items-center gap-[3px] text-xs font-medium text-fg-muted">
                 <MessageSquare aria-hidden className="size-3.5" />
