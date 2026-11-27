@@ -15,7 +15,7 @@ O auto-deploy por webhook do GitHub App fica desligado: quem decide o deploy é 
 
 | Serviço           | Papel                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------ |
-| `kanban-postgres` | Postgres 18, sem porta publicada, volume `pgdata`                                                            |
+| `kanban-postgres` | Postgres 18, sem porta publicada, volume `pgdata`, também na rede `coolify`                                  |
 | `migrate`         | `prisma migrate deploy`, roda e sai; o `app` só sobe se ele terminar com sucesso                             |
 | `app`             | servidor standalone do Next em imagem distroless, só leitura, sem capabilities, healthcheck em `/api/health` |
 | `db-dump`         | `pg_dump --format=custom` a cada hora para o volume `dumps`, com troca atômica do arquivo                    |
