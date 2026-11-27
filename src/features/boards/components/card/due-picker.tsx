@@ -63,7 +63,8 @@ export function DuePicker({
 }: DuePickerProps) {
   const today = useToday();
   const isPhone = useIsPhone();
-  const calendarId = `${useId()}-calendar`;
+  const id = useId();
+  const calendarId = `${id}-calendar`;
   const [openIn, setOpenIn] = useState<"popover" | "inline" | null>(null);
   const isPopoverOpen = openIn === "popover" && !isPhone;
   const isInlineOpen = openIn === "inline" && isPhone;
