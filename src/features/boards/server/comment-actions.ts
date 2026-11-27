@@ -8,10 +8,10 @@ import {
   parseCardRef,
 } from "@/features/boards/server/access";
 import {
-  COMMENT_SELECT,
   toCardComment,
   type CardComment,
-} from "@/features/boards/server/comment-queries";
+} from "@/features/boards/lib/card-comment";
+import { COMMENT_SELECT } from "@/features/boards/server/comment-queries";
 import {
   loadActorAllowedTo,
   recheckActor,
