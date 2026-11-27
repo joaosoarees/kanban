@@ -156,7 +156,7 @@ export function CodeForm({
         className="flex flex-col gap-5"
       >
         <fieldset
-          disabled={isPending}
+          disabled={isBusy}
           className="m-0 flex min-w-0 flex-col gap-4 border-0 p-0"
         >
           {codeField}
@@ -165,6 +165,7 @@ export function CodeForm({
           type="submit"
           isPending={isPending}
           pendingLabel="Confirmando…"
+          disabled={isSwitching}
           className={cn("h-10 w-full", primaryButton)}
         >
           {submitLabel}
@@ -175,18 +176,17 @@ export function CodeForm({
         initialWait={initialWait}
         onExpired={onExpired}
       />
-      <form
-        action={switchAction}
-        className="text-center text-sm text-muted-foreground"
-      >
+      <p className="text-center text-sm text-muted-foreground">
         Não é este e-mail?{" "}
         <button
-          type="submit"
+          type="button"
+          disabled={isBusy}
+          onClick={switchEmail}
           className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           Usar outro e-mail
         </button>
-      </form>
+      </p>
     </div>
   );
 }
