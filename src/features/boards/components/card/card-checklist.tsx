@@ -6,7 +6,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  type Announcements,
   type Modifier,
+  type UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -28,6 +30,10 @@ import { ChecklistNotice, ChecklistTextForm } from "./checklist-text-form";
 
 const DISCARDED: ActionResult = { status: "success", data: undefined };
 const SKELETON_WIDTHS = ["w-[62%]", "w-[80%]", "w-[45%]", "w-[70%]", "w-[55%]"];
+
+const screenReaderInstructions = {
+  draggable: "Use o menu da alça para mover o item.",
+};
 
 const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
@@ -57,6 +63,21 @@ export function CardChecklist({
   const isFull = items.length >= MAX_CHECKLIST_ITEMS;
   const allDone = total > 0 && done === total;
   const headingId = `${cardId}-checklist`;
+  const textOf = (id: UniqueIdentifier) =>
+    items.find((item) => item.id === id)?.text ?? "";
+  const positionOf = (id: UniqueIdentifier) =>
+    `posição ${items.findIndex((item) => item.id === id) + 1} de ${items.length}`;
+  const announcements: Announcements = {
+    onDragStart: ({ active }) => `Item ${textOf(active.id)} selecionado.`,
+    onDragOver: ({ over }) =>
+      over ? `Sobre a ${positionOf(over.id)}.` : undefined,
+    onDragEnd: ({ active, over }) =>
+      over
+        ? `Item ${textOf(active.id)} solto na ${positionOf(over.id)}.`
+        : `Movimento de ${textOf(active.id)} cancelado.`,
+    onDragCancel: ({ active }) =>
+      `Movimento de ${textOf(active.id)} cancelado.`,
+  };
 
   return (
     <section
@@ -137,6 +158,7 @@ export function CardChecklist({
       {isLoaded && items.length > 0 && (
         <DndContext
           sensors={sensors}
+          accessibility={{ announcements, screenReaderInstructions }}
           collisionDetection={closestCenter}
           modifiers={[verticalOnly]}
           onDragEnd={({ active, over }) => {
