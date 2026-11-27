@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -98,15 +98,6 @@ export function CommentItem({
   const today = useToday();
   const isEditing = edit.commentId === comment.id;
   const [isDeleting, setIsDeleting] = useState(false);
-  const editButtonRef = useRef<HTMLButtonElement>(null);
-  const wasEditing = useRef(false);
-
-  useLayoutEffect(() => {
-    if (!isEditing && wasEditing.current && edit.commentId === null) {
-      editButtonRef.current?.focus();
-    }
-    wasEditing.current = isEditing;
-  }, [isEditing, edit.commentId]);
 
   const authorName = comment.author?.name ?? "Ex-membro";
   const showActions = !isEditing && (comment.canEdit || comment.canDelete);
@@ -139,7 +130,7 @@ export function CommentItem({
           <div className="mt-1 -ml-2 flex gap-0.5 [grid-area:actions] sm:mt-0 sm:ml-0">
             {comment.canEdit && (
               <button
-                ref={editButtonRef}
+                ref={edit.editButtonRef(comment.id)}
                 type="button"
                 disabled={edit.isPending && edit.commentId !== null}
                 onClick={() => {

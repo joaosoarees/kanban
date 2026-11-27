@@ -111,9 +111,7 @@ export function CardComments({
               edit={forms.edit}
               onDeleted={(commentId) => {
                 comments.remove(commentId);
-                requestAnimationFrame(() =>
-                  forms.composer.fieldRef.current?.focus(),
-                );
+                forms.composer.focus();
               }}
             />
           ))}
