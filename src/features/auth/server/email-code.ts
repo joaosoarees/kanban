@@ -33,6 +33,7 @@ export async function issueCode(
   tx: Prisma.TransactionClient,
   owner: Owner,
   now: Date,
+  newEmail?: string,
 ): Promise<string> {
   const code = randomInt(0, 10 ** CODE_LENGTH)
     .toString()
@@ -42,11 +43,13 @@ export async function issueCode(
     sentAt: now,
     expiresAt: codeExpiresAt(now),
     attempts: 0,
+    ...(newEmail === undefined ? {} : { newEmail }),
   };
   await tx.emailCode.upsert({
     where: { userId_purpose: owner },
     create: { ...owner, ...fields },
     update: fields,
+    select: { userId: true },
   });
   return code;
 }
@@ -73,15 +76,20 @@ export async function consumeCode(
   owner: Owner,
   code: string,
   now: Date,
-): Promise<boolean> {
+): Promise<{ newEmail: string | null } | null> {
   await lockUser(tx, owner.userId);
   const where = { userId_purpose: owner };
   const stored = await tx.emailCode.findUnique({
     where,
-    select: { codeHash: true, expiresAt: true, attempts: true },
+    select: {
+      codeHash: true,
+      expiresAt: true,
+      attempts: true,
+      newEmail: true,
+    },
   });
   if (!stored || !isCodeUsable(stored, now)) {
-    return false;
+    return null;
   }
 
   const matches = timingSafeEqual(
@@ -89,12 +97,13 @@ export async function consumeCode(
     hashCode(owner, code),
   );
   if (matches) {
-    await tx.emailCode.delete({ where });
+    await tx.emailCode.delete({ where, select: { userId: true } });
   } else {
     await tx.emailCode.update({
       where,
       data: { attempts: stored.attempts + 1 },
+      select: { userId: true },
     });
   }
-  return matches;
+  return matches ? { newEmail: stored.newEmail } : null;
 }

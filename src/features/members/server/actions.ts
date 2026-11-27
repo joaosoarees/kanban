@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
-  addMemberSchema,
   changeRoleSchema,
   removeMemberSchema,
 } from "@/features/members/lib/schemas";
@@ -14,16 +13,15 @@ import {
   revalidateWorkspace,
   WORKSPACE_GONE,
 } from "@/features/workspaces/server/access";
+import { can } from "@/features/workspaces/lib/permissions";
 import type { Prisma, Role } from "@/generated/prisma/client";
 import {
   FORBIDDEN,
   INVALID,
-  invalidFields,
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
-import { isUniqueViolation } from "@/server/prisma-errors";
 
 const MEMBER_CHANGED: ActionError = {
   status: "error",
@@ -51,6 +49,7 @@ async function removeMembership(
     where: { assigneeId: userId, column: { board: { workspaceId } } },
     data: { assigneeId: null },
   });
+  await tx.invite.deleteMany({ where: { workspaceId, invitedById: userId } });
   return null;
 }
 
@@ -63,61 +62,6 @@ async function loadTarget(
     where: { userId_workspaceId: { userId, workspaceId } },
     select: { role: true },
   });
-}
-
-export async function addMemberAction(
-  workspaceId: unknown,
-  input: unknown,
-): Promise<ActionResult> {
-  const actor = await loadActorAllowedTo(workspaceId, "addMember");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-
-  const parsed = addMemberSchema.safeParse(input);
-  if (!parsed.success) {
-    return invalidFields(parsed.error);
-  }
-
-  const user = await db.user.findUnique({
-    where: { email: parsed.data.email },
-    select: { id: true, name: true },
-  });
-  if (!user) {
-    const message =
-      "Nenhuma conta com esse e-mail. Peça para a pessoa se cadastrar primeiro.";
-    return { status: "error", message, fieldErrors: { email: [message] } };
-  }
-
-  const userId = user.id;
-  try {
-    const refused = await db.$transaction(async (tx) => {
-      const denied = await recheckActor(tx, actor, "addMember");
-      if (denied) {
-        return denied;
-      }
-      await tx.membership.create({
-        data: {
-          userId,
-          workspaceId: actor.workspaceId,
-          role: parsed.data.role,
-        },
-      });
-      return null;
-    });
-    if (refused) {
-      return refused;
-    }
-  } catch (error) {
-    if (isUniqueViolation(error)) {
-      const message = `${user.name} já faz parte do workspace.`;
-      return { status: "error", message, fieldErrors: { email: [message] } };
-    }
-    throw error;
-  }
-
-  revalidateWorkspace(actor.slug);
-  return { status: "success", data: undefined };
 }
 
 export async function changeRoleAction(
@@ -152,7 +96,15 @@ export async function changeRoleAction(
       where: { userId, workspaceId: actor.workspaceId, role: target.role },
       data: { role },
     });
-    return count === 0 ? MEMBER_CHANGED : null;
+    if (count === 0) {
+      return MEMBER_CHANGED;
+    }
+    if (!can(role, "inviteMember")) {
+      await tx.invite.deleteMany({
+        where: { workspaceId: actor.workspaceId, invitedById: userId },
+      });
+    }
+    return null;
   });
 
   revalidateWorkspace(actor.slug);

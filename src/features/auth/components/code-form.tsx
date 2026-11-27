@@ -1,18 +1,24 @@
 "use client";
 
+import { useEffect, useTransition } from "react";
+import { toast } from "sonner";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { TextField } from "@/components/text-field";
+import { Button } from "@/components/ui/button";
 import {
+  ResendButton,
   ResendCode,
   type ResendAction,
 } from "@/features/auth/components/resend-code";
 import { verifyCodeSchema } from "@/features/auth/lib/email-code";
 import { useActionForm } from "@/hooks/use-action-form";
 import type { ActionResult } from "@/lib/action-result";
+import { runAction } from "@/lib/run-action";
 import { cn } from "@/lib/utils";
 
 const CONFIRM_FAILED = "Não foi possível confirmar. Tente de novo.";
+const SWITCH_FAILED = "Não foi possível voltar ao e-mail. Tente de novo.";
 
 type CodeFormProps = {
   action: (values: { code: string }) => Promise<ActionResult>;
@@ -20,7 +26,10 @@ type CodeFormProps = {
   switchAction: () => Promise<void>;
   submitLabel: string;
   initialWait: number;
-  onExpired: () => void;
+  onExpired: (message?: string) => void;
+  onSuccess?: () => void;
+  layout?: "page" | "card";
+  focusOnMount?: boolean;
 };
 
 export function CodeForm({
@@ -30,10 +39,15 @@ export function CodeForm({
   submitLabel,
   initialWait,
   onExpired,
+  onSuccess,
+  layout = "page",
+  focusOnMount = false,
 }: CodeFormProps) {
+  const [isSwitching, startSwitch] = useTransition();
   const {
     form: {
       register,
+      setFocus,
       formState: { errors },
     },
     submit,
@@ -43,12 +57,95 @@ export function CodeForm({
     defaultValues: { code: "" },
     action,
     failure: CONFIRM_FAILED,
+    onSuccess,
     onError: (error) => {
       if (error.gone === true) {
-        onExpired();
+        onExpired(error.message);
       }
     },
   });
+
+  useEffect(() => {
+    if (focusOnMount) {
+      setFocus("code");
+    }
+  }, [focusOnMount, setFocus]);
+
+  const switchEmail = () => {
+    startSwitch(async () => {
+      const result = await runAction(async () => {
+        await switchAction();
+        return { status: "success", data: undefined };
+      }, SWITCH_FAILED);
+      if (result.status === "error") {
+        toast.error(result.message);
+      }
+    });
+  };
+
+  const isBusy = isPending || isSwitching;
+
+  const codeField = (
+    <TextField
+      id="code"
+      required
+      label="Código"
+      inputMode="numeric"
+      autoComplete="one-time-code"
+      autoCapitalize="none"
+      spellCheck={false}
+      inputClassName="text-[15px] tracking-[0.12em] tabular-nums md:text-[15px]"
+      hint="Confira também a caixa de spam."
+      error={errors.code?.message ?? errors.root?.message}
+      {...register("code")}
+    />
+  );
+
+  if (layout === "card") {
+    return (
+      <form
+        onSubmit={submit}
+        noValidate
+        aria-busy={isPending}
+        className="flex flex-col gap-4"
+      >
+        <fieldset
+          disabled={isBusy}
+          className="m-0 flex min-w-0 flex-col border-0 p-0"
+        >
+          {codeField}
+        </fieldset>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <ResendButton
+              action={resendAction}
+              initialWait={initialWait}
+              onExpired={onExpired}
+              disabled={isBusy}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={isBusy}
+              onClick={switchEmail}
+              className="h-10 px-3 hover:bg-muted"
+            >
+              Usar outro e-mail
+            </Button>
+          </div>
+          <PendingButton
+            type="submit"
+            isPending={isPending}
+            pendingLabel="Confirmando…"
+            disabled={isSwitching}
+            className={cn("h-10 w-full sm:w-35", primaryButton)}
+          >
+            {submitLabel}
+          </PendingButton>
+        </div>
+      </form>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -59,27 +156,16 @@ export function CodeForm({
         className="flex flex-col gap-5"
       >
         <fieldset
-          disabled={isPending}
+          disabled={isBusy}
           className="m-0 flex min-w-0 flex-col gap-4 border-0 p-0"
         >
-          <TextField
-            id="code"
-            required
-            label="Código"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            autoCapitalize="none"
-            spellCheck={false}
-            inputClassName="text-[15px] tracking-[0.12em] tabular-nums md:text-[15px]"
-            hint="Confira também a caixa de spam."
-            error={errors.code?.message ?? errors.root?.message}
-            {...register("code")}
-          />
+          {codeField}
         </fieldset>
         <PendingButton
           type="submit"
           isPending={isPending}
           pendingLabel="Confirmando…"
+          disabled={isSwitching}
           className={cn("h-10 w-full", primaryButton)}
         >
           {submitLabel}
@@ -89,19 +175,19 @@ export function CodeForm({
         action={resendAction}
         initialWait={initialWait}
         onExpired={onExpired}
+        disabled={isBusy}
       />
-      <form
-        action={switchAction}
-        className="text-center text-sm text-muted-foreground"
-      >
+      <p className="text-center text-sm text-muted-foreground">
         Não é este e-mail?{" "}
         <button
-          type="submit"
-          className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          type="button"
+          disabled={isBusy}
+          onClick={switchEmail}
+          className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:no-underline"
         >
           Usar outro e-mail
         </button>
-      </form>
+      </p>
     </div>
   );
 }

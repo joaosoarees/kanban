@@ -1,4 +1,5 @@
 import "server-only";
+import { UNLOCKED_PASSWORD } from "@/features/auth/lib/password-lock";
 import { signUpAttemptMail } from "@/features/auth/emails/sign-up-attempt";
 import { verifyEmailMail } from "@/features/auth/emails/verify-email";
 import {
@@ -105,7 +106,14 @@ export async function registerAccount(
 
     await tx.user.update({
       where: { id: existing.id },
-      data: { name, passwordHash, createdAt: now, passwordChangedAt: now },
+      data: {
+        name,
+        passwordHash,
+        createdAt: now,
+        passwordChangedAt: now,
+        ...UNLOCKED_PASSWORD,
+      },
+      select: { id: true },
     });
     const resent = await resendCode(tx, verifyOwner(existing.id), now);
     return {
@@ -175,13 +183,19 @@ export async function verifyEmail(
     if (account.emailVerifiedAt !== null) {
       return { status: "invalid" };
     }
-    const valid = await consumeCode(tx, verifyOwner(pending.userId), code, now);
-    if (!valid) {
+    const consumed = await consumeCode(
+      tx,
+      verifyOwner(pending.userId),
+      code,
+      now,
+    );
+    if (consumed === null) {
       return { status: "invalid" };
     }
     await tx.user.update({
       where: { id: pending.userId },
       data: { emailVerifiedAt: now },
+      select: { id: true },
     });
     return { status: "verified", passwordChangedAt: account.passwordChangedAt };
   });

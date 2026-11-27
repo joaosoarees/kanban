@@ -16,6 +16,8 @@ import {
   verifyCodeSchema,
 } from "@/features/auth/lib/email-code";
 import { verifyPassword } from "@/features/auth/server/password";
+import { checkAccountPassword } from "@/features/auth/server/password-check";
+import { enter } from "@/features/auth/server/enter";
 import {
   checkResetCode,
   requestPasswordReset,
@@ -39,6 +41,7 @@ import {
   endPasswordReset,
   endPendingVerification,
   endSession,
+  forgetInvite,
   getPasswordReset,
   getPasswordResetGrant,
   getPendingVerification,
@@ -48,7 +51,6 @@ import {
   startSession,
 } from "@/server/session";
 
-const AFTER_SIGN_IN = "/";
 const VERIFY_PATH = "/verify-email";
 
 export async function signUpAction(input: unknown): Promise<ActionResult> {
@@ -73,22 +75,19 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 
   const user = await db.user.findUnique({
     where: { email: parsed.data.email },
-    select: {
-      id: true,
-      passwordHash: true,
-      passwordChangedAt: true,
-      emailVerifiedAt: true,
-    },
+    select: { id: true, passwordChangedAt: true, emailVerifiedAt: true },
   });
 
-  const matches = await verifyPassword(
-    parsed.data.password,
-    user?.passwordHash,
-  );
-  if (!user || !matches) {
+  const matches =
+    user === null
+      ? await verifyPassword(parsed.data.password, null)
+      : (await checkAccountPassword(user.id, parsed.data.password, new Date()))
+          .status === "match";
+  if (user === null || !matches) {
     return {
       status: "error",
-      message: "E-mail ou senha incorretos. Confira e tente de novo.",
+      message:
+        "E-mail ou senha incorretos, ou muitas tentativas seguidas. Confira e tente de novo em alguns minutos.",
     };
   }
 
@@ -107,12 +106,13 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
     userId: user.id,
     passwordChangedAt: user.passwordChangedAt,
   });
-  return redirect(AFTER_SIGN_IN);
+  return enter(user.id);
 }
 
-export async function signOutAction(): Promise<void> {
+export async function signOutAction(): Promise<ActionResult> {
+  await forgetInvite();
   await endSession();
-  return redirect("/sign-in");
+  return { status: "success", data: undefined };
 }
 
 const PENDING_EXPIRED: ActionError = {
@@ -148,7 +148,7 @@ export async function verifyEmailAction(input: unknown): Promise<ActionResult> {
     userId: pending.userId,
     passwordChangedAt: outcome.passwordChangedAt,
   });
-  return redirect(AFTER_SIGN_IN);
+  return enter(pending.userId);
 }
 
 export async function resendCodeAction(): Promise<
@@ -281,5 +281,5 @@ export async function resetPasswordAction(
   }
 
   await startSession({ userId: grant.userId, passwordChangedAt });
-  return redirect(AFTER_SIGN_IN);
+  return enter(grant.userId);
 }

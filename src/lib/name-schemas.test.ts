@@ -42,37 +42,37 @@ const nameFields = [
 ] as const;
 
 describe.each(nameFields)("%s name", (_label, field) => {
-  it("keeps a valid name", () => {
+  it("should keep a valid name", () => {
     expect(field.parse("  Produto  ")).toBe("Produto");
   });
 
-  it("refuses a NUL character", () => {
+  it("should refuse a NUL character", () => {
     expect(field.safeParse(`a${NUL}b`).success).toBe(false);
   });
 
-  it("refuses a name with only zero-width characters", () => {
+  it("should refuse a name with only zero-width characters", () => {
     expect(field.safeParse(`${ZERO_WIDTH} ${ZERO_WIDTH}`).success).toBe(false);
   });
 
-  it.each(INVISIBLE_CODE_POINTS)("refuses only U+%s", (codePoint) => {
+  it.each(INVISIBLE_CODE_POINTS)("should refuse only U+%s", (codePoint) => {
     const name = String.fromCodePoint(Number.parseInt(codePoint, 16));
     expect(field.safeParse(name).success).toBe(false);
   });
 
-  it("keeps a zero-width character inside visible text", () => {
+  it("should keep a zero-width character inside visible text", () => {
     const name = `a${ZERO_WIDTH}b`;
     expect(field.parse(name)).toBe(name);
   });
 });
 
 describe("sign-in email", () => {
-  it("keeps a valid email", () => {
+  it("should keep a valid email", () => {
     expect(signInSchema.shape.email.parse(" Ana@Example.com ")).toBe(
       "ana@example.com",
     );
   });
 
-  it("refuses a NUL character", () => {
+  it("should refuse a NUL character", () => {
     expect(signInSchema.shape.email.safeParse(`a${NUL}b`).success).toBe(false);
   });
 });

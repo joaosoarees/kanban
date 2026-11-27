@@ -1,7 +1,7 @@
 import type { Role } from "@/generated/prisma/enums";
 
 export type WorkspaceAction =
-  | "addMember"
+  | "inviteMember"
   | "changeRole"
   | "removeMember"
   | "renameWorkspace"
@@ -9,7 +9,8 @@ export type WorkspaceAction =
   | "leaveWorkspace"
   | "manageBoards"
   | "manageColumns"
-  | "manageCards";
+  | "manageCards"
+  | "deleteAnyComment";
 
 export type MemberTarget = { role: Role; isSelf: boolean };
 
@@ -28,7 +29,7 @@ const canManageMember: Rule = (actor, target) => {
 };
 
 const RULES: Record<WorkspaceAction, Rule> = {
-  addMember: canManage,
+  inviteMember: canManage,
   renameWorkspace: canManage,
   deleteWorkspace: (actor) => actor === "OWNER",
   leaveWorkspace: (actor) => actor !== "OWNER",
@@ -37,6 +38,7 @@ const RULES: Record<WorkspaceAction, Rule> = {
   manageBoards: canManage,
   manageColumns: () => true,
   manageCards: () => true,
+  deleteAnyComment: canManage,
 };
 
 export function can(

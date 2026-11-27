@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import { useToday } from "@/features/boards/hooks/use-today";
 import type {
   BoardCard,
   BoardColumn,
@@ -35,17 +36,20 @@ export function replaceBoardFilter(filter: BoardFilter) {
 }
 
 export function useVisibleCards(columns: BoardColumn[], filter: BoardFilter) {
+  const today = useToday();
   const [snapshot, setSnapshot] = useState(() =>
     takeFilterSnapshot(
       columns.flatMap(({ cards }) => cards),
       filter,
+      today,
     ),
   );
   let current = snapshot;
-  if (snapshot.key !== filterKey(filter)) {
+  if (snapshot.key !== filterKey(filter, today)) {
     current = takeFilterSnapshot(
       columns.flatMap(({ cards }) => cards),
       filter,
+      today,
     );
     setSnapshot(current);
   }
@@ -55,7 +59,9 @@ export function useVisibleCards(columns: BoardColumn[], filter: BoardFilter) {
   };
   const cardsOf = isFilterActive(filter)
     ? (column: BoardColumn): BoardCard[] =>
-        column.cards.filter((card) => isCardVisible(card, filter, current))
+        column.cards.filter((card) =>
+          isCardVisible(card, filter, current, today),
+        )
     : null;
   return { cardsOf, reveal };
 }

@@ -1,9 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { CardDialog } from "@/features/boards/components/card/card-dialog";
+import { useEffect, useRef } from "react";
+import {
+  CardDialog,
+  type DeletedCard,
+} from "@/features/boards/components/card/card-dialog";
 import type {
   BoardColumn,
   CardUpdate,
@@ -11,15 +13,7 @@ import type {
 import { useBoardFilter } from "@/features/boards/hooks/use-board-filter";
 import { isFilterActive } from "@/features/boards/lib/board-filter";
 import { locateCard } from "@/features/boards/lib/card-moves";
-import {
-  pushCardUrl,
-  readCardParam,
-  replaceCardUrl,
-} from "@/features/boards/lib/card-url";
-
-const CARD_NOT_FOUND =
-  "Card não encontrado. Ele pode ter sido excluído ou estar em outro quadro.";
-const CARD_DELETED = "Este card foi excluído. O quadro foi atualizado.";
+import { readCardParam } from "@/features/boards/lib/card-url";
 
 type CardDialogHostProps = {
   workspaceId: string;
@@ -42,20 +36,7 @@ export function CardDialogHost({
 }: CardDialogHostProps) {
   const requestedId = readCardParam(useSearchParams());
   const canReorder = !isFilterActive(useBoardFilter());
-  const [dirtyCardId, setDirtyCardId] = useState<string | null>(null);
-  const heldId =
-    dirtyCardId !== null && locateCard(columns, dirtyCardId)
-      ? dirtyCardId
-      : null;
-  const cardId = heldId ?? requestedId;
-  const location = cardId === null ? null : locateCard(columns, cardId);
-  const shownId = useRef<string | null>(null);
-  const isMissing = cardId !== null && location === null;
-  const deletedCard = useRef<{
-    id: string;
-    columnId: string;
-    index: number;
-  } | null>(null);
+  const deletedCard = useRef<DeletedCard | null>(null);
 
   useEffect(() => {
     const deleted = deletedCard.current;
@@ -75,55 +56,15 @@ export function CardDialogHost({
     (neighbor ?? focusTargetOf(deleted.columnId))?.focus();
   }, [columns]);
 
-  useEffect(() => {
-    if (cardId === null) {
-      shownId.current = null;
-      return;
-    }
-    if (!isMissing) {
-      shownId.current = cardId;
-      return;
-    }
-    toast.error(shownId.current === cardId ? CARD_DELETED : CARD_NOT_FOUND);
-    shownId.current = null;
-    replaceCardUrl(null);
-  }, [cardId, isMissing]);
-
-  if (cardId === null || location === null) {
-    return null;
-  }
-
   return (
     <CardDialog
-      key={cardId}
       workspaceId={workspaceId}
       boardId={boardId}
-      card={location.card}
-      column={location.column}
-      index={location.index}
+      requestedId={requestedId}
       columns={columns}
       canReorder={canReorder}
-      isLeaving={heldId !== null && requestedId !== heldId}
-      onDirtyChange={(isDirty) => {
-        setDirtyCardId(isDirty ? cardId : null);
-      }}
-      onKeepEditing={() => {
-        pushCardUrl(cardId);
-      }}
-      onDiscardLeaving={() => {
-        setDirtyCardId(null);
-      }}
-      onDeleted={() => {
-        deletedCard.current = {
-          id: cardId,
-          columnId: location.column.id,
-          index: location.index,
-        };
-      }}
-      onClose={() => {
-        setDirtyCardId(null);
-        shownId.current = null;
-        pushCardUrl(null);
+      onDeleted={(card) => {
+        deletedCard.current = card;
       }}
       onMoveCard={onMoveCard}
       onUpdateCard={onUpdateCard}

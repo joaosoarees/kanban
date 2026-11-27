@@ -7,9 +7,9 @@
 Kanban por workspaces para times pequenos (2 a 10 pessoas). O time entra num workspace, abre um quadro e move cards entre colunas ao longo do dia. Uso principal no navegador de desktop, com o quadro aberto o dia todo; o celular precisa funcionar, mas não é o cenário principal. Tarefa principal: ver quem está fazendo o quê e mover o trabalho sem atrito.
 
 - Hierarquia: Workspace → Quadro → Coluna → Card (título, descrição, responsável, etiquetas). Papéis fixos: Dono, Admin, Membro.
-- Entrada com e-mail e senha, sem login social nem convite por e-mail: um admin adiciona quem já tem conta.
+- Entrada com e-mail e senha, sem login social. Quem administra convida pelo e-mail, e a pessoa entra depois de aceitar, com ou sem conta.
 - Sem tempo real: o que outras pessoas mudam aparece ao recarregar ou navegar. Mover uma coluna aparece na hora, antes de o servidor confirmar, e um erro desfaz o movimento com uma mensagem clara. Criar, renomear e excluir aparecem quando o servidor confirma.
-- Fora do escopo por enquanto: comentários, anexos, data de entrega, histórico de atividade, busca.
+- Fora do escopo por enquanto: anexos, histórico de atividade, busca.
 - Princípios: o quadro é o produto, e tudo o mais serve para chegar a ele rápido; simplicidade antes de recurso.
 - Não há logo além da marca de barras, ilustrações, depoimentos nem dados reais: nenhuma tela inventa clientes, números ou depoimentos.
 
@@ -124,6 +124,29 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — A senha nova avisa que as outras sessões serão encerradas — explica por que outro aparelho pede login de novo.
 - 2026-11-25 — Texto tem no mínimo 13px; só etiquetas e contadores podem ter 12px — a referência pede evitar texto pequeno, e etiquetas e contadores precisam caber no card e na coluna.
 - 2026-11-25 — Sem preferência de densidade por enquanto — quadros de times pequenos têm poucos cards, e um modo compacto dobraria as versões do card nos dois temas.
+- 2026-11-26 — Telas de convite desenhadas no canvas da fatia 15 (https://claude.ai/artifact/E894WS7A1kDnbWz6WUePhz, pranchas 15.1 a 15.8, claro e escuro), aprovadas — `/invite` usa a casca das telas de entrada, fora do grupo `(auth)`, porque abre com ou sem sessão.
+- 2026-11-26 — Sem sessão, "Criar conta" é a ação principal do convite e "Entrar" a secundária — o caso comum é quem ainda não tem conta, e a tela não pode revelar se o e-mail já tem.
+- 2026-11-26 — Aviso do convite: faixa na cor de destaque acima do título de entrar, criar conta e confirmar o e-mail, com "Seguir sem o convite" — lembra por que a pessoa está ali e dá uma saída. No cadastro, o e-mail vem travado, em cinza com cadeado.
+- 2026-11-26 — O e-mail do convite tem um botão "Ver convite" e o endereço em texto embaixo, exceção à regra dos e-mails sem links — o convite precisa abrir em outro navegador ou aparelho, e não traz código.
+- 2026-11-26 — "Convites pendentes" fica entre "Convidar" e a lista de membros, que ganha o título "Membros"; some quando vazio; revogar não pede confirmação — convidar de novo desfaz o engano. A linha começa pelo prazo ("Vence em 6 dias · enviado por…"), que é o que importa quando o texto é cortado.
+- 2026-11-26 — Página `/account` desenhada no canvas da fatia 16 (https://claude.ai/artifact/3ZwoX5NK5dGgN6JXViQttf, pranchas 16.1 a 16.5), aprovada — três cartões (Nome, Senha, E-mail) numa coluna de 672px, com o cabeçalho do início; entra pelo item "Conta" do menu da conta, marcado quando a página está aberta.
+- 2026-11-26 — A troca de e-mail acontece dentro do próprio cartão, em dois passos (e-mail novo e senha, depois o código), e volta ao passo do código ao recarregar — sem rota nova, e quem saiu no meio continua de onde parou.
+- 2026-11-26 — Dentro de um cartão, o passo do código põe "Reenviar" e "Usar outro e-mail" à esquerda e "Confirmar" à direita; as telas de entrada mantêm o botão na largura toda e os links embaixo — o mesmo formulário com duas disposições, para os erros e o reenvio ficarem num lugar só.
+- 2026-11-26 — O código errado mostra uma só mensagem, "Código inválido ou vencido. Peça um novo.", e não as tentativas restantes do canvas — igual às outras telas de código.
+- 2026-11-26 — Prazo no card desenhado no canvas da fatia 17 (https://claude.ai/artifact/69GUz4Hss9diKNZjCCktZY, peças 17.0 e telas 17.1 a 17.5, claro e escuro), aprovado — o prazo é um dia, sem hora, comparado com o dia de quem vê; "Concluído" é uma marca do card, separada da coluna.
+- 2026-11-26 — No card do quadro, o selo de prazo vem primeiro na linha de baixo, com a forma da etiqueta: neutro, "Hoje" em destaque, atrasado em vermelho e "✓ Concluído" em verde no lugar da data. Os tokens `success-fg` e `success-bg` entram para o verde.
+- 2026-11-26 — No diálogo, Prazo e Concluído ficam entre Responsável e Etiquetas. O campo de prazo é o botão de propriedade do responsável; a data atrasada lê "24 nov 2026 · atrasado" e a de hoje "Hoje, 26 nov". A caixa "Concluído" é o checkbox de 16px do filtro, sem rótulo de linha.
+- 2026-11-26 — O calendário abre em popover sob o campo no desktop e dentro do diálogo, em largura total e com dias de 40px, no celular. Escolher um dia salva e fecha; não há atalhos; a semana começa no domingo; um "×" ao lado do campo remove o prazo.
+- 2026-11-26 — O filtro ganha o grupo "Prazo", de escolha única, entre Responsável e Etiquetas: Qualquer prazo, Atrasados, Vencem em 7 dias e Sem prazo. Todo membro edita prazo e conclusão, então não há estado só leitura.
+- 2026-11-26 — Comentários no card desenhados no canvas da fatia 18 (https://claude.ai/artifact/TBdShY7xnJkdRDnmtwMWcU, telas 18.1 a 18.4, claro e escuro), aprovados — texto puro, sem formatação nem menções.
+- 2026-11-26 — A seção "Comentários" fica entre a descrição e a linha "Excluir card / Mover para": o campo no topo, o mais novo primeiro e "Ver anteriores" no fim. Sem rolagem própria: o diálogo inteiro rola — quem abre o card vê o último comentário sem rolar, e duas áreas de rolagem uma dentro da outra prendem a roda e o dedo.
+- 2026-11-26 — Comentar não é otimista: o texto fica no campo, só leitura, com o spinner no botão até a action terminar. Ctrl/⌘+Enter envia e Enter quebra a linha; um rascunho ou uma edição não enviados usam o aviso "Descartar as alterações?" da descrição.
+- 2026-11-26 — A data do comentário é "hoje, 18h30", "ontem, 9h12" ou "20/11, 18h30", com o ano só fora do ano atual — sem "há 5 min", para o texto não mudar sozinho com a tela aberta.
+- 2026-11-26 — "Editar" e "Excluir" ficam no cabeçalho do comentário, sempre visíveis; no celular descem para baixo do texto. O autor edita e exclui; ADMIN e OWNER só excluem os dos outros. Excluir pede confirmação.
+- 2026-11-26 — No card do quadro, o número de comentários vem com o ícone `MessageSquare` em 12px ao lado do avatar e some quando é zero.
+- 2026-11-26 — Só um comentário fica em edição por vez (tela 18.5 do canvas da fatia 18, aprovada). "Editar" em outro comentário fecha a edição atual quando ela não mudou; com alteração pendente, pede "Descartar as alterações?" — "Continuar editando" volta ao campo e "Descartar" abre a outra edição. Enquanto uma edição salva, os outros "Editar" ficam desabilitados. O rascunho do campo novo não é afetado.
+- 2026-11-26 — O link do convite é `/invite#<token>`: o token fica fora do log de acesso, e o navegador busca a prévia. Enquanto carrega, um esqueleto do tamanho da tela de convidado; depois de 2 s, a linha de baixo vira "Ainda carregando o convite…".
+- 2026-11-26 — Se a prévia do convite não carrega, a tela diz "Não foi possível carregar o convite" com "Tentar de novo", no layout de "Este convite não vale mais", e não chama de inválido um link que pode estar certo. Sem token ou com token mal formado, vale a tela "Este convite não vale mais"; o token só viaja no fragmento (`/invite#<token>`), e `/invite/<token>` responde 404 para o token não ir ao log de acesso.
 
 ## Perguntas abertas
 

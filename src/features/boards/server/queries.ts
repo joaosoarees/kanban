@@ -12,6 +12,9 @@ type CardRow = {
   hasDescription: boolean;
   assigneeId: string | null;
   labelIds: string[];
+  dueOn: string | null;
+  completed: boolean;
+  commentCount: number;
 };
 
 export async function getBoards(workspaceId: string) {
@@ -29,7 +32,7 @@ export const requireBoard = cache(
       notFound();
     }
 
-    const board = await db.board.findFirst({
+    const board = await db.board.findUnique({
       where: { id: id.data, workspaceId },
       select: {
         id: true,
@@ -52,11 +55,18 @@ export const requireBoard = cache(
         card.title,
         card.description IS NOT NULL AS "hasDescription",
         card."assigneeId",
+        card."dueOn"::text AS "dueOn",
+        card."completedAt" IS NOT NULL AS completed,
         ARRAY(
           SELECT applied."labelId"::text
           FROM card_labels applied
           WHERE applied."cardId" = card.id
-        ) AS "labelIds"
+        ) AS "labelIds",
+        (
+          SELECT count(*)::int
+          FROM comments comment
+          WHERE comment."cardId" = card.id
+        ) AS "commentCount"
       FROM cards card
       JOIN columns board_column ON board_column.id = card."columnId"
       WHERE board_column."boardId" = ${board.id}::uuid
@@ -100,7 +110,7 @@ export async function getCardDescription(
     return null;
   }
 
-  return db.card.findFirst({
+  return db.card.findUnique({
     where: {
       id: ref.data.cardId,
       column: { boardId: ref.data.boardId, board: { workspaceId } },

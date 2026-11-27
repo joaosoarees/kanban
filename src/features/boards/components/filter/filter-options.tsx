@@ -2,6 +2,7 @@
 
 import { Check, Search, UsersRound } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
+import { CheckBox } from "@/components/check-box";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
 import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
 import { comparable } from "@/features/boards/components/label/label-list";
@@ -10,6 +11,7 @@ import { replaceBoardFilter } from "@/features/boards/hooks/use-board-filter";
 import {
   NO_ASSIGNEE,
   type BoardFilter,
+  type DueFilter,
 } from "@/features/boards/lib/board-filter";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +21,23 @@ const LIST =
   "relative flex max-h-[min(188px,25svh)] flex-col overflow-y-auto p-1 pt-0";
 const OPTION =
   "relative flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-md px-2 text-[15px] hover:bg-muted has-focus-visible:ring-3 has-focus-visible:ring-ring/50 sm:h-9 sm:text-sm";
+
+const DUE_OPTIONS: { value: DueFilter | null; name: string }[] = [
+  { value: null, name: "Qualquer prazo" },
+  { value: "overdue", name: "Atrasados" },
+  { value: "week", name: "Vencem em 7 dias" },
+  { value: "none", name: "Sem prazo" },
+];
+
+function SelectedMark() {
+  return (
+    <Check
+      aria-hidden
+      className="size-4 shrink-0 text-brand-fg"
+      strokeWidth={2.5}
+    />
+  );
+}
 
 type PersonOption = {
   value: string;
@@ -31,6 +50,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
   const { labels, members } = useBoardMeta();
   const [query, setQuery] = useState("");
   const groupName = useId();
+  const dueGroupName = useId();
   const search = comparable(query);
   const matches = labels.filter(({ name }) =>
     comparable(name).includes(search),
@@ -71,6 +91,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
         ? filter.labelIds.filter((id) => id !== labelId)
         : [...filter.labelIds, labelId],
       assignee: filter.assignee,
+      due: filter.due,
     });
   };
 
@@ -91,6 +112,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                     labelIds: filter.labelIds,
                     assignee:
                       person.value === ANY_ASSIGNEE ? null : person.value,
+                    due: filter.due,
                   });
                 }}
                 className="sr-only"
@@ -102,17 +124,38 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                   <span className="text-fg-muted">{person.suffix}</span>
                 )}
               </span>
-              {selected === person.value && (
-                <Check
-                  aria-hidden
-                  className="size-4 shrink-0 text-brand-fg"
-                  strokeWidth={2.5}
-                />
-              )}
+              {selected === person.value && <SelectedMark />}
             </label>
           ))}
         </div>
       </fieldset>
+
+      <div className="border-t">
+        <fieldset className="m-0 min-w-0 border-0 p-0">
+          <legend className={LEGEND}>Prazo</legend>
+          <div className={LIST}>
+            {DUE_OPTIONS.map((option) => (
+              <label key={option.value ?? "any"} className={OPTION}>
+                <input
+                  type="radio"
+                  name={dueGroupName}
+                  checked={filter.due === option.value}
+                  onChange={() => {
+                    replaceBoardFilter({
+                      labelIds: filter.labelIds,
+                      assignee: filter.assignee,
+                      due: option.value,
+                    });
+                  }}
+                  className="sr-only"
+                />
+                <span className="min-w-0 flex-1 truncate">{option.name}</span>
+                {filter.due === option.value && <SelectedMark />}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
       <div className="border-t">
         <fieldset className="m-0 min-w-0 border-0 p-0">
@@ -153,17 +196,7 @@ export function FilterOptions({ filter }: { filter: BoardFilter }) {
                         }}
                         className="sr-only"
                       />
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "flex size-4 shrink-0 items-center justify-center rounded border border-border-control bg-card text-on-color",
-                          isChecked && "border-brand bg-brand",
-                        )}
-                      >
-                        {isChecked && (
-                          <Check className="size-3" strokeWidth={3} />
-                        )}
-                      </span>
+                      <CheckBox checked={isChecked} />
                       <LabelTag name={label.name} color={label.color} />
                     </label>
                   );

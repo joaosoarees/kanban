@@ -6,9 +6,12 @@ import * as z from "zod";
 import { cardDescriptionSchema } from "@/features/boards/lib/card-schemas";
 import { updateCardDescriptionAction } from "@/features/boards/server/card-actions";
 import { useActionForm } from "@/hooks/use-action-form";
+import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
+import type { ActionError } from "@/lib/action-result";
 
 const LOAD_FAILED = "Não foi possível abrir o card. Tente de novo.";
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";
+const NO_CARD: ActionError = { status: "error", message: SAVE_FAILED };
 
 const descriptionResponseSchema = z.discriminatedUnion("status", [
   z.object({
@@ -25,8 +28,7 @@ const descriptionResponseSchema = z.discriminatedUnion("status", [
 type UseCardDescriptionOptions = {
   workspaceId: string;
   boardId: string;
-  cardId: string;
-  onDirtyChange: (isDirty: boolean) => void;
+  cardId: string | null;
   onLoadFailed: (message: string, isGone: boolean) => void;
 };
 
@@ -34,11 +36,16 @@ export function useCardDescription({
   workspaceId,
   boardId,
   cardId,
-  onDirtyChange,
   onLoadFailed,
 }: UseCardDescriptionOptions) {
   const [saved, setSaved] = useState<string | null>();
   const [isEditing, setIsEditing] = useState(false);
+  const [loadedCardId, setLoadedCardId] = useState(cardId);
+  if (loadedCardId !== cardId) {
+    setLoadedCardId(cardId);
+    setSaved(undefined);
+    setIsEditing(false);
+  }
   const {
     form: {
       register,
@@ -53,7 +60,9 @@ export function useCardDescription({
     schema: cardDescriptionSchema,
     defaultValues: { description: "" },
     action: async (values) =>
-      updateCardDescriptionAction(workspaceId, boardId, cardId, values),
+      cardId === null
+        ? NO_CARD
+        : updateCardDescriptionAction(workspaceId, boardId, cardId, values),
     failure: SAVE_FAILED,
     onSuccess: (_, values) => {
       setSaved(values.description);
@@ -72,14 +81,13 @@ export function useCardDescription({
   const isDirty = isEditing && value !== (saved ?? "");
 
   const reportLoadFailure = useEffectEvent(onLoadFailed);
-  const reportDirty = useEffectEvent(onDirtyChange);
 
   useEffect(() => {
     let isCurrent = true;
-    const load = async () => {
+    const load = async (id: string) => {
       try {
         const response = await fetch(
-          `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/description`,
+          `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${id}/description`,
           { cache: "no-store", redirect: "error" },
         );
         const result = descriptionResponseSchema.parse(await response.json());
@@ -98,29 +106,15 @@ export function useCardDescription({
         }
       }
     };
-    if (isLoading) {
-      void load();
+    if (isLoading && cardId !== null) {
+      void load(cardId);
     }
     return () => {
       isCurrent = false;
     };
   }, [isLoading, workspaceId, boardId, cardId]);
 
-  useEffect(() => {
-    reportDirty(isDirty);
-  }, [isDirty]);
-
-  useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
-      if (isDirty) {
-        event.preventDefault();
-      }
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => {
-      window.removeEventListener("beforeunload", warn);
-    };
-  }, [isDirty]);
+  useUnsavedChangesWarning(isDirty);
 
   return {
     saved,

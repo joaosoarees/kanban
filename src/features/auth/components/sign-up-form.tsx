@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { textLink } from "@/components/button-styles";
 import { TextField } from "@/components/text-field";
 import { FormFooter } from "@/features/auth/components/form-footer";
 import { signUpSchema } from "@/features/auth/lib/schemas";
@@ -8,7 +10,7 @@ import { useActionForm } from "@/hooks/use-action-form";
 
 const SIGN_UP_FAILED = "Não foi possível criar a conta. Tente de novo.";
 
-export function SignUpForm() {
+export function SignUpForm({ invitedEmail }: { invitedEmail?: string }) {
   const {
     form: {
       register,
@@ -18,7 +20,7 @@ export function SignUpForm() {
     isPending,
   } = useActionForm({
     schema: signUpSchema,
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: invitedEmail ?? "", password: "" },
     action: signUpAction,
     failure: SIGN_UP_FAILED,
   });
@@ -50,6 +52,17 @@ export function SignUpForm() {
           label="E-mail"
           type="email"
           autoComplete="email"
+          readOnly={invitedEmail !== undefined}
+          hint={
+            invitedEmail === undefined ? undefined : (
+              <>
+                O convite é para este e-mail. Já tem conta?{" "}
+                <Link href="/sign-in" className={textLink}>
+                  Entre
+                </Link>
+              </>
+            )
+          }
           error={errors.email?.message}
           {...register("email")}
         />

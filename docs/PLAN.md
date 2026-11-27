@@ -23,7 +23,7 @@ Projeto de estudo para treinar as skills. Roda local em Docker Compose e em prod
 ## Erros
 
 1. Erros esperados (validação, permissão, conflito): a action retorna `{ status: "error", message }`, sem lançar exceção.
-2. Recurso inexistente ou sem acesso: `notFound()` (404, não 403).
+2. Recurso inexistente ou sem acesso: `notFound()` nas páginas (404, não 403). Nas actions, sem acesso devolve `FORBIDDEN`, e recurso que deixou de existir devolve o `*_GONE` dele.
 3. Erros inesperados: `error.tsx` em níveis (`global-error`, área logada, workspace, board).
 
 Entra a partir da fatia 3; cada fatia nova ganha seu `error.tsx` e `loading.tsx` quando fizer sentido.
@@ -32,7 +32,7 @@ Entra a partir da fatia 3; cada fatia nova ganha seu `error.tsx` e `loading.tsx`
 
 - Workspace → Board → Coluna → Card. O card tem título, descrição, responsável e etiquetas.
 - Papéis fixos no código: OWNER, ADMIN, MEMBER.
-- Membros entram quando um admin adiciona um usuário já cadastrado pelo e-mail. Como a resposta revela se o e-mail tem conta, a action fica sob rate limit; convites com aceite ficam para uma fatia futura.
+- Membros entram por convite com aceite (fatia 15). Todos os papéis veem a lista de membros; convidar e gerenciar convites é de OWNER e ADMIN.
 
 ```
 User (id, name, email @unique, passwordHash)
@@ -66,7 +66,7 @@ Deletes em cascata de Workspace até Card.
 - Ambiente local em Docker Compose: Postgres e app, com o bun só dentro do container.
 - Hooks nativos do git em `.husky`, executados no container: lint-staged e typecheck (`bun check`) no pre-commit, commitlint (Conventional Commits em inglês) no commit-msg.
 - CI no GitHub Actions: lint, format, typecheck, test, build. Branch protection na `main`.
-- Testes: só o teste unitário da lógica de posição. Sem mocks e sem testes de componente.
+- Testes unitários para toda lógica pura não trivial (posição, filtros, schemas, permissões). Sem mocks e sem testes de componente.
 
 ## Deploy
 
@@ -74,9 +74,9 @@ Deletes em cascata de Workspace até Card.
 - Deploy automático na `main`: o job `deploy` do CI roda depois do `check` e chama a API do Coolify com um token só de `deploy`. Auto-deploy por webhook e previews de PR ficam desligados.
 - Imagem de produção com `output: "standalone"`, build com Bun e runtime Node distroless, sem root.
 - Postgres no mesmo compose, sem porta publicada. Migrations num serviço `migrate` que roda antes do `app`; elas são sempre compatíveis com a versão anterior do código.
-- Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura no repositório.
+- Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura (IP, domínio, URL de painel ou de API) no repositório. Região, rótulos do Traefik e nomes de variáveis do Coolify não são segredo nem endereço.
 - Backup: `pg_dump` a cada hora e envio diário ao S3 com 7 dias de retenção.
-- Rate limit no Traefik para `POST` de login, cadastro e adicionar membro.
+- Rate limit no Traefik para o `POST` das telas de entrada e de conta (ver as fatias 13 e 15).
 - Rollback por `git revert` em PR.
 
 ## Reorganização (fatias 10 e 11)
@@ -165,10 +165,113 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 - As telas passam pelo `craft`.
 - Skills: `cognito-password-reset` (fluxo), `nextjs-jwt-session`, `password-hashing`, `craft`.
 
+## Convites, conta, prazo e comentários (fatias 15 a 18)
+
+- As quatro fatias formam um pacote: os PRs entram na branch `release/slices-15-18`, com o `check` do CI verde e merge por rebase, e ela vai para a `main` de uma vez no fim, com um único deploy.
+- Depois que o último PR da fatia 18 entrar na release, e antes do merge na `main`, uma auditoria da release inteira contra as skills (`auditing-code-against-skills`): primeiro só leitura, e as correções escolhidas entram em PRs pequenos para a release.
+- As telas novas passam pelo `craft` antes de serem implementadas: `/invite`, os convites pendentes em membros, `/account`, o prazo e o "concluído" no card e no diálogo, e os comentários no diálogo.
+- Os únicos e-mails novos são o convite, o código de troca de e-mail e o aviso ao endereço antigo. Comentários e prazos não mandam e-mail.
+
+### Convites com aceite (fatia 15)
+
+- O convite substitui o "adicionar pelo e-mail". OWNER e ADMIN convidam com o papel MEMBER ou ADMIN, nunca OWNER. A resposta é sempre "Convite enviado para x", com ou sem conta, e o rate limit de enumeração do adicionar sai junto. A única recusa é para quem já é membro ("Esta pessoa já faz parte do workspace"), que quem convida já vê na lista.
+- O link `/invite#<token>` leva um token de 32 bytes aleatórios no fragmento, que o navegador não manda ao servidor; a página o envia no corpo de uma Server Action, então ele fica fora dos logs de acesso. O banco guarda só o SHA-256: com essa entropia, um hash rápido basta. O convite vale por 7 dias e uma vez só.
+- Aceitar exige estar logado com o e-mail convidado, já verificado. Com outra conta aberta, a tela diz "Este convite é para outro e-mail" e oferece trocar de conta.
+- Sem sessão, a página mostra o workspace e quem convidou, com "Entrar" e "Criar conta"; o cadastro vem com o e-mail preenchido e travado. O token fica num cookie `pending_invite` (JWT com `aud` próprio e a validade do convite), e o aceite acontece depois do login ou da verificação do e-mail, levando ao workspace.
+- Token errado, vencido ou revogado caem na mesma tela: "Este convite não vale mais. Peça um novo a quem convidou."
+- O aceite roda numa transação com a linha do workspace travada (`recheckActor`): quem convidou ainda precisa ser OWNER ou ADMIN e o papel ainda precisa ser permitido. Aceitar cria o membership e apaga o convite. Quem já é membro só vê o convite sumir e entra no workspace.
+- A página de membros ganha "Convites pendentes", só para OWNER e ADMIN, com reenviar e revogar. Reenviar gera um token novo e mais 7 dias; revogar apaga. O vencido continua na lista até um dos dois. Convidar de novo o mesmo e-mail substitui o convite anterior.
+- Limites contra spam saindo do domínio no SES: 50 convites pendentes por workspace, 60 s entre reenvios do mesmo convite e 20 envios por dia por quem convida. Os envios do dia são contados numa tabela própria, para que revogar não devolva a cota.
+- O rate limit do Traefik passa a cobrir também o `POST` de `/invite` (as actions da página de convite) e de `/account`.
+- Skills: `multi-tenant-data-model`, `tenant-role-authorization`, `role-based-access-control`, `relational-keys-and-column-types`, `postgres-constraints-and-keys`, `defining-access-patterns`, `postgres-indexes-and-explain`, `prisma-transactions`, `postgres-locking-and-isolation`, `password-hashing` (quando um hash rápido basta), `nextjs-jwt-session`, `nextjs-auth-cookies`, `nextjs-redirects`, `ses-sandbox-and-production-access`, `cognito-sign-up-and-confirmation` (fluxo), `craft`.
+
+```
+Invite (id, workspaceId, email, role: MEMBER | ADMIN, invitedById, tokenHash, sentAt, expiresAt)
+  UNIQUE (workspaceId, email), UNIQUE (tokenHash), onDelete: Cascade
+  CHECK (email = lower(email)), CHECK (expiresAt > sentAt), CHECK (tokenHash ~ '^[0-9a-f]{64}$')
+InviteSend (id, invitedById, sentAt)   @@index([invitedById, sentAt])
+```
+
+Implementação em três PRs para a `release/slices-15-18`, depois do backend:
+
+1. Página do convite e aviso nas telas de entrada.
+   - A casca das telas de entrada vira um componente, usado por `(auth)` e por `/invite` (`nextjs-layouts-and-templates`, `nextjs-component-composition`).
+   - `/invite` mostra os quatro estados, com o carregamento dentro de `Suspense` (`nextjs-app-router-routing`, `nextjs-server-data-fetching`, `nextjs-loading-and-streaming`, `nextjs-metadata`).
+   - Aceitar e trocar de conta chamam as actions do backend (`nextjs-server-actions-in-client-components`, `nextjs-server-action-results`, `nextjs-redirects`).
+   - O aviso lê o cookie `pending_invite`; o cadastro recebe o e-mail travado; "Seguir sem o convite" apaga o cookie (`nextjs-auth-cookies`, `nextjs-jwt-session`, `react-hook-form-default-values`, `react-hook-form-zod`, `nextjs-server-actions`).
+   - O e-mail do convite ganha o endereço em texto abaixo do botão, também na versão em texto puro (`mime-email-messages`).
+2. Convidar e convites pendentes.
+   - `InviteForm` substitui `AddMemberForm` (`nextjs-server-action-forms`, `react-hook-form-zod`).
+   - `PendingInvites` reenvia e revoga, revogar de forma otimista (`react-query-optimistic-updates` como padrão, `react-concurrent-rendering`), só para OWNER e ADMIN (`tenant-role-authorization`, `role-based-access-control`).
+   - O prazo da linha ("vence em N dias", "vence hoje", "venceu em 20/11") é uma função pura com teste (`designing-testable-code`, `writing-unit-tests`).
+   - Sai o adicionar antigo: `addMemberAction`, a permissão `addMember` e o seu rate limit (`auditing-code-against-skills` para conferir que nada ficou usando).
+3. Proteção e documentação.
+   - Rate limit do Traefik para o `POST` de `/invite` no `compose.prod.yaml`.
+   - Conferir, só leitura, se a conta SES saiu do sandbox, senão o convite só chega a endereços verificados (`ses-sandbox-and-production-access`).
+   - Decisões no `DESIGN.md` e a fatia marcada aqui (`craft`).
+
+Os três PRs entraram na `release/slices-15-18` (#61, #62 e o de proteção). A fatia é marcada como feita quando a release entrar na `main`.
+
+- SES conferido em 2026-11-26: a conta em `sa-east-1` saiu do sandbox e o domínio está verificado, então o convite chega a qualquer endereço.
+- Fica para depois: convites vencidos continuam na lista até alguém revogar ou reenviar, e nada apaga os vencidos antigos.
+
+### Perfil da conta (fatia 16)
+
+- Página `/account`, fora de qualquer workspace, aberta pelo item "Conta" do menu do usuário, com três blocos: nome, senha e e-mail. Excluir a conta fica de fora: esbarra em ser o único OWNER e pede uma fatia própria.
+- Nome: troca simples.
+- Senha: pede a atual. A troca atualiza `password_changed_at`, o que derruba as outras sessões; a sessão atual recebe um token novo.
+- E-mail: começar a troca pede a senha atual. Um código `CHANGE_EMAIL` vai para o endereço novo, com as regras dos outros códigos (8 dígitos, 15 minutos, 5 tentativas, 60 s entre envios), e o e-mail só muda depois do código certo. O endereço antigo recebe um aviso. As sessões continuam.
+- Um e-mail novo que já tem conta recebe a mesma resposta ("Enviamos um código"), mas nenhum código sai. A unicidade é conferida de novo na confirmação.
+- Senha errada: 5 erros seguidos travam a conferência de senha da conta por 15 minutos, no login e nas ações da conta que pedem a senha atual. O contador é da conta, não do IP, então um terceiro consegue travar o login de alguém; ficou assim de propósito, e o dono destrava pelo "Esqueci a senha" (redefinir ou verificar o e-mail zera a trava).
+- No login, um e-mail sem conta e uma senha errada respondem com 6 a 8 ms de diferença. Ficou assim.
+- Skills: `password-hashing`, `nextjs-jwt-session`, `nextjs-auth-cookies`, `cognito-password-reset` (fluxo), `normalizing-relational-schemas`, `postgres-constraints-and-keys`, `prisma-schema-and-migrations`, `nextjs-server-action-forms`, `react-hook-form-zod`, `nextjs-app-router-routing`, `craft`.
+
+```
+EmailCodePurpose + CHANGE_EMAIL
+EmailCode + newEmail?   CHECK ((purpose = 'CHANGE_EMAIL') = (newEmail IS NOT NULL)), CHECK (newEmail = lower(newEmail))
+```
+
+### Prazo no card (fatia 17)
+
+- O prazo é só a data (`due_on date`), sem hora. "Atrasado" é uma data anterior a hoje no fuso de quem vê, calculado no cliente.
+- O card ganha `completed_at`, marcado por uma caixa no diálogo, com ou sem prazo. Card concluído nunca conta como atrasado e mostra o selo verde.
+- Qualquer membro define e remove o prazo e marca como concluído, salvando na hora, de forma otimista e idempotente, como as etiquetas.
+- O selo no card mostra "12 nov" ("12 nov 2027" em outro ano), vermelho se atrasado e destacado se vence hoje.
+- Filtro `?due=overdue|week|none`, combinado por "e" com etiquetas e responsável: `overdue` são os atrasados não concluídos, `week` os que vencem de hoje até 7 dias à frente, sem os concluídos, e `none` os sem prazo.
+- Skills: `relational-keys-and-column-types` (date contra timestamptz), `defining-access-patterns`, `prisma-schema-and-migrations`, `react-query-optimistic-updates` (padrão otimista), `craft`.
+
+```
+Card + dueOn? @db.Date, completedAt? @db.Timestamptz(3)
+```
+
+### Comentários no card (fatia 18)
+
+- Só comentários: autor, texto puro de até 5.000 caracteres e data, sem formatação nem menções. O histórico automático fica de fora, porque exigiria registrar eventos em todas as actions.
+- O autor edita e exclui os próprios comentários; ADMIN e OWNER excluem qualquer um. Comentário editado mostra "(editado)". Excluir pede confirmação.
+- Quem sai do workspace deixa os comentários, com o nome.
+- Os comentários carregam quando o diálogo abre, fora da consulta do quadro: os 30 mais recentes, e "Ver anteriores" busca mais com cursor pelo id (uuid v7, já em ordem).
+- O card no quadro mostra um ícone com o número de comentários, contado com `_count` na consulta do quadro, sem coluna de contador.
+- Comentário novo vai pelo `useActionForm` e aparece quando a action termina, com o botão em "enviando", sem ser otimista, para o texto não sumir numa falha. Editar e excluir chamam `runAction`.
+- Skills: `modeling-entity-relationships`, `postgres-constraints-and-keys`, `sql-cursor-pagination`, `prisma-read-queries`, `precomputed-counters` (por que não ter contador), `nextjs-server-action-forms`, `react-hook-form-zod`, `craft`.
+
+```
+Comment (id, cardId, authorId, body, createdAt, editedAt?)
+  @@index([cardId, id]), card onDelete: Cascade
+  CHECK (char_length(body) BETWEEN 1 AND 5000)
+```
+
+## Deploy sem queda (fatia 19)
+
+- Hoje o Coolify publica o `compose.prod.yaml` inteiro e, a cada deploy, para todos os contêineres antes de subir os novos: o app fica fora enquanto o Postgres reinicia, o `migrate` roda e o app novo passa no healthcheck.
+- O app sai do compose e vira um Application de Dockerfile no Coolify, com rolling update: o contêiner novo sobe, passa no healthcheck e só então o antigo sai. Postgres, `db-dump` e backup ficam no compose e deixam de reiniciar a cada deploy.
+- O `migrate` roda antes do app novo, com o antigo ainda no ar. Isso já é a regra deste plano: migrations sempre compatíveis com a versão anterior do código.
+- A conferir antes de começar: em que contêiner o Coolify roda o comando de pré-deploy, como o app alcança o Postgres de outro recurso pela rede, e como ficam os labels de rate limit do Traefik e o job `deploy` do CI.
+- Skills: `ci-cd-pipeline-fundamentals`, `github-actions-ci-workflow`, `prisma-schema-and-migrations` (`migrate deploy`).
+
 ## Processo
 
 - Commits pequenos, um assunto por commit.
-- Toda mudança entra por branch e PR; merge só com o CI verde, por rebase, para manter os commits pequenos no histórico.
+- Toda mudança entra por branch e PR; merge só com o CI verde, por merge commit, para manter os commits pequenos no histórico. Até a fatia 18 o merge era por rebase; mudou porque o GitHub não faz rebase de PR com mais de 100 commits.
 - Antes de criar qualquer página, o `craft` lista os estados e desenha as telas, e o João aprova; só então a página é implementada.
 
 ## Fatias
@@ -187,3 +290,8 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 12. [x] Envio de e-mail: Mailpit, SES e templates
 13. [x] Verificação de e-mail
 14. [x] Esqueci a senha
+15. [x] Convites com aceite
+16. [x] Perfil da conta
+17. [x] Prazo no card
+18. [x] Comentários no card
+19. [ ] Deploy sem queda

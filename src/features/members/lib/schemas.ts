@@ -2,7 +2,7 @@ import * as z from "zod";
 
 export const assignableRoleSchema = z.enum(["ADMIN", "MEMBER"]);
 
-export const addMemberSchema = z.object({
+export const inviteMemberSchema = z.object({
   email: z
     .string()
     .trim()
@@ -10,6 +10,12 @@ export const addMemberSchema = z.object({
     .pipe(z.email("Digite um e-mail como nome@empresa.com.")),
   role: assignableRoleSchema,
 });
+
+export const inviteIdSchema = z.object({
+  inviteId: z.uuid(),
+});
+
+export const inviteTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/u);
 
 export const changeRoleSchema = z.object({
   userId: z.uuid(),

@@ -8,15 +8,17 @@ const AUTH_PATHS = new Set([
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  "/invite",
 ]);
+
+function isAuthPath(pathname: string) {
+  return AUTH_PATHS.has(pathname);
+}
 
 export function FreshDocument() {
   useEffect(() => {
     const loaded = performance.getEntriesByType("navigation").at(0);
-    if (
-      loaded !== undefined &&
-      !AUTH_PATHS.has(new URL(loaded.name).pathname)
-    ) {
+    if (loaded !== undefined && !isAuthPath(new URL(loaded.name).pathname)) {
       window.location.replace(window.location.href);
     }
   }, []);

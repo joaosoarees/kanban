@@ -1,6 +1,6 @@
 import { CARD_GONE } from "@/features/boards/server/access";
 import { getCardDescription } from "@/features/boards/server/queries";
-import { loadActorAllowedTo } from "@/features/workspaces/server/access";
+import { loadActorFor } from "@/features/workspaces/server/access";
 import type { ActionError, ActionResult } from "@/lib/action-result";
 import { getCurrentUser } from "@/server/session";
 
@@ -24,12 +24,13 @@ export async function GET(
     params,
   }: RouteContext<"/api/workspaces/[workspaceId]/boards/[boardId]/cards/[cardId]/description">,
 ) {
-  if ((await getCurrentUser()) === null) {
+  const user = await getCurrentUser();
+  if (user === null) {
     return reply(SIGNED_OUT, 401);
   }
 
   const { workspaceId, boardId, cardId } = await params;
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
+  const actor = await loadActorFor(user, workspaceId, "manageCards");
   if (!actor) {
     return reply(CARD_GONE, 404);
   }

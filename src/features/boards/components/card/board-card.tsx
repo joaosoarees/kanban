@@ -1,6 +1,7 @@
-import { AlignLeft } from "lucide-react";
+import { AlignLeft, MessageSquare } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useBoardMeta } from "@/features/boards/components/board/board-meta";
+import { DueBadge } from "@/features/boards/components/card/due-badge";
 import { MemberAvatar } from "@/features/boards/components/card/member-avatar";
 import { LabelTag } from "@/features/boards/components/label/label-tag";
 import type { BoardCard as BoardCardData } from "@/features/boards/hooks/use-board-columns";
@@ -30,9 +31,14 @@ function CardContent({ card }: { card: BoardCardData }) {
           </span>
         )}
       </span>
-      {(cardLabels.length > 0 || assignee !== undefined) && (
+      {(cardLabels.length > 0 ||
+        assignee !== undefined ||
+        card.commentCount > 0 ||
+        card.dueOn !== null ||
+        card.completed) && (
         <span className="flex w-full items-end justify-between gap-2">
           <span className="flex min-w-0 flex-wrap items-center gap-1">
+            <DueBadge card={card} />
             {cardLabels.slice(0, VISIBLE_LABELS).map(({ id, name, color }) => (
               <LabelTag key={id} name={name} color={color} />
             ))}
@@ -47,12 +53,25 @@ function CardContent({ card }: { card: BoardCardData }) {
               </span>
             )}
           </span>
-          {assignee && (
-            <span className="relative shrink-0">
-              <MemberAvatar name={assignee.name} />
-              <span className="sr-only">Responsável: {assignee.name}</span>
-            </span>
-          )}
+          <span className="flex shrink-0 items-center gap-2">
+            {card.commentCount > 0 && (
+              <span className="relative flex h-[22px] items-center gap-[3px] text-xs font-medium text-fg-muted">
+                <MessageSquare aria-hidden className="size-3.5" />
+                <span aria-hidden>{card.commentCount}</span>
+                <span className="sr-only">
+                  {card.commentCount === 1
+                    ? "1 comentário"
+                    : `${card.commentCount} comentários`}
+                </span>
+              </span>
+            )}
+            {assignee && (
+              <span className="relative shrink-0">
+                <MemberAvatar name={assignee.name} />
+                <span className="sr-only">Responsável: {assignee.name}</span>
+              </span>
+            )}
+          </span>
         </span>
       )}
     </>

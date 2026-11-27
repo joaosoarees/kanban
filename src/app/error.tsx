@@ -11,7 +11,7 @@ export default function RootError({
   error,
   retry,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   retry: () => void;
 }) {
   useEffect(() => {
@@ -26,7 +26,9 @@ export default function RootError({
       description="Algo falhou do nosso lado. Tente de novo em instantes."
       actions={
         <Button
-          onClick={retry}
+          onClick={() => {
+            retry();
+          }}
           className={cn("h-11 px-4 sm:h-10", primaryButton)}
         >
           Tentar de novo

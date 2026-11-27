@@ -56,3 +56,7 @@ export const moveCardSchema = z
     previousCardId: z.uuid().nullable(),
   })
   .refine(({ cardId, previousCardId }) => cardId !== previousCardId);
+
+export const cardDueSchema = z.object({ dueOn: z.iso.date().nullable() });
+
+export const cardCompletionSchema = z.object({ completed: z.boolean() });

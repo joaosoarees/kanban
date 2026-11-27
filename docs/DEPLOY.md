@@ -4,7 +4,7 @@ Produção roda numa VPS ARM com Coolify. O Coolify builda o `compose.prod.yaml`
 
 ## Como um deploy acontece
 
-1. O PR entra na `main` por rebase, com o `check` verde.
+1. O PR entra na `main` por merge commit, com o `check` verde.
 2. O CI roda de novo na `main`. Com o `check` verde, o job `deploy` chama `POST /api/v1/deploy` do Coolify e acompanha o deploy até `finished`.
 3. O Coolify builda as imagens, sobe o `postgres`, roda o `migrate` e só então troca o `app`.
 4. O job termina consultando `/api/health` na URL pública.

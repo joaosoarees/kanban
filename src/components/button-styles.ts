@@ -22,3 +22,6 @@ export function linkButton(variant: "default" | "outline", className?: string) {
     className,
   );
 }
+
+export const textLink =
+  "cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50";

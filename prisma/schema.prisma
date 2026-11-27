@@ -8,17 +8,22 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(uuid(7)) @db.Uuid
-  name              String
-  email             String    @unique
-  passwordHash      String
-  emailVerifiedAt   DateTime? @db.Timestamptz(3)
-  passwordChangedAt DateTime? @db.Timestamptz(3)
-  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  id                     String    @id @default(uuid(7)) @db.Uuid
+  name                   String
+  email                  String    @unique
+  passwordHash           String
+  emailVerifiedAt        DateTime? @db.Timestamptz(3)
+  passwordChangedAt      DateTime? @db.Timestamptz(3)
+  failedPasswordAttempts Int       @default(0)
+  passwordLockedUntil    DateTime? @db.Timestamptz(3)
+  createdAt              DateTime  @default(now()) @db.Timestamptz(3)
 
   memberships   Membership[]
   assignedCards Card[]
   emailCodes    EmailCode[]
+  sentInvites   Invite[]
+  inviteSends   InviteSend[]
+  comments      Comment[]
 
   @@map("users")
 }
@@ -26,6 +31,7 @@ model User {
 enum EmailCodePurpose {
   VERIFY_EMAIL
   RESET_PASSWORD
+  CHANGE_EMAIL
 }
 
 model EmailCode {
@@ -35,6 +41,7 @@ model EmailCode {
   sentAt    DateTime         @db.Timestamptz(3)
   expiresAt DateTime         @db.Timestamptz(3)
   attempts  Int              @default(0)
+  newEmail  String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -56,6 +63,7 @@ model Workspace {
 
   memberships Membership[]
   boards      Board[]
+  invites     Invite[]
 
   @@map("workspaces")
 }
@@ -72,6 +80,35 @@ model Membership {
   @@id([userId, workspaceId])
   @@index([workspaceId])
   @@map("memberships")
+}
+
+model Invite {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  workspaceId String   @db.Uuid
+  email       String
+  role        Role
+  invitedById String   @db.Uuid
+  tokenHash   String   @unique
+  sentAt      DateTime @db.Timestamptz(3)
+  expiresAt   DateTime @db.Timestamptz(3)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy User      @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, email])
+  @@index([invitedById, workspaceId])
+  @@map("invites")
+}
+
+model InviteSend {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  invitedById String   @db.Uuid
+  sentAt      DateTime @db.Timestamptz(3)
+
+  invitedBy User @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([invitedById, sentAt])
+  @@map("invite_sends")
 }
 
 model Board {
@@ -103,21 +140,40 @@ model Column {
 }
 
 model Card {
-  id          String   @id @default(uuid(7)) @db.Uuid
-  columnId    String   @db.Uuid
-  assigneeId  String?  @db.Uuid
+  id          String    @id @default(uuid(7)) @db.Uuid
+  columnId    String    @db.Uuid
+  assigneeId  String?   @db.Uuid
   title       String
   description String?
   position    String
-  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  dueOn       DateTime? @db.Date
+  completedAt DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
 
   column   Column      @relation(fields: [columnId], references: [id], onDelete: Cascade)
   assignee User?       @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
   labels   CardLabel[]
+  comments Comment[]
 
   @@unique([columnId, position])
   @@index([assigneeId])
   @@map("cards")
+}
+
+model Comment {
+  id        String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  cardId    String    @db.Uuid
+  authorId  String?   @db.Uuid
+  body      String
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  editedAt  DateTime? @db.Timestamptz(3)
+
+  card   Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([cardId, id])
+  @@index([authorId])
+  @@map("comments")
 }
 
 enum LabelColor {

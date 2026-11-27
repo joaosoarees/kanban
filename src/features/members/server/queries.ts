@@ -1,4 +1,13 @@
 import "server-only";
+import { connection } from "next/server";
+import {
+  inviteDueLabel,
+  isInviteExpired,
+} from "@/features/members/lib/invites";
+import {
+  compareAssignableMembers,
+  compareMembers,
+} from "@/features/members/lib/member-order";
 import type { Role } from "@/generated/prisma/client";
 import { db } from "@/server/db";
 
@@ -9,8 +18,6 @@ export type WorkspaceMember = {
   role: Role;
   assignedCards: number;
 };
-
-const ROLE_ORDER: Record<Role, number> = { OWNER: 0, ADMIN: 1, MEMBER: 2 };
 
 export async function getMembers(
   workspaceId: string,
@@ -45,12 +52,7 @@ export async function getMembers(
       role,
       assignedCards: assignedCards.get(user.id) ?? 0,
     }))
-    .toSorted(
-      (a, b) =>
-        ROLE_ORDER[a.role] - ROLE_ORDER[b.role] ||
-        a.name.localeCompare(b.name, "pt-BR") ||
-        a.userId.localeCompare(b.userId),
-    );
+    .toSorted(compareMembers);
 }
 
 export async function getAssignableMembers(
@@ -68,10 +70,42 @@ export async function getAssignableMembers(
       name: user.name,
       isViewer: user.id === viewerId,
     }))
-    .toSorted(
-      (a, b) =>
-        Number(b.isViewer) - Number(a.isViewer) ||
-        a.name.localeCompare(b.name, "pt-BR") ||
-        a.id.localeCompare(b.id),
-    );
+    .toSorted(compareAssignableMembers);
+}
+
+export type PendingInvite = {
+  id: string;
+  email: string;
+  role: Role;
+  inviterId: string;
+  inviterName: string;
+  due: string;
+  isExpired: boolean;
+};
+
+export async function getPendingInvites(
+  workspaceId: string,
+): Promise<PendingInvite[]> {
+  await connection();
+  const invites = await db.invite.findMany({
+    where: { workspaceId },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      expiresAt: true,
+      invitedBy: { select: { id: true, name: true } },
+    },
+    orderBy: [{ sentAt: "desc" }, { id: "desc" }],
+  });
+  const now = new Date();
+  return invites.map((invite) => ({
+    id: invite.id,
+    email: invite.email,
+    role: invite.role,
+    inviterId: invite.invitedBy.id,
+    inviterName: invite.invitedBy.name,
+    due: inviteDueLabel(invite.expiresAt, now),
+    isExpired: isInviteExpired(invite.expiresAt, now),
+  }));
 }

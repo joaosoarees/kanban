@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InviteGoneToast } from "@/features/members/components/invite-gone-toast";
 import { MemberCount } from "@/features/workspaces/components/member-count";
 import { NewWorkspaceButton } from "@/features/workspaces/components/new-workspace-button";
 import { RoleBadge } from "@/features/workspaces/components/role-badge";
@@ -20,6 +21,9 @@ export default function WorkspacesPage() {
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-12">
       <Suspense fallback={<WorkspacesSkeleton />}>
         <WorkspaceList />
+      </Suspense>
+      <Suspense fallback={null}>
+        <InviteGoneToast />
       </Suspense>
     </main>
   );

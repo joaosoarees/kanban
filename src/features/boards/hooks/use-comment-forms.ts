@@ -1,0 +1,204 @@
+"use client";
+
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import type { CardCommentsState } from "@/features/boards/hooks/use-card-comments";
+import { commentSchema } from "@/features/boards/lib/comment-schemas";
+import type { CardComment } from "@/features/boards/lib/card-comment";
+import {
+  createCommentAction,
+  editCommentAction,
+} from "@/features/boards/server/comment-actions";
+import { useActionForm } from "@/hooks/use-action-form";
+import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
+import type { ActionError } from "@/lib/action-result";
+import { hasVisibleText } from "@/lib/text";
+
+const CREATE_FAILED = "Não foi possível comentar. Tente de novo.";
+const EDIT_FAILED = "Não foi possível salvar.";
+
+function noCard(message: string): ActionError {
+  return { status: "error", message };
+}
+
+type CommentFormsOptions = {
+  workspaceId: string;
+  boardId: string;
+  cardId: string | null;
+  comments: CardCommentsState;
+};
+
+export function useCommentForms({
+  workspaceId,
+  boardId,
+  cardId,
+  comments,
+}: CommentFormsOptions) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [nextEdit, setNextEdit] = useState<CardComment | null>(null);
+  const composerFieldRef = useRef<HTMLTextAreaElement>(null);
+  const composerFocusFrame = useRef(0);
+  const refocusEditOf = useRef<string | null>(null);
+  const [formsCardId, setFormsCardId] = useState(cardId);
+  if (formsCardId !== cardId) {
+    setFormsCardId(cardId);
+    setEditingId(null);
+    setNextEdit(null);
+  }
+
+  const focusComposer = () => {
+    cancelAnimationFrame(composerFocusFrame.current);
+    composerFocusFrame.current = requestAnimationFrame(() => {
+      composerFieldRef.current?.focus();
+    });
+  };
+
+  const closeEdit = (commentId: string | null) => {
+    refocusEditOf.current = commentId;
+    setEditingId(null);
+  };
+
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(composerFocusFrame.current);
+    },
+    [],
+  );
+
+  const composer = useActionForm({
+    schema: commentSchema,
+    defaultValues: { body: "" },
+    action: async (values) =>
+      cardId === null
+        ? noCard(CREATE_FAILED)
+        : createCommentAction(workspaceId, boardId, cardId, values),
+    failure: CREATE_FAILED,
+    onSuccess: (comment) => {
+      composer.form.reset({ body: "" });
+      comments.put(comment);
+      focusComposer();
+    },
+  });
+  const edit = useActionForm({
+    schema: commentSchema,
+    defaultValues: { body: "" },
+    action: async (values) =>
+      cardId === null || editingId === null
+        ? noCard(EDIT_FAILED)
+        : editCommentAction(workspaceId, boardId, cardId, editingId, values),
+    failure: EDIT_FAILED,
+    onSuccess: (comment) => {
+      comments.put(comment);
+      closeEdit(comment.id);
+    },
+    onError: (error) => {
+      if (error.gone === true && editingId !== null) {
+        toast.error(error.message);
+        comments.remove(editingId);
+        setEditingId(null);
+      }
+    },
+  });
+
+  const { form: composerForm } = composer;
+  const { form: editForm } = edit;
+
+  const formsResetFor = useRef(cardId);
+
+  useLayoutEffect(() => {
+    if (formsResetFor.current !== cardId) {
+      formsResetFor.current = cardId;
+      refocusEditOf.current = null;
+      composerForm.reset({ body: "" });
+      editForm.reset({ body: "" });
+    }
+  }, [cardId, composerForm, editForm]);
+
+  const composerBody = useWatch({
+    control: composer.form.control,
+    name: "body",
+  });
+  const editBody = useWatch({ control: edit.form.control, name: "body" });
+  const { isDirty: isEditChanged } = edit.form.formState;
+  const hasDraft = hasVisibleText(composerBody);
+  const hasEdit = editingId !== null && isEditChanged;
+  const unsaved = hasDraft
+    ? hasEdit
+      ? "both"
+      : "comment"
+    : hasEdit
+      ? "edit"
+      : null;
+  const isBusy = composer.isPending || edit.isPending;
+
+  useUnsavedChangesWarning(unsaved !== null);
+
+  const openEdit = (comment: CardComment) => {
+    refocusEditOf.current = null;
+    edit.form.reset({ body: comment.body });
+    setNextEdit(null);
+    setEditingId(comment.id);
+  };
+
+  return {
+    unsaved,
+    isBusy,
+    discard: () => {
+      refocusEditOf.current = null;
+      composer.form.reset({ body: "" });
+      setEditingId(null);
+      setNextEdit(null);
+    },
+    composer: {
+      ...composer,
+      body: composerBody,
+      hasDraft,
+      fieldRef: composerFieldRef,
+      focus: focusComposer,
+    },
+    edit: {
+      ...edit,
+      body: editBody,
+      commentId: editingId,
+      nextComment: nextEdit,
+      start: (comment: CardComment) => {
+        if (edit.isPending || editingId === comment.id) {
+          return;
+        }
+        if (hasEdit) {
+          setNextEdit(comment);
+          return;
+        }
+        openEdit(comment);
+      },
+      cancel: () => {
+        closeEdit(editingId);
+      },
+      editButtonRef:
+        (commentId: string) => (node: HTMLButtonElement | null) => {
+          if (node !== null && refocusEditOf.current === commentId) {
+            refocusEditOf.current = null;
+            node.focus();
+          }
+        },
+      keepEditing: () => {
+        setNextEdit(null);
+        edit.form.setFocus("body");
+      },
+      discardForNext: () => {
+        const isListed = comments.comments.some(
+          ({ id }) => id === nextEdit?.id,
+        );
+        if (nextEdit !== null && isListed) {
+          openEdit(nextEdit);
+          return;
+        }
+        setNextEdit(null);
+        closeEdit(editingId);
+      },
+    },
+  };
+}
+
+export type CommentFormsState = ReturnType<typeof useCommentForms>;

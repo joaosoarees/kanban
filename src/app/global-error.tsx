@@ -7,7 +7,7 @@ export default function GlobalError({
   error,
   retry,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   retry: () => void;
 }) {
   useEffect(() => {
@@ -26,7 +26,9 @@ export default function GlobalError({
         </p>
         <button
           type="button"
-          onClick={retry}
+          onClick={() => {
+            retry();
+          }}
           className="mt-3 h-10 cursor-pointer rounded-lg bg-brand px-4 text-sm font-medium text-on-color outline-none hover:bg-brand-strong focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           Tentar de novo

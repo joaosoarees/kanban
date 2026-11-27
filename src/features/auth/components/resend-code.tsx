@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { MAIL_FAILED_MESSAGE } from "@/features/auth/lib/email-code";
 import type { ActionResult } from "@/lib/action-result";
 import { runAction } from "@/lib/run-action";
@@ -12,22 +14,27 @@ export type ResendAction = () => Promise<
 
 type Notice = { tone: "info" | "error"; text: string };
 
+type ResendOptions = {
+  action: ResendAction;
+  initialWait: number;
+  onExpired: (message?: string) => void;
+  onNotice: (notice: Notice | null) => void;
+};
+
+const SENT_NOTICE: Notice = { tone: "info", text: "Enviamos um código novo." };
+
 function formatWait(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-export function ResendCode({
+function useResendCode({
   action,
   initialWait,
   onExpired,
-}: {
-  action: ResendAction;
-  initialWait: number;
-  onExpired: () => void;
-}) {
+  onNotice,
+}: ResendOptions) {
   const [wait, setWait] = useState(initialWait);
-  const [notice, setNotice] = useState<Notice | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -40,23 +47,38 @@ export function ResendCode({
   }, []);
 
   const resend = () => {
-    setNotice(null);
+    onNotice(null);
     startTransition(async () => {
       const result = await runAction(action, MAIL_FAILED_MESSAGE);
       if (result.status === "success") {
         setWait(result.data.waitSeconds);
         if (result.data.sent) {
-          setNotice({ tone: "info", text: "Enviamos um código novo." });
+          onNotice(SENT_NOTICE);
         }
         return;
       }
       if (result.gone === true) {
-        onExpired();
+        onExpired(result.message);
         return;
       }
-      setNotice({ tone: "error", text: result.message });
+      onNotice({ tone: "error", text: result.message });
     });
   };
+
+  return { wait, isPending, resend };
+}
+
+type ResendProps = Omit<ResendOptions, "onNotice">;
+
+export function ResendCode({
+  disabled = false,
+  ...props
+}: ResendProps & { disabled?: boolean }) {
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const { wait, isPending, resend } = useResendCode({
+    ...props,
+    onNotice: setNotice,
+  });
 
   return (
     <div className="flex flex-col gap-1">
@@ -70,8 +92,9 @@ export function ResendCode({
           ) : (
             <button
               type="button"
+              disabled={disabled}
               onClick={resend}
-              className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:no-underline"
             >
               Reenviar código
             </button>
@@ -89,5 +112,43 @@ export function ResendCode({
         {notice?.text}
       </output>
     </div>
+  );
+}
+
+function toastNotice(notice: Notice | null) {
+  if (notice === null) {
+    return;
+  }
+  if (notice.tone === "error") {
+    toast.error(notice.text);
+    return;
+  }
+  toast.success(notice.text);
+}
+
+export function ResendButton({
+  disabled = false,
+  ...props
+}: ResendProps & { disabled?: boolean }) {
+  const { wait, isPending, resend } = useResendCode({
+    ...props,
+    onNotice: toastNotice,
+  });
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      disabled={disabled || isPending || wait > 0}
+      aria-busy={isPending || undefined}
+      onClick={resend}
+      className="h-10 w-full px-4 tabular-nums enabled:hover:bg-muted sm:w-42"
+    >
+      {isPending
+        ? "Enviando…"
+        : wait > 0
+          ? `Reenviar em ${formatWait(wait)}`
+          : "Reenviar código"}
+    </Button>
   );
 }

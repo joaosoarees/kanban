@@ -1,4 +1,5 @@
 import "server-only";
+import { UNLOCKED_PASSWORD } from "@/features/auth/lib/password-lock";
 import { resetPasswordMail } from "@/features/auth/emails/reset-password";
 import {
   RESEND_INTERVAL_MS,
@@ -79,8 +80,8 @@ export async function checkResetCode(
     if (user === undefined) {
       return null;
     }
-    const valid = await consumeCode(tx, resetOwner(user.id), code, now);
-    return valid ? { userId: user.id } : null;
+    const consumed = await consumeCode(tx, resetOwner(user.id), code, now);
+    return consumed === null ? null : { userId: user.id };
   });
 }
 
@@ -107,7 +108,9 @@ export async function resetPassword(
         passwordHash,
         passwordChangedAt: now,
         emailVerifiedAt: user.emailVerifiedAt ?? now,
+        ...UNLOCKED_PASSWORD,
       },
+      select: { id: true },
     });
     await tx.emailCode.deleteMany({ where: resetOwner(grant.userId) });
     return now;
