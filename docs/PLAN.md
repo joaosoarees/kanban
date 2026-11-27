@@ -70,10 +70,10 @@ Deletes em cascata de Workspace até Card.
 
 ## Deploy
 
-- VPS ARM com Coolify. O Coolify builda o `compose.prod.yaml` na própria VPS; sem registry de imagens.
+- VPS ARM com Coolify, que builda as imagens na própria VPS; sem registry de imagens. Desde a fatia 19, o app é uma Application do Coolify, e o `compose.prod.yaml` sobe só o banco, os dumps e o backup.
 - Deploy automático na `main`: o job `deploy` do CI roda depois do `check` e chama a API do Coolify com um token só de `deploy`. Auto-deploy por webhook e previews de PR ficam desligados.
 - Imagem de produção com `output: "standalone"`, build com Bun e runtime Node distroless, sem root.
-- Postgres no mesmo compose, sem porta publicada. Migrations num serviço `migrate` que roda antes do `app`; elas são sempre compatíveis com a versão anterior do código.
+- Postgres no compose, sem porta publicada. O contêiner do app roda as migrations ao iniciar, antes do servidor; elas são sempre compatíveis com a versão anterior do código.
 - Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura (IP, domínio, URL de painel ou de API) no repositório. Região, rótulos do Traefik e nomes de variáveis do Coolify não são segredo nem endereço.
 - Backup: `pg_dump` a cada hora e envio diário ao S3 com 7 dias de retenção.
 - Rate limit no Traefik para o `POST` das telas de entrada e de conta (ver as fatias 13 e 15).
