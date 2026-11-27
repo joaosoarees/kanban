@@ -63,6 +63,7 @@ export const activityPageSchema = z.object({
 export type CardActivity = CardActivityEntry & {
   id: string;
   createdAt: string;
+  byViewer: boolean;
 };
 
 export type ActivityPage = {
@@ -79,4 +80,11 @@ export function parseCardActivity(type: string, data: unknown) {
   }
   const entry = cardActivitySchema.safeParse({ ...fields.data, type });
   return entry.success ? entry.data : null;
+}
+
+export function mergeActivities(current: CardActivity[], page: CardActivity[]) {
+  const byId = new Map(
+    [...current, ...page].map((activity) => [activity.id, activity]),
+  );
+  return [...byId.values()].toSorted((a, b) => (a.id < b.id ? 1 : -1));
 }
