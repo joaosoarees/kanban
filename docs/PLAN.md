@@ -279,8 +279,9 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 
 ## Checklist no card (fatia 20)
 
+- As fatias 20 e 21 formam um pacote, como as 15 a 18: os PRs entram na branch `release/slices-20-21`, com o `check` do CI verde e merge por merge commit, e ela vai para a `main` de uma vez no fim, com um único deploy. Antes desse merge, uma auditoria da release inteira contra as skills (`auditing-code-against-skills`), primeiro só leitura, com as correções em PRs pequenos para a release.
 - Um checklist por card, sem nome: os itens ficam direto no card. Vários checklists nomeados ficam de fora até um card pedir.
-- O item tem texto puro de até 200 caracteres, posição e `completed_at`. Concluir um item não conclui o card, e concluir o card não mexe nos itens.
+- O item tem texto puro de até 200 caracteres, posição e `completedAt`. Concluir um item não conclui o card, e concluir o card não mexe nos itens.
 - Até 50 itens por card, contados sob o lock do card: nenhuma constraint conta linhas, e sem o lock duas requisições juntas passariam do limite.
 - Qualquer membro cria, edita, marca, reordena e exclui itens. Criar e editar o texto vão pelo `useActionForm` e aparecem quando a action termina, sem ser otimistas, para o texto não sumir numa falha, como nos comentários. Marcar, reordenar e excluir chamam `runAction` e salvam na hora, de forma otimista e idempotente, como as etiquetas. A posição usa a mesma chave de ordenação dos cards, com `COLLATE "C"` na migration.
 - O card no quadro mostra "3/5" quando tem itens, sem coluna de contador: a tabela é pequena, e um contador cobraria em toda escrita. O total vem do `_count` na consulta do quadro; os concluídos, de um `groupBy` por `cardId` com `completedAt` preenchido, porque o `_count` conta cada relação uma vez só.
