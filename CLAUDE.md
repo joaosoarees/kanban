@@ -20,7 +20,7 @@ Projeto de estudo. Decisões, modelo de dados e as fatias de construção estão
 ## Branches e PRs
 
 - A `main` é protegida: toda mudança entra por branch e PR, com o check `check` do CI verde.
-- Merge só por rebase, para os commits pequenos ficarem no histórico.
+- Merge só por merge commit, para os commits pequenos ficarem no histórico com o PR que os trouxe. Rebase e squash ficam desligados no repositório: o rebase do GitHub recusa PR com mais de 100 commits, como a release das fatias 15 a 18.
 - Nunca faça push direto nem force push na `main`.
 
 ## Páginas e UI

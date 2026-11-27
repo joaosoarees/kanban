@@ -271,7 +271,7 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 ## Processo
 
 - Commits pequenos, um assunto por commit.
-- Toda mudança entra por branch e PR; merge só com o CI verde, por rebase, para manter os commits pequenos no histórico.
+- Toda mudança entra por branch e PR; merge só com o CI verde, por merge commit, para manter os commits pequenos no histórico. Até a fatia 18 o merge era por rebase; mudou porque o GitHub não faz rebase de PR com mais de 100 commits.
 - Antes de criar qualquer página, o `craft` lista os estados e desenha as telas, e o João aprova; só então a página é implementada.
 
 ## Fatias

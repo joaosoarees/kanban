@@ -62,7 +62,7 @@ Next.js 16 com App Router, React 19, TypeScript, Prisma 7 e PostgreSQL 18, com T
 - **Ordem sem renumerar.** A posição de colunas e cards usa índices fracionários, então mover um card grava uma linha só.
 - **Testes onde a regra não é óbvia.** Posição, filtros, prazos, schemas, permissões e códigos de e-mail têm teste unitário, sem mocks; componentes não têm.
 - **Desenhado antes de codado.** Cada tela passou por uma lista de estados e por pranchas aprovadas antes da implementação. O brief e as decisões de design estão em [DESIGN.md](DESIGN.md).
-- **CI com orçamento de tempo.** Lint, formatação, typecheck, testes e build rodam em paralelo, e cada etapa falha se passar do tempo combinado. A `main` só recebe PR com o CI verde, por rebase, em commits pequenos.
+- **CI com orçamento de tempo.** Lint, formatação, typecheck, testes e build rodam em paralelo, e cada etapa falha se passar do tempo combinado. A `main` só recebe PR com o CI verde, por merge commit, em commits pequenos.
 - **Deploy a cada merge.** O CI chama o Coolify numa VPS, que builda uma imagem distroless e roda as migrations antes de subir a versão nova; o CI só fica verde quando o app no ar responde ao health check. O banco tem backup diário em S3, já testado com restauração. Os detalhes estão em [docs/DEPLOY.md](docs/DEPLOY.md).
 
 O plano, o modelo de dados e as fatias de construção estão em [docs/PLAN.md](docs/PLAN.md).
