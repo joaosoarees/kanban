@@ -110,7 +110,7 @@ export function CommentItem({
       >
         {initialsOf(authorName)}
       </span>
-      <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)] [grid-template-areas:'meta'_'body'_'actions'] sm:grid-cols-[minmax(0,1fr)_auto] sm:[grid-template-areas:'meta_actions'_'body_body']">
+      <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)] [grid-template-areas:'meta'_'body'_'actions'] @md:grid-cols-[minmax(0,1fr)_auto] @md:[grid-template-areas:'meta_actions'_'body_body']">
         <p className="flex h-7 min-w-0 items-center gap-1.5 text-[13px] whitespace-nowrap text-fg-muted [grid-area:meta]">
           <span className="truncate text-sm font-medium text-foreground">
             {authorName}
@@ -127,7 +127,7 @@ export function CommentItem({
           {comment.editedAt !== null && <span>· (editado)</span>}
         </p>
         {showActions && (
-          <div className="mt-1 -ml-2 flex gap-0.5 [grid-area:actions] sm:mt-0 sm:ml-0">
+          <div className="mt-1 -ml-2 flex gap-0.5 [grid-area:actions] @md:mt-0 @md:ml-0">
             {comment.canEdit && (
               <button
                 ref={edit.editButtonRef(comment.id)}

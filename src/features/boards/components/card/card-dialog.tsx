@@ -10,8 +10,10 @@ import type {
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import { useCardChecklist } from "@/features/boards/hooks/use-card-checklist";
 import { useCardComments } from "@/features/boards/hooks/use-card-comments";
 import { useCardDescription } from "@/features/boards/hooks/use-card-description";
+import { useChecklistForms } from "@/features/boards/hooks/use-checklist-forms";
 import { useCommentForms } from "@/features/boards/hooks/use-comment-forms";
 import { locateCard } from "@/features/boards/lib/card-moves";
 import { pushCardUrl, replaceCardUrl } from "@/features/boards/lib/card-url";
@@ -71,6 +73,20 @@ export function CardDialog({
       }
     },
   });
+  const checklist = useCardChecklist({
+    workspaceId,
+    boardId,
+    cardId,
+    onCardGone: () => {
+      router.refresh();
+    },
+  });
+  const checklistForms = useChecklistForms({
+    workspaceId,
+    boardId,
+    cardId,
+    checklist,
+  });
   const comments = useCardComments(workspaceId, boardId, cardId);
   const commentForms = useCommentForms({
     workspaceId,
@@ -79,7 +95,12 @@ export function CardDialog({
     comments,
   });
 
-  const isDirty = description.isDirty || commentForms.unsaved !== null;
+  const unsavedCount = [
+    description.isDirty,
+    checklistForms.isDirty,
+    commentForms.unsaved !== null,
+  ].filter(Boolean).length;
+  const isDirty = unsavedCount > 0;
   const isLeaving = cardId !== null && requestedId !== cardId && isDirty;
 
   if (requestedId !== shownId && !isLeaving) {
@@ -112,7 +133,12 @@ export function CardDialog({
     <Dialog
       open
       onOpenChange={(open) => {
-        if (open || description.isSaving || commentForms.isBusy) {
+        if (
+          open ||
+          description.isSaving ||
+          checklistForms.isBusy ||
+          commentForms.isBusy
+        ) {
           return;
         }
         if (isDirty) {
@@ -124,7 +150,7 @@ export function CardDialog({
     >
       <DialogContent
         showCloseButton={false}
-        className="top-3 flex max-h-[calc(100svh-1.5rem)] translate-y-0 flex-col gap-4 overflow-y-auto p-5 sm:top-[88px] sm:max-h-[calc(100svh-7rem)] sm:max-w-[600px]"
+        className="top-3 flex max-h-[calc(100svh-1.5rem)] translate-y-0 flex-col gap-4 overflow-y-auto p-5 sm:top-[88px] sm:max-h-[calc(100svh-7rem)] sm:max-w-[600px] lg:max-w-[960px] lg:gap-0 lg:overflow-hidden lg:p-0"
       >
         <CardDialogBody
           key={card.id}
@@ -136,10 +162,13 @@ export function CardDialog({
           columns={columns}
           canReorder={canReorder}
           description={description}
+          checklist={checklist}
+          checklistForms={checklistForms}
           comments={comments}
           commentForms={commentForms}
           onDeleted={() => {
             description.cancel();
+            checklistForms.discard();
             commentForms.discard();
             onDeleted({ id: card.id, columnId: column.id, index });
             close();
@@ -161,13 +190,17 @@ export function CardDialog({
           }}
           title="Descartar as alterações?"
           description={
-            description.isDirty
-              ? "A descrição editada ainda não foi salva e será perdida."
-              : commentForms.unsaved === "both"
-                ? "Há comentários escritos ou editados que ainda não foram salvos e serão perdidos."
-                : commentForms.unsaved === "edit"
-                  ? "A edição do comentário ainda não foi salva e será perdida."
-                  : "O comentário escrito ainda não foi enviado e será perdido."
+            unsavedCount > 1
+              ? "Há alterações no card que ainda não foram salvas e serão perdidas."
+              : description.isDirty
+                ? "A descrição editada ainda não foi salva e será perdida."
+                : checklistForms.isDirty
+                  ? "O item do checklist ainda não foi salvo e será perdido."
+                  : commentForms.unsaved === "both"
+                    ? "Há comentários escritos ou editados que ainda não foram salvos e serão perdidos."
+                    : commentForms.unsaved === "edit"
+                      ? "A edição do comentário ainda não foi salva e será perdida."
+                      : "O comentário escrito ainda não foi enviado e será perdido."
           }
           confirmLabel="Descartar"
           pendingLabel="Descartando…"
@@ -175,6 +208,7 @@ export function CardDialog({
           onConfirm={() => {
             setDiscardingId(null);
             description.cancel();
+            checklistForms.discard();
             commentForms.discard();
             if (!isLeaving) {
               close();

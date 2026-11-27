@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { CardChecklist } from "@/features/boards/components/card/card-checklist";
 import { CardComments } from "@/features/boards/components/card/card-comments";
 import {
   CardDescription,
@@ -19,10 +20,13 @@ import type {
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import type { CardChecklistState } from "@/features/boards/hooks/use-card-checklist";
 import type { CardCommentsState } from "@/features/boards/hooks/use-card-comments";
 import type { CardDescriptionState } from "@/features/boards/hooks/use-card-description";
+import type { ChecklistFormsState } from "@/features/boards/hooks/use-checklist-forms";
 import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
 import { deleteCardAction } from "@/features/boards/server/card-actions";
+import { cn } from "@/lib/utils";
 
 type CardDialogBodyProps = {
   workspaceId: string;
@@ -33,6 +37,8 @@ type CardDialogBodyProps = {
   columns: BoardColumn[];
   canReorder: boolean;
   description: CardDescriptionState;
+  checklist: CardChecklistState;
+  checklistForms: ChecklistFormsState;
   comments: CardCommentsState;
   commentForms: CommentFormsState;
   onDeleted: () => void;
@@ -49,6 +55,8 @@ export function CardDialogBody({
   columns,
   canReorder,
   description,
+  checklist,
+  checklistForms,
   comments,
   commentForms,
   onDeleted,
@@ -56,10 +64,39 @@ export function CardDialogBody({
   onUpdateCard,
 }: CardDialogBodyProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const footerOf = (visibility: string) => (
+    <div className={cn("flex-col gap-4", visibility)}>
+      <Separator />
+      <div className="flex items-center justify-between gap-2">
+        <Button
+          variant="outline"
+          disabled={description.isSaving}
+          onClick={() => {
+            setIsDeleting(true);
+          }}
+          className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
+        >
+          Excluir card
+        </Button>
+        {description.isEditing ? (
+          <CardDescriptionActions state={description} />
+        ) : (
+          <CardMoveMenu
+            cardId={card.id}
+            column={column}
+            index={index}
+            columns={columns}
+            canReorder={canReorder}
+            onMove={onMoveCard}
+          />
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <>
-      <div className="flex items-start gap-2">
+      <div className="flex items-start gap-2 lg:px-5 lg:pt-5 lg:pb-4">
         <div className="min-w-0 flex-1">
           <div className="-mx-1.5">
             <CardTitle
@@ -87,50 +124,41 @@ export function CardDialogBody({
         </DialogClose>
       </div>
 
-      <CardProperties
-        workspaceId={workspaceId}
-        boardId={boardId}
-        card={card}
-        columns={columns}
-        onUpdateCard={onUpdateCard}
-      />
-
-      <CardDescription cardId={card.id} state={description} />
-
-      <CardComments
-        workspaceId={workspaceId}
-        boardId={boardId}
-        cardId={card.id}
-        count={card.commentCount}
-        comments={comments}
-        forms={commentForms}
-      />
-
-      <Separator />
-
-      <div className="flex items-center justify-between gap-2">
-        <Button
-          variant="outline"
-          disabled={description.isSaving}
-          onClick={() => {
-            setIsDeleting(true);
-          }}
-          className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
-        >
-          Excluir card
-        </Button>
-        {description.isEditing ? (
-          <CardDescriptionActions state={description} />
-        ) : (
-          <CardMoveMenu
-            cardId={card.id}
-            column={column}
-            index={index}
+      <div className="flex flex-col gap-4 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_360px] lg:grid-rows-[minmax(0,1fr)] lg:gap-0 lg:border-t">
+        <div className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-4 lg:overflow-y-auto lg:px-5 lg:pt-4 lg:pb-5">
+          <CardProperties
+            workspaceId={workspaceId}
+            boardId={boardId}
+            card={card}
             columns={columns}
-            canReorder={canReorder}
-            onMove={onMoveCard}
+            onUpdateCard={onUpdateCard}
           />
-        )}
+
+          <CardDescription cardId={card.id} state={description} />
+
+          <CardChecklist
+            cardId={card.id}
+            knownTotal={card.checklistTotal}
+            knownDone={card.checklistDone}
+            checklist={checklist}
+            forms={checklistForms}
+          />
+
+          {footerOf("hidden lg:flex")}
+        </div>
+
+        <div className="lg:min-h-0 lg:overflow-y-auto lg:border-l lg:px-5 lg:pt-4 lg:pb-5">
+          <CardComments
+            workspaceId={workspaceId}
+            boardId={boardId}
+            cardId={card.id}
+            count={card.commentCount}
+            comments={comments}
+            forms={commentForms}
+          />
+        </div>
+
+        {footerOf("flex lg:hidden")}
       </div>
 
       <ConfirmDialog

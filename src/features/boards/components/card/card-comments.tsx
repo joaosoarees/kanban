@@ -64,7 +64,7 @@ export function CardComments({
   return (
     <section
       aria-labelledby={`${cardId}-comments`}
-      className="flex shrink-0 flex-col gap-3"
+      className="@container flex shrink-0 flex-col gap-3"
     >
       <h3
         id={`${cardId}-comments`}
