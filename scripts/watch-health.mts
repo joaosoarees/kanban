@@ -34,11 +34,14 @@ async function probe() {
 const timer = setInterval(() => void probe(), 500);
 process.stdout.write(`watching ${healthUrl} every 0.5 s, Ctrl+C to stop\n`);
 
-process.on("SIGINT", () => {
+function stop() {
   clearInterval(timer);
   const seconds = Math.round((Date.now() - startedAt) / 1000);
   process.stdout.write(
     `${requests} requests, ${failures} failures in ${seconds} s\n`,
   );
   process.exit(failures === 0 ? 0 : 1);
-});
+}
+
+process.on("SIGINT", stop);
+process.on("SIGTERM", stop);
