@@ -109,10 +109,10 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
   return enter(user.id);
 }
 
-export async function signOutAction(): Promise<void> {
+export async function signOutAction(): Promise<ActionResult> {
   await endSession();
   await forgetInvite();
-  return redirect("/sign-in");
+  return { status: "success", data: undefined };
 }
 
 const PENDING_EXPIRED: ActionError = {
