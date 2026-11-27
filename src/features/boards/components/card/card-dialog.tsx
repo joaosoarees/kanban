@@ -138,6 +138,8 @@ export function CardDialog({
           comments={comments}
           commentForms={commentForms}
           onDeleted={() => {
+            description.cancel();
+            commentForms.discard();
             onDeleted({ id: card.id, columnId: column.id, index });
             close();
           }}
