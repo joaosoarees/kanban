@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   inviteDueLabel,
+  inviteExpiresAt,
   isInviteExpired,
   secondsUntilInviteResend,
   sendWindowStart,
@@ -71,4 +72,10 @@ describe("secondsUntilInviteResend", () => {
       expect(secondsUntilInviteResend(sentAt, now)).toBe(expected);
     },
   );
+});
+
+describe("inviteExpiresAt", () => {
+  it("should end the invite seven days after it was sent", () => {
+    expect(inviteExpiresAt(now)).toEqual(new Date("2026-12-03T15:00:00.000Z"));
+  });
 });
