@@ -175,6 +175,7 @@ export function CodeForm({
         action={resendAction}
         initialWait={initialWait}
         onExpired={onExpired}
+        disabled={isBusy}
       />
       <p className="text-center text-sm text-muted-foreground">
         Não é este e-mail?{" "}
@@ -182,7 +183,7 @@ export function CodeForm({
           type="button"
           disabled={isBusy}
           onClick={switchEmail}
-          className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:no-underline"
         >
           Usar outro e-mail
         </button>
