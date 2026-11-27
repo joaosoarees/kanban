@@ -23,7 +23,7 @@ Projeto de estudo para treinar as skills. Roda local em Docker Compose e em prod
 ## Erros
 
 1. Erros esperados (validação, permissão, conflito): a action retorna `{ status: "error", message }`, sem lançar exceção.
-2. Recurso inexistente ou sem acesso: `notFound()` nas páginas (404, não 403); nas actions, o erro `FORBIDDEN`.
+2. Recurso inexistente ou sem acesso: `notFound()` nas páginas (404, não 403). Nas actions, sem acesso devolve `FORBIDDEN`, e recurso que deixou de existir devolve um erro com `gone: true`.
 3. Erros inesperados: `error.tsx` em níveis (`global-error`, área logada, workspace, board).
 
 Entra a partir da fatia 3; cada fatia nova ganha seu `error.tsx` e `loading.tsx` quando fizer sentido.
