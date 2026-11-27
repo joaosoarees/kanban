@@ -1,4 +1,4 @@
-import type { CardComment } from "@/features/boards/server/comment-queries";
+import type { CardComment } from "@/features/boards/lib/card-comment";
 
 export function newestFirst(comments: CardComment[]) {
   const byId = new Map(comments.map((comment) => [comment.id, comment]));

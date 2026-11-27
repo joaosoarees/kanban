@@ -5,7 +5,7 @@ import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import type { CardCommentsState } from "@/features/boards/hooks/use-card-comments";
 import { commentSchema } from "@/features/boards/lib/comment-schemas";
-import type { CardComment } from "@/features/boards/server/comment-queries";
+import type { CardComment } from "@/features/boards/lib/card-comment";
 import {
   createCommentAction,
   editCommentAction,

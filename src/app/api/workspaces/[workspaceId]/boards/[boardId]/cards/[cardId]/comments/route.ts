@@ -1,10 +1,8 @@
 import type { NextRequest } from "next/server";
 import { commentPageSchema } from "@/features/boards/lib/comment-schemas";
 import { CARD_GONE, parseCardRef } from "@/features/boards/server/access";
-import {
-  getCardComments,
-  type CommentPage,
-} from "@/features/boards/server/comment-queries";
+import type { CommentPage } from "@/features/boards/lib/card-comment";
+import { getCardComments } from "@/features/boards/server/comment-queries";
 import { loadActorFor } from "@/features/workspaces/server/access";
 import {
   INVALID,

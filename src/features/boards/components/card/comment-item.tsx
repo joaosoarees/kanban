@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
 import { useToday } from "@/features/boards/hooks/use-today";
 import { formatCommentDate } from "@/features/boards/lib/comment-date";
-import type { CardComment } from "@/features/boards/server/comment-queries";
+import type { CardComment } from "@/features/boards/lib/card-comment";
 import { deleteCommentAction } from "@/features/boards/server/comment-actions";
 import type { ActionResult } from "@/lib/action-result";
 import { initialsOf } from "@/lib/initials";

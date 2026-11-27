@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { newestFirst, withPage } from "@/features/boards/lib/comment-list";
-import type { CardComment } from "@/features/boards/server/comment-queries";
+import type { CardComment } from "@/features/boards/lib/card-comment";
 
 function comment(id: string, body = `Comentário ${id}`): CardComment {
   return {
