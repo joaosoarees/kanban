@@ -12,8 +12,9 @@ O Traefik do Coolify termina o HTTPS e encaminha o domínio para a Application.
 1. O PR entra na `main` por merge commit, com o `check` verde.
 2. O CI roda de novo na `main`. Com o `check` verde, o job `deploy` chama `POST /api/v1/deploy` do Coolify para a Application e acompanha o deploy até `finished`.
 3. O Coolify builda o estágio `runner` e sobe o contêiner novo ao lado do antigo. O contêiner novo roda `prisma migrate deploy` e só então inicia o servidor (`docker/start.mts`).
-4. Quando o `HEALTHCHECK` da imagem passa, o Traefik passa a mandar requisições ao contêiner novo, e o Coolify para o antigo com `SIGTERM`.
-5. O job termina consultando `/api/health` na URL pública.
+4. Quando o `HEALTHCHECK` da imagem passa, o Traefik passa a mandar requisições ao contêiner novo. O Coolify espera 5 s e para o antigo com `SIGTERM`.
+5. O contêiner antigo continua atendendo por 5 s depois do `SIGTERM`, com o `/api/ready` respondendo 503. O health check do Traefik consulta essa rota a cada segundo e tira o antigo da rota antes de ele sair.
+6. O job termina consultando `/api/health` na URL pública.
 
 Enquanto os dois contêineres convivem, o código antigo atende com o banco já migrado. Por isso toda migration é compatível com a versão anterior do código (expand/contract): primeiro se adiciona, num deploy seguinte se remove.
 
@@ -87,9 +88,10 @@ http:
         burst: 10
 ```
 
-Os labels da Application são os que o Coolify gera para os domínios, mais um roteador `kanban-app-auth`. Esse roteador tem prioridade 1000, o middleware `kanban-auth-ratelimit@file` e o serviço `https-0-<uuid da Application>`. Ele vale só para `POST` no domínio de produção em `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password`, `/reset-password`, `/invite` e `/account`. As Server Actions dessas telas fazem `POST` no caminho da própria página, então o limite cobre login, cadastro, confirmação de e-mail, redefinição de senha, os reenvios de código, o aceite de convite e as trocas da conta.
+Os labels da Application são os que o Coolify gera para o domínio, mais o health check do serviço `https-0-<uuid da Application>` (`loadbalancer.healthcheck.path=/api/ready`, `interval=1s`, `timeout=1s`) e um roteador `kanban-app-auth`. Esse roteador tem prioridade 1000, o middleware `kanban-auth-ratelimit@file` e o serviço `https-0-<uuid da Application>`. Ele vale só para `POST` no domínio de produção em `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password`, `/reset-password`, `/invite` e `/account`. As Server Actions dessas telas fazem `POST` no caminho da própria página, então o limite cobre login, cadastro, confirmação de e-mail, redefinição de senha, os reenvios de código, o aceite de convite e as trocas da conta.
 
 - **Regeneração dos labels desligada** (`is_container_label_readonly_enabled = false`). Ligada, qualquer mudança de domínio regera os labels e apaga o `kanban-app-auth`. Desligada, mudar o domínio exige editar os labels à mão.
+- **Health check do Traefik.** Sem ele, o Traefik só tira o contêiner antigo da rota quando o vê morrer, e as requisições desse intervalo recebem 502 ou ficam sem resposta. O app sozinho não resolve: ele só pode esperar, e quem decide a rota é o Traefik.
 - **Labels iguais entre deploys.** Se mudarem, o contêiner antigo e o novo declaram o mesmo roteador com configurações diferentes durante a troca, e o Traefik recusa o roteador (`HTTP router defined multiple times with different configurations`): o domínio fica sem rota até o antigo sair.
 
 ## Medir a queda de um deploy
