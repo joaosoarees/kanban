@@ -80,7 +80,7 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 
   const matches =
     user === null
-      ? await verifyPassword(parsed.data.password)
+      ? await verifyPassword(parsed.data.password, null)
       : (await checkAccountPassword(user.id, parsed.data.password, new Date()))
           .status === "match";
   if (user === null || !matches) {
