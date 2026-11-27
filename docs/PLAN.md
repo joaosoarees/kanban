@@ -222,6 +222,8 @@ Os três PRs entraram na `release/slices-15-18` (#61, #62 e o de proteção). A 
 - Senha: pede a atual. A troca atualiza `password_changed_at`, o que derruba as outras sessões; a sessão atual recebe um token novo.
 - E-mail: começar a troca pede a senha atual. Um código `CHANGE_EMAIL` vai para o endereço novo, com as regras dos outros códigos (8 dígitos, 15 minutos, 5 tentativas, 60 s entre envios), e o e-mail só muda depois do código certo. O endereço antigo recebe um aviso. As sessões continuam.
 - Um e-mail novo que já tem conta recebe a mesma resposta ("Enviamos um código"), mas nenhum código sai. A unicidade é conferida de novo na confirmação.
+- Senha errada: 5 erros seguidos travam a conferência de senha da conta por 15 minutos, no login e nas ações da conta que pedem a senha atual. O contador é da conta, não do IP, então um terceiro consegue travar o login de alguém; ficou assim de propósito, e o dono destrava pelo "Esqueci a senha" (redefinir ou verificar o e-mail zera a trava).
+- No login, um e-mail sem conta e uma senha errada respondem com 6 a 8 ms de diferença. Ficou assim.
 - Skills: `password-hashing`, `nextjs-jwt-session`, `nextjs-auth-cookies`, `cognito-password-reset` (fluxo), `normalizing-relational-schemas`, `postgres-constraints-and-keys`, `prisma-schema-and-migrations`, `nextjs-server-action-forms`, `react-hook-form-zod`, `nextjs-app-router-routing`, `craft`.
 
 ```
@@ -288,8 +290,8 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 12. [x] Envio de e-mail: Mailpit, SES e templates
 13. [x] Verificação de e-mail
 14. [x] Esqueci a senha
-15. [ ] Convites com aceite
-16. [ ] Perfil da conta
-17. [ ] Prazo no card
-18. [ ] Comentários no card
+15. [x] Convites com aceite
+16. [x] Perfil da conta
+17. [x] Prazo no card
+18. [x] Comentários no card
 19. [ ] Deploy sem queda
