@@ -6,20 +6,20 @@ Produção roda numa VPS ARM com Coolify. O Coolify builda o `compose.prod.yaml`
 
 1. O PR entra na `main` por merge commit, com o `check` verde.
 2. O CI roda de novo na `main`. Com o `check` verde, o job `deploy` chama `POST /api/v1/deploy` do Coolify e acompanha o deploy até `finished`.
-3. O Coolify builda as imagens, sobe o `postgres`, roda o `migrate` e só então troca o `app`.
+3. O Coolify builda as imagens, sobe o `kanban-postgres`, roda o `migrate` e só então troca o `app`.
 4. O job termina consultando `/api/health` na URL pública.
 
 O auto-deploy por webhook do GitHub App fica desligado: quem decide o deploy é o CI.
 
 ## Serviços do `compose.prod.yaml`
 
-| Serviço    | Papel                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------ |
-| `postgres` | Postgres 18, sem porta publicada, volume `pgdata`                                                            |
-| `migrate`  | `prisma migrate deploy`, roda e sai; o `app` só sobe se ele terminar com sucesso                             |
-| `app`      | servidor standalone do Next em imagem distroless, só leitura, sem capabilities, healthcheck em `/api/health` |
-| `db-dump`  | `pg_dump --format=custom` a cada hora para o volume `dumps`, com troca atômica do arquivo                    |
-| `backup`   | `offen/docker-volume-backup`, envia o volume `dumps` para o S3 todo dia às 05:30 UTC e mantém 7 dias         |
+| Serviço           | Papel                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| `kanban-postgres` | Postgres 18, sem porta publicada, volume `pgdata`                                                            |
+| `migrate`         | `prisma migrate deploy`, roda e sai; o `app` só sobe se ele terminar com sucesso                             |
+| `app`             | servidor standalone do Next em imagem distroless, só leitura, sem capabilities, healthcheck em `/api/health` |
+| `db-dump`         | `pg_dump --format=custom` a cada hora para o volume `dumps`, com troca atômica do arquivo                    |
+| `backup`          | `offen/docker-volume-backup`, envia o volume `dumps` para o S3 todo dia às 05:30 UTC e mantém 7 dias         |
 
 ## Variáveis
 
@@ -74,7 +74,7 @@ Uma migration que possa passar de alguns minutos (um índice numa tabela grande,
 ```sh
 docker build -f Dockerfile.prod --target migrator -t kanban-migrate "<url do repositório>.git#<branch do PR>"
 docker run --rm --network <rede do Coolify> -w /migrator \
-  -e DATABASE_URL="postgresql://kanban:<senha>@<host do postgres>:5432/kanban" \
+  -e DATABASE_URL="postgresql://kanban:<senha>@kanban-postgres:5432/kanban" \
   kanban-migrate node node_modules/prisma/build/index.js migrate deploy
 docker image rm kanban-migrate
 ```
@@ -99,6 +99,6 @@ Reverter o commit com `git revert` num PR. O merge dispara um deploy novo. As mi
    docker rm -f kanban-restore
    ```
 
-3. Para restaurar em produção, pare o `app`, rode o `pg_restore` com `--clean --if-exists` contra o serviço `postgres` do recurso e suba o `app` de novo.
+3. Para restaurar em produção, pare o `app`, rode o `pg_restore` com `--clean --if-exists` contra o serviço `kanban-postgres` do recurso e suba o `app` de novo.
 
 Para forçar um backup fora do horário: `docker exec <container backup> backup`.
