@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { inviteTokenSchema } from "@/features/members/lib/schemas";
+import {
+  inviteMemberSchema,
+  inviteTokenSchema,
+} from "@/features/members/lib/schemas";
 
 const TOKEN = "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_AbCd";
 
@@ -17,5 +20,36 @@ describe("inviteTokenSchema", () => {
     { name: "empty", token: "" },
   ])("should reject a token $name", ({ token }) => {
     expect(inviteTokenSchema.safeParse(token).success).toBe(false);
+  });
+});
+
+describe("inviteMemberSchema", () => {
+  it("should trim and lower-case the e-mail", () => {
+    const parsed = inviteMemberSchema.parse({
+      email: " Bruno@Example.COM ",
+      role: "MEMBER",
+    });
+
+    expect(parsed).toEqual({ email: "bruno@example.com", role: "MEMBER" });
+  });
+
+  it("should refuse the owner role", () => {
+    const result = inviteMemberSchema.safeParse({
+      email: "bruno@example.com",
+      role: "OWNER",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("should refuse something that is not an e-mail", () => {
+    const result = inviteMemberSchema.safeParse({
+      email: "bruno",
+      role: "ADMIN",
+    });
+
+    expect(result.error?.issues.map(({ message }) => message)).toEqual([
+      "Digite um e-mail como nome@empresa.com.",
+    ]);
   });
 });
