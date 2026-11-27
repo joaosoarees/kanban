@@ -1,13 +1,13 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { compare, hash, truncates } from "bcryptjs";
+import { PASSWORD_MAX_BYTES } from "@/features/auth/lib/schemas";
 
 const COST = 12;
-const MAX_PASSWORD_BYTES = 72;
 
 export async function hashPassword(password: string): Promise<string> {
   if (truncates(password)) {
-    throw new RangeError(`Too long: at most ${MAX_PASSWORD_BYTES} bytes`);
+    throw new RangeError(`Too long: at most ${PASSWORD_MAX_BYTES} bytes`);
   }
   return hash(password, COST);
 }
