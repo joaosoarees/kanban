@@ -47,11 +47,12 @@ export function CardDialog({
 }: CardDialogProps) {
   const router = useRouter();
   const [shownId, setShownId] = useState(requestedId);
-  const [isDiscarding, setIsDiscarding] = useState(false);
+  const [discardingId, setDiscardingId] = useState<string | null>(null);
   const displayedId = useRef<string | null>(null);
   const location = shownId === null ? null : locateCard(columns, shownId);
   const cardId = location === null ? null : shownId;
   const isMissing = shownId !== null && location === null;
+  const isDiscarding = discardingId !== null && discardingId === cardId;
 
   const close = () => {
     displayedId.current = null;
@@ -115,7 +116,7 @@ export function CardDialog({
           return;
         }
         if (isDirty) {
-          setIsDiscarding(true);
+          setDiscardingId(cardId);
           return;
         }
         close();
@@ -153,7 +154,7 @@ export function CardDialog({
             if (open) {
               return;
             }
-            setIsDiscarding(false);
+            setDiscardingId(null);
             if (isLeaving) {
               pushCardUrl(card.id);
             }
@@ -172,7 +173,7 @@ export function CardDialog({
           pendingLabel="Descartando…"
           cancelLabel="Continuar editando"
           onConfirm={() => {
-            setIsDiscarding(false);
+            setDiscardingId(null);
             description.cancel();
             commentForms.discard();
             if (!isLeaving) {
