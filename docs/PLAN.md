@@ -182,7 +182,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 - O aceite roda numa transação com a linha do workspace travada (`recheckActor`): quem convidou ainda precisa ser OWNER ou ADMIN e o papel ainda precisa ser permitido. Aceitar cria o membership e apaga o convite. Quem já é membro só vê o convite sumir e entra no workspace.
 - A página de membros ganha "Convites pendentes", só para OWNER e ADMIN, com reenviar e revogar. Reenviar gera um token novo e mais 7 dias; revogar apaga. O vencido continua na lista até um dos dois. Convidar de novo o mesmo e-mail substitui o convite anterior.
 - Limites contra spam saindo do domínio no SES: 50 convites pendentes por workspace, 60 s entre reenvios do mesmo convite e 20 envios por dia por quem convida. Os envios do dia são contados numa tabela própria, para que revogar não devolva a cota.
-- O rate limit do Traefik passa a cobrir também o `POST` de `/invite/<token>` e `/account`.
+- O rate limit do Traefik passa a cobrir também o `POST` de `/invite` (as actions da página de convite) e de `/account`.
 - Skills: `multi-tenant-data-model`, `tenant-role-authorization`, `role-based-access-control`, `relational-keys-and-column-types`, `postgres-constraints-and-keys`, `defining-access-patterns`, `postgres-indexes-and-explain`, `prisma-transactions`, `postgres-locking-and-isolation`, `password-hashing` (quando um hash rápido basta), `nextjs-jwt-session`, `nextjs-auth-cookies`, `nextjs-redirects`, `ses-sandbox-and-production-access`, `cognito-sign-up-and-confirmation` (fluxo), `craft`.
 
 ```
@@ -206,7 +206,7 @@ Implementação em três PRs para a `release/slices-15-18`, depois do backend:
    - O prazo da linha ("vence em N dias", "vence hoje", "venceu em 20/11") é uma função pura com teste (`designing-testable-code`, `writing-unit-tests`).
    - Sai o adicionar antigo: `addMemberAction`, a permissão `addMember` e o seu rate limit (`auditing-code-against-skills` para conferir que nada ficou usando).
 3. Proteção e documentação.
-   - Rate limit do Traefik para o `POST` de `/invite/*` no `compose.prod.yaml`.
+   - Rate limit do Traefik para o `POST` de `/invite` no `compose.prod.yaml`.
    - Conferir, só leitura, se a conta SES saiu do sandbox, senão o convite só chega a endereços verificados (`ses-sandbox-and-production-access`).
    - Decisões no `DESIGN.md` e a fatia marcada aqui (`craft`).
 
