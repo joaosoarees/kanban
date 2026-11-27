@@ -18,6 +18,8 @@ export type BoardCard = {
   dueOn: string | null;
   completed: boolean;
   commentCount: number;
+  checklistTotal: number;
+  checklistDone: number;
 };
 
 export type BoardColumn = {
