@@ -7,7 +7,7 @@ import {
 import { db } from "@/server/db";
 
 export async function getCardActivities(
-  workspaceId: string,
+  { userId, workspaceId }: { userId: string; workspaceId: string },
   ref: { boardId: string; cardId: string },
   before: string | null,
 ): Promise<ActivityPage | null> {
@@ -29,19 +29,32 @@ export async function getCardActivities(
     },
     orderBy: { id: "desc" },
     take: ACTIVITY_PAGE_SIZE + 1,
-    select: { id: true, type: true, data: true, createdAt: true },
+    select: {
+      id: true,
+      type: true,
+      data: true,
+      createdAt: true,
+      actorId: true,
+    },
   });
 
   const page = rows.slice(0, ACTIVITY_PAGE_SIZE);
   const last = page.at(-1);
   return {
-    activities: page.flatMap(({ id, type, data, createdAt }) => {
+    activities: page.flatMap(({ id, type, data, createdAt, actorId }) => {
       const entry = parseCardActivity(type, data);
       if (entry === null) {
         console.error(`Skipped card activity ${id} (${type}): invalid data`);
         return [];
       }
-      return [{ ...entry, id, createdAt: createdAt.toISOString() }];
+      return [
+        {
+          ...entry,
+          id,
+          createdAt: createdAt.toISOString(),
+          byViewer: actorId === userId,
+        },
+      ];
     }),
     nextCursor: rows.length > ACTIVITY_PAGE_SIZE && last ? last.id : null,
   };
