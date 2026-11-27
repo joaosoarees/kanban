@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { CardChecklist } from "@/features/boards/components/card/card-checklist";
 import { CardComments } from "@/features/boards/components/card/card-comments";
 import {
   CardDescription,
@@ -19,8 +20,10 @@ import type {
   BoardColumn,
   CardUpdate,
 } from "@/features/boards/hooks/use-board-columns";
+import type { CardChecklistState } from "@/features/boards/hooks/use-card-checklist";
 import type { CardCommentsState } from "@/features/boards/hooks/use-card-comments";
 import type { CardDescriptionState } from "@/features/boards/hooks/use-card-description";
+import type { ChecklistFormsState } from "@/features/boards/hooks/use-checklist-forms";
 import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
 import { deleteCardAction } from "@/features/boards/server/card-actions";
 
@@ -33,6 +36,8 @@ type CardDialogBodyProps = {
   columns: BoardColumn[];
   canReorder: boolean;
   description: CardDescriptionState;
+  checklist: CardChecklistState;
+  checklistForms: ChecklistFormsState;
   comments: CardCommentsState;
   commentForms: CommentFormsState;
   onDeleted: () => void;
@@ -49,6 +54,8 @@ export function CardDialogBody({
   columns,
   canReorder,
   description,
+  checklist,
+  checklistForms,
   comments,
   commentForms,
   onDeleted,
@@ -98,6 +105,14 @@ export function CardDialogBody({
           />
 
           <CardDescription cardId={card.id} state={description} />
+
+          <CardChecklist
+            cardId={card.id}
+            knownTotal={card.checklistTotal}
+            knownDone={card.checklistDone}
+            checklist={checklist}
+            forms={checklistForms}
+          />
 
           <Separator className="order-2 lg:order-none" />
 
