@@ -53,21 +53,38 @@ async function fetchCommentPage(
 export function useCardComments(
   workspaceId: string,
   boardId: string,
-  cardId: string,
+  cardId: string | null,
 ) {
-  const url = `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/comments`;
+  const url =
+    cardId === null
+      ? null
+      : `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/comments`;
   const [status, setStatus] = useState<ListStatus>("loading");
   const [comments, setComments] = useState<CardComment[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [older, setOlder] = useState<OlderStatus>("idle");
+  const [loadedUrl, setLoadedUrl] = useState(url);
   const removedIds = useRef(new Set<string>());
+  const currentUrl = useRef(url);
+
+  if (loadedUrl !== url) {
+    setLoadedUrl(url);
+    setStatus("loading");
+    setComments([]);
+    setNextCursor(null);
+    setOlder("idle");
+  }
 
   const isLoading = status === "loading";
 
   useEffect(() => {
+    currentUrl.current = url;
+  }, [url]);
+
+  useEffect(() => {
     let ignore = false;
-    const load = async () => {
-      const page = await fetchCommentPage(url, null);
+    const load = async (pageUrl: string) => {
+      const page = await fetchCommentPage(pageUrl, null);
       if (ignore) {
         return;
       }
@@ -80,8 +97,8 @@ export function useCardComments(
       setNextCursor(page.nextCursor);
       setStatus("ready");
     };
-    if (isLoading) {
-      void load();
+    if (isLoading && url !== null) {
+      void load(url);
     }
     return () => {
       ignore = true;
@@ -97,11 +114,14 @@ export function useCardComments(
       setStatus("loading");
     },
     loadOlder: async () => {
-      if (nextCursor === null || older === "loading") {
+      if (url === null || nextCursor === null || older === "loading") {
         return;
       }
       setOlder("loading");
       const page = await fetchCommentPage(url, nextCursor);
+      if (currentUrl.current !== url) {
+        return;
+      }
       if (page === null) {
         setOlder("failed");
         return;

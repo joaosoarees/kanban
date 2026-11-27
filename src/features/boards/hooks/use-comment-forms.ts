@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import type { CardCommentsState } from "@/features/boards/hooks/use-card-comments";
@@ -11,12 +11,20 @@ import {
   editCommentAction,
 } from "@/features/boards/server/comment-actions";
 import { useActionForm } from "@/hooks/use-action-form";
+import type { ActionError } from "@/lib/action-result";
 import { hasVisibleText } from "@/lib/text";
+
+const CREATE_FAILED = "Não foi possível comentar. Tente de novo.";
+const EDIT_FAILED = "Não foi possível salvar.";
+
+function noCard(message: string): ActionError {
+  return { status: "error", message };
+}
 
 type CommentFormsOptions = {
   workspaceId: string;
   boardId: string;
-  cardId: string;
+  cardId: string | null;
   comments: CardCommentsState;
 };
 
@@ -29,13 +37,21 @@ export function useCommentForms({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nextEdit, setNextEdit] = useState<CardComment | null>(null);
   const composerFieldRef = useRef<HTMLTextAreaElement>(null);
+  const [formsCardId, setFormsCardId] = useState(cardId);
+  if (formsCardId !== cardId) {
+    setFormsCardId(cardId);
+    setEditingId(null);
+    setNextEdit(null);
+  }
 
   const composer = useActionForm({
     schema: commentSchema,
     defaultValues: { body: "" },
     action: async (values) =>
-      createCommentAction(workspaceId, boardId, cardId, values),
-    failure: "Não foi possível comentar. Tente de novo.",
+      cardId === null
+        ? noCard(CREATE_FAILED)
+        : createCommentAction(workspaceId, boardId, cardId, values),
+    failure: CREATE_FAILED,
     onSuccess: (comment) => {
       composer.form.reset({ body: "" });
       comments.put(comment);
@@ -46,8 +62,10 @@ export function useCommentForms({
     schema: commentSchema,
     defaultValues: { body: "" },
     action: async (values) =>
-      editCommentAction(workspaceId, boardId, cardId, editingId ?? "", values),
-    failure: "Não foi possível salvar.",
+      cardId === null || editingId === null
+        ? noCard(EDIT_FAILED)
+        : editCommentAction(workspaceId, boardId, cardId, editingId, values),
+    failure: EDIT_FAILED,
     onSuccess: (comment) => {
       comments.put(comment);
       setEditingId(null);
@@ -60,6 +78,16 @@ export function useCommentForms({
       }
     },
   });
+
+  const { form: composerForm } = composer;
+  const { form: editForm } = edit;
+
+  useLayoutEffect(() => {
+    if (cardId !== null) {
+      composerForm.reset({ body: "" });
+      editForm.reset({ body: "" });
+    }
+  }, [cardId, composerForm, editForm]);
 
   const composerBody = useWatch({
     control: composer.form.control,
@@ -99,6 +127,11 @@ export function useCommentForms({
   return {
     unsaved,
     isBusy,
+    discard: () => {
+      composer.form.reset({ body: "" });
+      setEditingId(null);
+      setNextEdit(null);
+    },
     composer: {
       ...composer,
       body: composerBody,
