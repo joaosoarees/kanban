@@ -82,7 +82,7 @@ export async function checkAccountPassword(
 ): Promise<PasswordCheck> {
   const reservation = await reserveAttempt(userId, now);
   if (reservation.status === "locked") {
-    await verifyPassword(password);
+    await verifyPassword(password, null);
     return reservation;
   }
 
