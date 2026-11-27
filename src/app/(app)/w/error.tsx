@@ -27,7 +27,12 @@ export default function WorkspaceError({
       description="Algo falhou do nosso lado. Tente de novo em instantes."
       actions={
         <>
-          <Button onClick={retry} className={cn("h-10 px-4", primaryButton)}>
+          <Button
+            onClick={() => {
+              retry();
+            }}
+            className={cn("h-10 px-4", primaryButton)}
+          >
             Tentar de novo
           </Button>
           <Link href="/" className={linkButton("outline", "h-10 px-4")}>
