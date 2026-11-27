@@ -13,13 +13,13 @@ O auto-deploy por webhook do GitHub App fica desligado: quem decide o deploy é 
 
 ## Serviços do `compose.prod.yaml`
 
-| Serviço           | Papel                                                                                                        |
-| ----------------- | ------------------------------------------------------------------------------------------------------------ |
-| `kanban-postgres` | Postgres 18, sem porta publicada, volume `pgdata`                                                            |
-| `migrate`         | `prisma migrate deploy`, roda e sai; o `app` só sobe se ele terminar com sucesso                             |
-| `app`             | servidor standalone do Next em imagem distroless, só leitura, sem capabilities, healthcheck em `/api/health` |
-| `db-dump`         | `pg_dump --format=custom` a cada hora para o volume `dumps`, com troca atômica do arquivo                    |
-| `backup`          | `offen/docker-volume-backup`, envia o volume `dumps` para o S3 todo dia às 05:30 UTC e mantém 7 dias         |
+| Serviço           | Papel                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `kanban-postgres` | Postgres 18, sem porta publicada, volume `pgdata`; também na rede `coolify`, onde qualquer contêiner dela o alcança e só a senha o protege |
+| `migrate`         | `prisma migrate deploy`, roda e sai; o `app` só sobe se ele terminar com sucesso                                                           |
+| `app`             | servidor standalone do Next em imagem distroless, só leitura, sem capabilities, healthcheck em `/api/health`                               |
+| `db-dump`         | `pg_dump --format=custom` a cada hora para o volume `dumps`, com troca atômica do arquivo                                                  |
+| `backup`          | `offen/docker-volume-backup`, envia o volume `dumps` para o S3 todo dia às 05:30 UTC e mantém 7 dias                                       |
 
 ## Variáveis
 
