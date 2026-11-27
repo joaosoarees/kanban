@@ -7,6 +7,7 @@ import {
   MAX_LABELS_PER_BOARD,
 } from "@/features/boards/lib/label-schemas";
 import { BOARD_GONE, lockBoard } from "@/features/boards/server/access";
+import { recordActivities } from "@/features/boards/server/activity";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
@@ -155,11 +156,22 @@ export async function deleteLabelAction(
 
   await db.$transaction(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
-    if (lockedBoardId !== null) {
-      await tx.label.deleteMany({
-        where: { id: labelRef, boardId: lockedBoardId },
-      });
+    if (lockedBoardId === null) {
+      return;
     }
+    const label = await tx.label.findUnique({
+      where: { id: labelRef, boardId: lockedBoardId },
+      select: { name: true, color: true, cards: { select: { cardId: true } } },
+    });
+    if (!label) {
+      return;
+    }
+    await tx.label.delete({ where: { id: labelRef }, select: { id: true } });
+    await recordActivities(
+      tx,
+      label.cards.map(({ cardId }) => cardId),
+      { type: "LABEL_REMOVED", name: label.name, color: label.color },
+    );
   });
 
   revalidateWorkspace(actor.slug);

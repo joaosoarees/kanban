@@ -37,9 +37,11 @@ export async function getCardActivities(
   return {
     activities: page.flatMap(({ id, type, data, createdAt }) => {
       const entry = parseCardActivity(type, data);
-      return entry === null
-        ? []
-        : [{ ...entry, id, createdAt: createdAt.toISOString() }];
+      if (entry === null) {
+        console.error(`Skipped card activity ${id} (${type}): invalid data`);
+        return [];
+      }
+      return [{ ...entry, id, createdAt: createdAt.toISOString() }];
     }),
     nextCursor: rows.length > ACTIVITY_PAGE_SIZE && last ? last.id : null,
   };
