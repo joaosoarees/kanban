@@ -15,6 +15,8 @@ type CardRow = {
   dueOn: string | null;
   completed: boolean;
   commentCount: number;
+  checklistTotal: number;
+  checklistDone: number;
 };
 
 export async function getBoards(workspaceId: string) {
@@ -66,9 +68,18 @@ export const requireBoard = cache(
           SELECT count(*)::int
           FROM comments comment
           WHERE comment."cardId" = card.id
-        ) AS "commentCount"
+        ) AS "commentCount",
+        checklist.total AS "checklistTotal",
+        checklist.done AS "checklistDone"
       FROM cards card
       JOIN columns board_column ON board_column.id = card."columnId"
+      CROSS JOIN LATERAL (
+        SELECT
+          count(*)::int AS total,
+          count(*) FILTER (WHERE item."completedAt" IS NOT NULL)::int AS done
+        FROM checklist_items item
+        WHERE item."cardId" = card.id
+      ) checklist
       WHERE board_column."boardId" = ${board.id}::uuid
       ORDER BY card.position, card.id
     `;
