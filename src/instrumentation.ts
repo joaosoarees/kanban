@@ -11,7 +11,9 @@ export const onRequestError: Instrumentation.onRequestError = (
       ? String(error.digest)
       : undefined;
 
+  const [pathname] = request.path.split("?");
+
   console.error(
-    `[onRequestError] ${request.method} ${request.path} route=${context.routePath} digest=${digest} message=${message}`,
+    `[onRequestError] ${request.method} ${pathname} route=${context.routePath} digest=${digest} message=${message}`,
   );
 };
