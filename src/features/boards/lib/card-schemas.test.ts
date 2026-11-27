@@ -14,85 +14,85 @@ const INVISIBLE = `${HANGUL_FILLER}${LEFT_TO_RIGHT_MARK}${TAG_SPACE}`;
 const UNPRINTABLE = String.fromCodePoint(0x01, 0x85, 0x2800, 0xfff9, 0x1d159);
 
 describe("cardTitleSchema", () => {
-  it("trims a valid title", () => {
+  it("should trim a valid title", () => {
     const parsed = cardTitleSchema.parse({ title: "  Revisar PR  " });
     expect(parsed.title).toBe("Revisar PR");
   });
 
-  it("refuses a NUL character", () => {
+  it("should refuse a NUL character", () => {
     const parsed = cardTitleSchema.safeParse({ title: `a${NUL}b` });
     expect(parsed.success).toBe(false);
   });
 
-  it("refuses a title with only zero-width characters", () => {
+  it("should refuse a title with only zero-width characters", () => {
     const parsed = cardTitleSchema.safeParse({
       title: `${ZERO_WIDTH} ${ZERO_WIDTH}`,
     });
     expect(parsed.success).toBe(false);
   });
 
-  it("refuses a title with only default-ignorable characters", () => {
+  it("should refuse a title with only default-ignorable characters", () => {
     expect(cardTitleSchema.safeParse({ title: INVISIBLE }).success).toBe(false);
   });
 
-  it("refuses a title with only control characters and blank glyphs", () => {
+  it("should refuse a title with only control characters and blank glyphs", () => {
     expect(cardTitleSchema.safeParse({ title: UNPRINTABLE }).success).toBe(
       false,
     );
   });
 
   it.each([0x0b, 0x0c, 0x85])(
-    "refuses line break code point %i",
+    "should refuse line break code point %i",
     (codePoint) => {
       const title = `a${String.fromCodePoint(codePoint)}b`;
       expect(cardTitleSchema.safeParse({ title }).success).toBe(false);
     },
   );
 
-  it("keeps a zero-width character inside visible text", () => {
+  it("should keep a zero-width character inside visible text", () => {
     const title = `a${ZERO_WIDTH}b`;
     expect(cardTitleSchema.parse({ title }).title).toBe(title);
   });
 });
 
 describe("cardDescriptionSchema", () => {
-  it("keeps line breaks inside the text", () => {
+  it("should keep line breaks inside the text", () => {
     const description = "linha 1\nlinha 2";
     expect(cardDescriptionSchema.parse({ description }).description).toBe(
       description,
     );
   });
 
-  it("stores an empty description as null", () => {
+  it("should store an empty description as null", () => {
     const parsed = cardDescriptionSchema.parse({ description: "   " });
     expect(parsed.description).toBeNull();
   });
 
-  it("stores a zero-width description as null", () => {
+  it("should store a zero-width description as null", () => {
     const parsed = cardDescriptionSchema.parse({
       description: `${ZERO_WIDTH} ${ZERO_WIDTH}`,
     });
     expect(parsed.description).toBeNull();
   });
 
-  it("stores a default-ignorable description as null", () => {
+  it("should store a default-ignorable description as null", () => {
     const parsed = cardDescriptionSchema.parse({ description: INVISIBLE });
     expect(parsed.description).toBeNull();
   });
 
-  it("stores a description of control characters and blank glyphs as null", () => {
+  it("should store a description of control characters and blank glyphs as null", () => {
     const parsed = cardDescriptionSchema.parse({ description: UNPRINTABLE });
     expect(parsed.description).toBeNull();
   });
 
-  it("accepts its own empty output when parsed again", () => {
+  it("should accept its own empty output when parsed again", () => {
     const first = cardDescriptionSchema.parse({ description: "" });
     const second = cardDescriptionSchema.safeParse(first);
     expect(second.success).toBe(true);
     expect(second.data?.description).toBeNull();
   });
 
-  it("refuses a NUL character", () => {
+  it("should refuse a NUL character", () => {
     const parsed = cardDescriptionSchema.safeParse({
       description: `a${NUL}b`,
     });
@@ -101,14 +101,14 @@ describe("cardDescriptionSchema", () => {
 });
 
 describe("cardDueSchema", () => {
-  it.each(["2026-11-12", null])("accepts %s", (dueOn) => {
+  it.each(["2026-11-12", null])("should accept %s", (dueOn) => {
     const parsed = cardDueSchema.safeParse({ dueOn });
 
     expect(parsed.success).toBe(true);
   });
 
   it.each(["2026-11-12T10:00:00Z", "2026-02-30", "12/11/2026", undefined])(
-    "refuses %s",
+    "should refuse %s",
     (dueOn) => {
       const parsed = cardDueSchema.safeParse({ dueOn });
 

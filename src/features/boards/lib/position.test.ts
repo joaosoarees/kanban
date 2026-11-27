@@ -50,47 +50,47 @@ function plannedPosition(
 describe("positionInColumn", () => {
   const [a, b, c] = board(["a", "b", "c"]);
 
-  it("creates a position in an empty column", () => {
+  it("should create a position in an empty column", () => {
     expect(positionInColumn([], "moved", null)).toBe(initialPositions(1)[0]);
   });
 
-  it("places the card before the first one", () => {
+  it("should place the card before the first one", () => {
     const position = plannedPosition([a, b, c], "moved", null);
     expect(position < a.position).toBe(true);
   });
 
-  it("places the card between two others", () => {
+  it("should place the card between two others", () => {
     const position = plannedPosition([a, b, c], "moved", "a");
     expect(a.position < position).toBe(true);
     expect(position < b.position).toBe(true);
   });
 
-  it("places the card after the last one", () => {
+  it("should place the card after the last one", () => {
     const position = plannedPosition([a, b, c], "moved", "c");
     expect(c.position < position).toBe(true);
   });
 
-  it("ignores the card's own position when moving inside the column", () => {
+  it("should ignore the card's own position when moving inside the column", () => {
     const position = plannedPosition([a, b, c], "b", "c");
     expect(c.position < position).toBe(true);
   });
 
-  it("moves a card to the top of its own column", () => {
+  it("should move a card to the top of its own column", () => {
     const position = plannedPosition([a, b, c], "c", null);
     expect(position < a.position).toBe(true);
   });
 
-  it("refuses a previous card that is not in the column", () => {
+  it("should refuse a previous card that is not in the column", () => {
     expect(positionInColumn([a, b, c], "moved", "missing")).toBeNull();
   });
 
-  it("refuses the card as its own previous card", () => {
+  it("should refuse the card as its own previous card", () => {
     expect(positionInColumn([a, b, c], "b", "b")).toBeNull();
   });
 });
 
 describe("initialPositions", () => {
-  it("creates strictly increasing positions", () => {
+  it("should create strictly increasing positions", () => {
     const [first, second, third] = initialPositions(3);
     expect(first < second).toBe(true);
     expect(second < third).toBe(true);
@@ -98,37 +98,37 @@ describe("initialPositions", () => {
 });
 
 describe("positionAtEnd", () => {
-  it("places an item after the last one", () => {
+  it("should place an item after the last one", () => {
     const ordered = board(["a", "b"]);
     expect(positionAtEnd(ordered) > ordered[1].position).toBe(true);
   });
 
-  it("works on an empty list", () => {
+  it("should work on an empty list", () => {
     expect(positionAtEnd([])).toBe(initialPositions(1)[0]);
   });
 });
 
 describe("planMove", () => {
-  it("moves an item to the start and updates only that item", () => {
+  it("should move an item to the start and update only that item", () => {
     const ordered = board(["a", "b", "c"]);
     const updates = plannedMove(ordered, "c", null);
     expect(updates.map(({ id }) => id)).toEqual(["c"]);
     expect(applyMove(ordered, updates)).toEqual(["c", "a", "b"]);
   });
 
-  it("moves an item between two others", () => {
+  it("should move an item between two others", () => {
     const ordered = board(["a", "b", "c"]);
     const updates = plannedMove(ordered, "a", "b");
     expect(applyMove(ordered, updates)).toEqual(["b", "a", "c"]);
   });
 
-  it("moves an item to the end", () => {
+  it("should move an item to the end", () => {
     const ordered = board(["a", "b", "c"]);
     const updates = plannedMove(ordered, "a", "c");
     expect(applyMove(ordered, updates)).toEqual(["b", "c", "a"]);
   });
 
-  it("rewrites every position when the neighbors share one", () => {
+  it("should rewrite every position when the neighbors share one", () => {
     const ordered = [
       { id: "a", position: "a0" },
       { id: "b", position: "a0" },
@@ -139,11 +139,11 @@ describe("planMove", () => {
     expect(applyMove(ordered, updates)).toEqual(["a", "c", "b"]);
   });
 
-  it("returns null when the moved item is gone", () => {
+  it("should return null when the moved item is gone", () => {
     expect(planMove(board(["a"]), "x", null)).toBeNull();
   });
 
-  it("returns null when the previous item is gone", () => {
+  it("should return null when the previous item is gone", () => {
     expect(planMove(board(["a", "b"]), "a", "x")).toBeNull();
   });
 });
