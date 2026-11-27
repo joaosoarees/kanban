@@ -53,3 +53,30 @@ export type CardActivityEvent = CardActivityEntry extends infer Entry
 export function isoDateOf(date: Date | null) {
   return date === null ? null : date.toISOString().slice(0, 10);
 }
+
+export const ACTIVITY_PAGE_SIZE = 30;
+
+export const activityPageSchema = z.object({
+  before: z.uuid().nullable(),
+});
+
+export type CardActivity = CardActivityEntry & {
+  id: string;
+  createdAt: string;
+};
+
+export type ActivityPage = {
+  activities: CardActivity[];
+  nextCursor: string | null;
+};
+
+const activityData = z.record(z.string(), z.unknown());
+
+export function parseCardActivity(type: string, data: unknown) {
+  const fields = activityData.safeParse(data);
+  if (!fields.success) {
+    return null;
+  }
+  const entry = cardActivitySchema.safeParse({ ...fields.data, type });
+  return entry.success ? entry.data : null;
+}
