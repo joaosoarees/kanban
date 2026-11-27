@@ -14,7 +14,6 @@ type CardCommentsProps = {
   workspaceId: string;
   boardId: string;
   cardId: string;
-  count: number;
   comments: CardCommentsState;
   forms: CommentFormsState;
 };
@@ -26,8 +25,6 @@ const SKELETON_ROWS = [
   { id: "second", name: "w-[140px]", lines: ["w-[85%]", "w-[40%]"] },
   { id: "third", name: "w-[200px]", lines: ["w-[70%]"] },
 ];
-
-const numberFormat = new Intl.NumberFormat("pt-BR");
 
 function CommentsSkeleton() {
   return (
@@ -55,28 +52,13 @@ export function CardComments({
   workspaceId,
   boardId,
   cardId,
-  count,
   comments,
   forms,
 }: CardCommentsProps) {
   const ref = { workspaceId, boardId, cardId };
 
   return (
-    <section
-      aria-labelledby={`${cardId}-comments`}
-      className="@container flex shrink-0 flex-col gap-3"
-    >
-      <h3
-        id={`${cardId}-comments`}
-        className="flex items-baseline gap-1.5 text-sm font-medium"
-      >
-        Comentários
-        {comments.status === "ready" && count > 0 && (
-          <span className="text-[13px] font-normal text-fg-muted">
-            {numberFormat.format(count)}
-          </span>
-        )}
-      </h3>
+    <div className="@container flex flex-col gap-3">
       <CommentComposer cardId={cardId} composer={forms.composer} />
       {comments.status === "loading" && comments.comments.length === 0 && (
         <CommentsSkeleton />
@@ -165,6 +147,6 @@ export function CardComments({
           return DISCARDED;
         }}
       />
-    </section>
+    </div>
   );
 }
