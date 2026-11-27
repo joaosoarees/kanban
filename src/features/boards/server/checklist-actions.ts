@@ -59,6 +59,20 @@ function itemScope(
   };
 }
 
+async function goneResult(
+  ref: { boardId: string; cardId: string },
+  workspaceId: string,
+): Promise<ActionError> {
+  const card = await db.card.findUnique({
+    where: {
+      id: ref.cardId,
+      column: { boardId: ref.boardId, board: { workspaceId } },
+    },
+    select: { id: true },
+  });
+  return card ? CHECKLIST_ITEM_GONE : CARD_GONE;
+}
+
 export async function createChecklistItemAction(
   workspaceId: unknown,
   boardId: unknown,
@@ -141,7 +155,7 @@ export async function updateChecklistItemAction(
   });
 
   revalidateWorkspace(actor.slug);
-  return count === 0 ? CHECKLIST_ITEM_GONE : SUCCESS;
+  return count === 0 ? goneResult(ref, actor.workspaceId) : SUCCESS;
 }
 
 export async function setChecklistItemCompletionAction(
@@ -188,7 +202,7 @@ export async function setChecklistItemCompletionAction(
   `;
 
   revalidateWorkspace(actor.slug);
-  return count === 0 ? CHECKLIST_ITEM_GONE : SUCCESS;
+  return count === 0 ? goneResult(ref, actor.workspaceId) : SUCCESS;
 }
 
 export async function moveChecklistItemAction(
@@ -255,15 +269,22 @@ export async function deleteChecklistItemAction(
   }
 
   const ref = parseCardRef(boardId, cardId);
+  if (!ref) {
+    return CARD_GONE;
+  }
   const itemRef = parseItemId(itemId);
-  if (!ref || itemRef === null) {
+  if (itemRef === null) {
     return SUCCESS;
   }
 
-  await db.checklistItem.deleteMany({
+  const { count } = await db.checklistItem.deleteMany({
     where: itemScope(ref, itemRef, actor.workspaceId),
   });
 
   revalidateWorkspace(actor.slug);
-  return SUCCESS;
+  if (count > 0) {
+    return SUCCESS;
+  }
+  const gone = await goneResult(ref, actor.workspaceId);
+  return gone === CARD_GONE ? CARD_GONE : SUCCESS;
 }
