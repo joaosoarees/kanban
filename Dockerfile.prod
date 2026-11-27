@@ -23,6 +23,21 @@ RUN chown -R node:node /app
 USER node
 CMD ["bunx", "prisma", "migrate", "deploy"]
 
+FROM deps AS migrator
+
+WORKDIR /migrator
+COPY docker/migrator/package.json docker/migrator/bun.lock ./
+RUN bun install --frozen-lockfile --production \
+  && node -e ' \
+    const app = require("/app/node_modules/prisma/package.json").version; \
+    const migrator = require("./node_modules/prisma/package.json").version; \
+    if (app !== migrator) { \
+      console.error(`docker/migrator has prisma ${migrator}, the app has ${app}: update docker/migrator/package.json and its bun.lock`); \
+      process.exit(1); \
+    } \
+  ' \
+  && cp -r /app/prisma7.config.ts /app/prisma ./
+
 FROM deps AS build
 
 COPY . .
@@ -34,12 +49,17 @@ FROM gcr.io/distroless/nodejs24-debian13:nonroot AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
   NEXT_TELEMETRY_DISABLED=1 \
+  CHECKPOINT_DISABLE=1 \
   HOSTNAME=0.0.0.0 \
   PORT=3000
 
 COPY --from=build --chown=nonroot:nonroot /app/.next/standalone ./
 COPY --from=build --chown=nonroot:nonroot /app/.next/static ./.next/static
 COPY --from=build --chown=nonroot:nonroot /app/public ./public
+COPY --from=migrator --chown=nonroot:nonroot /migrator ./migrator
+COPY --chown=nonroot:nonroot docker/start.mts ./start.mts
 
 EXPOSE 3000
-CMD ["server.js"]
+HEALTHCHECK --interval=10s --timeout=5s --retries=30 --start-period=5s --start-interval=1s \
+  CMD ["/nodejs/bin/node", "-e", "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+CMD ["start.mts"]

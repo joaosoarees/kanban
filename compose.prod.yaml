@@ -1,7 +1,7 @@
-x-database-url: &database-url postgresql://kanban:${SERVICE_PASSWORD_POSTGRES}@postgres:5432/kanban?schema=public
+x-database-url: &database-url postgresql://kanban:${SERVICE_PASSWORD_POSTGRES}@kanban-postgres:5432/kanban?schema=public
 
 services:
-  postgres:
+  kanban-postgres:
     image: postgres:18
     restart: unless-stopped
     mem_limit: 1g
@@ -29,7 +29,7 @@ services:
     environment:
       DATABASE_URL: *database-url
     depends_on:
-      postgres:
+      kanban-postgres:
         condition: service_healthy
 
   app:
@@ -65,7 +65,7 @@ services:
       - traefik.http.routers.kanban-auth.service=kanban-auth
       - traefik.http.services.kanban-auth.loadbalancer.server.port=3000
     depends_on:
-      postgres:
+      kanban-postgres:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
@@ -85,7 +85,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     environment:
-      PGHOST: postgres
+      PGHOST: kanban-postgres
       PGUSER: kanban
       PGDATABASE: kanban
       PGPASSWORD: ${SERVICE_PASSWORD_POSTGRES}
@@ -103,7 +103,7 @@ services:
     volumes:
       - dumps:/dumps
     depends_on:
-      postgres:
+      kanban-postgres:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
