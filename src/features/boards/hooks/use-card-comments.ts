@@ -6,7 +6,7 @@ import { newestFirst, withPage } from "@/features/boards/lib/comment-list";
 import type {
   CardComment,
   CommentPage,
-} from "@/features/boards/server/comment-queries";
+} from "@/features/boards/lib/card-comment";
 
 const commentSchema = z.object({
   id: z.string(),
