@@ -13,7 +13,7 @@ export default function BoardError({
   error,
   retry,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   retry: () => void;
 }) {
   const { slug } = useParams<{ slug: string }>();

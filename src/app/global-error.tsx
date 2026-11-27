@@ -7,7 +7,7 @@ export default function GlobalError({
   error,
   retry,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   retry: () => void;
 }) {
   useEffect(() => {

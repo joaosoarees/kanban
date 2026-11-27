@@ -11,7 +11,7 @@ export default function AppError({
   error,
   retry,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   retry: () => void;
 }) {
   useEffect(() => {
