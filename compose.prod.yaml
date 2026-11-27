@@ -11,6 +11,9 @@ services:
       POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
     volumes:
       - pgdata:/var/lib/postgresql
+    networks:
+      - default
+      - coolify
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U kanban -d kanban"]
       interval: 5s
@@ -137,6 +140,10 @@ services:
       interval: 60s
       timeout: 5s
       retries: 3
+
+networks:
+  coolify:
+    external: true
 
 volumes:
   pgdata:
