@@ -12,9 +12,11 @@ const decoyHash = hash(randomBytes(32).toString("hex"), COST);
 
 export async function verifyPassword(
   password: string,
-  passwordHash?: string,
+  passwordHash: string | null,
 ): Promise<boolean> {
-  const matches = await compare(password, passwordHash ?? (await decoyHash));
-
-  return matches && passwordHash !== undefined && !truncates(password);
+  if (passwordHash === null || truncates(password)) {
+    await compare(password, await decoyHash);
+    return false;
+  }
+  return compare(password, passwordHash);
 }
