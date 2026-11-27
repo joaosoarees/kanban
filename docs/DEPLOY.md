@@ -67,9 +67,19 @@ O roteador `kanban-auth` aplica esse limite só a `POST` em `/sign-in`, `/sign-u
 
 ## Migrations longas
 
-O contêiner do app roda `prisma migrate deploy` ao iniciar, antes do servidor, e o `HEALTHCHECK` da imagem dá a ele até 300 s para ficar saudável. Uma migration que passe disso faz o contêiner ser dado como doente no meio dela; se o Coolify o parar, a migration fica pela metade, marcada como falha, e os deploys seguintes param com `P3018` até alguém resolvê-la com `prisma migrate resolve`.
+O contêiner do app roda `prisma migrate deploy` ao iniciar, antes do servidor. O `HEALTHCHECK` da imagem (início em 5 s, 30 tentativas a cada 10 s) dá a ele cerca de 5 minutos para ficar saudável; o Coolify lê esses valores do Dockerfile e espera o mesmo tempo. O `start-period` fica curto de propósito: o Coolify espera o `start-period` inteiro antes da primeira checagem, então um valor longo atrasaria todo deploy. Uma migration que passe de 5 minutos faz o contêiner ser dado como doente no meio dela; o Coolify o para, a migration fica pela metade, marcada como falha, e os deploys seguintes param com `P3018` até alguém resolvê-la com `prisma migrate resolve`.
 
-Uma migration que possa passar de alguns minutos (um índice numa tabela grande, um backfill) roda à mão antes do deploy, com `prisma migrate deploy` contra o banco de produção; o deploy depois só encontra "No pending migrations".
+Uma migration que possa passar de alguns minutos (um índice numa tabela grande, um backfill) roda à mão antes do merge, na VPS, a partir do commit do PR:
+
+```sh
+docker build -f Dockerfile.prod --target migrator -t kanban-migrate "<url do repositório>.git#<branch do PR>"
+docker run --rm --network <rede do Coolify> -w /migrator \
+  -e DATABASE_URL="postgresql://kanban:<senha>@<host do postgres>:5432/kanban" \
+  kanban-migrate node node_modules/prisma/build/index.js migrate deploy
+docker image rm kanban-migrate
+```
+
+A senha é a `SERVICE_PASSWORD_POSTGRES` do recurso do banco, e o host e a rede são os mesmos do `DATABASE_URL` da Application. Depois do merge, o deploy só encontra "No pending migrations".
 
 ## Rollback
 
