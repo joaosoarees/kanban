@@ -10,6 +10,7 @@ declare module "vitest" {
     expect,
     it,
     mock,
+    setSystemTime,
     spyOn,
     test,
     vi,
