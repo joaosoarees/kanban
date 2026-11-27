@@ -23,7 +23,7 @@ Projeto de estudo para treinar as skills. Roda local em Docker Compose e em prod
 ## Erros
 
 1. Erros esperados (validação, permissão, conflito): a action retorna `{ status: "error", message }`, sem lançar exceção.
-2. Recurso inexistente ou sem acesso: `notFound()` (404, não 403).
+2. Recurso inexistente ou sem acesso: `notFound()` nas páginas (404, não 403); nas actions, o erro `FORBIDDEN`.
 3. Erros inesperados: `error.tsx` em níveis (`global-error`, área logada, workspace, board).
 
 Entra a partir da fatia 3; cada fatia nova ganha seu `error.tsx` e `loading.tsx` quando fizer sentido.
@@ -32,7 +32,7 @@ Entra a partir da fatia 3; cada fatia nova ganha seu `error.tsx` e `loading.tsx`
 
 - Workspace → Board → Coluna → Card. O card tem título, descrição, responsável e etiquetas.
 - Papéis fixos no código: OWNER, ADMIN, MEMBER.
-- Membros entram quando um admin adiciona um usuário já cadastrado pelo e-mail. Como a resposta revela se o e-mail tem conta, a action fica sob rate limit; convites com aceite ficam para uma fatia futura.
+- Membros entram por convite com aceite (fatia 15). Todos os papéis veem a lista de membros; convidar e gerenciar convites é de OWNER e ADMIN.
 
 ```
 User (id, name, email @unique, passwordHash)
@@ -66,7 +66,7 @@ Deletes em cascata de Workspace até Card.
 - Ambiente local em Docker Compose: Postgres e app, com o bun só dentro do container.
 - Hooks nativos do git em `.husky`, executados no container: lint-staged e typecheck (`bun check`) no pre-commit, commitlint (Conventional Commits em inglês) no commit-msg.
 - CI no GitHub Actions: lint, format, typecheck, test, build. Branch protection na `main`.
-- Testes: só o teste unitário da lógica de posição. Sem mocks e sem testes de componente.
+- Testes unitários para toda lógica pura não trivial (posição, filtros, schemas, permissões). Sem mocks e sem testes de componente.
 
 ## Deploy
 
@@ -74,7 +74,7 @@ Deletes em cascata de Workspace até Card.
 - Deploy automático na `main`: o job `deploy` do CI roda depois do `check` e chama a API do Coolify com um token só de `deploy`. Auto-deploy por webhook e previews de PR ficam desligados.
 - Imagem de produção com `output: "standalone"`, build com Bun e runtime Node distroless, sem root.
 - Postgres no mesmo compose, sem porta publicada. Migrations num serviço `migrate` que roda antes do `app`; elas são sempre compatíveis com a versão anterior do código.
-- Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura no repositório.
+- Segredos gerados pelo Coolify e só de runtime; nenhum segredo ou endereço de infraestrutura (IP, domínio, URL de painel ou de API) no repositório. Região, rótulos do Traefik e nomes de variáveis do Coolify não são segredo nem endereço.
 - Backup: `pg_dump` a cada hora e envio diário ao S3 com 7 dias de retenção.
 - Rate limit no Traefik para o `POST` das telas de entrada e de conta (ver as fatias 13 e 15).
 - Rollback por `git revert` em PR.
