@@ -70,7 +70,10 @@ function useResendCode({
 
 type ResendProps = Omit<ResendOptions, "onNotice">;
 
-export function ResendCode(props: ResendProps) {
+export function ResendCode({
+  disabled = false,
+  ...props
+}: ResendProps & { disabled?: boolean }) {
   const [notice, setNotice] = useState<Notice | null>(null);
   const { wait, isPending, resend } = useResendCode({
     ...props,
@@ -89,8 +92,9 @@ export function ResendCode(props: ResendProps) {
           ) : (
             <button
               type="button"
+              disabled={disabled}
               onClick={resend}
-              className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="cursor-pointer rounded-sm font-medium text-brand-fg underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:no-underline"
             >
               Reenviar código
             </button>
