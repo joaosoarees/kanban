@@ -1,5 +1,3 @@
-x-database-url: &database-url postgresql://kanban:${SERVICE_PASSWORD_POSTGRES}@kanban-postgres:5432/kanban?schema=public
-
 services:
   kanban-postgres:
     image: postgres:18
@@ -20,68 +18,6 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-      start_interval: 1s
-
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-      target: migrate
-    restart: "no"
-    exclude_from_hc: true
-    environment:
-      DATABASE_URL: *database-url
-    depends_on:
-      kanban-postgres:
-        condition: service_healthy
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-      target: runner
-    restart: unless-stopped
-    mem_limit: 1g
-    read_only: true
-    tmpfs:
-      - /app/.next/cache:uid=65532,gid=65532
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      DATABASE_URL: *database-url
-      SESSION_SECRET: ${SERVICE_BASE64_64_SESSION}
-      EMAIL_CODE_SECRET: ${SERVICE_BASE64_64_EMAILCODE}
-      MAIL_FROM: ${MAIL_FROM:?}
-      APP_URL: ${SERVICE_URL_APP}
-      AWS_REGION: sa-east-1
-      AWS_ACCESS_KEY_ID: ${MAIL_AWS_ACCESS_KEY_ID:?}
-      AWS_SECRET_ACCESS_KEY: ${MAIL_AWS_SECRET_ACCESS_KEY:?}
-    labels:
-      - traefik.http.routers.kanban-auth.rule=Host(`${SERVICE_FQDN_APP}`) && Method(`POST`) && (Path(`/sign-in`) || Path(`/sign-up`) || Path(`/verify-email`) || Path(`/forgot-password`) || Path(`/reset-password`) || Path(`/invite`) || Path(`/account`))
-      - traefik.http.routers.kanban-auth.priority=1000
-      - traefik.http.routers.kanban-auth.entrypoints=https
-      - traefik.http.routers.kanban-auth.tls=true
-      - traefik.http.routers.kanban-auth.tls.certresolver=letsencrypt
-      - traefik.http.routers.kanban-auth.middlewares=kanban-auth-ratelimit@file
-      - traefik.http.routers.kanban-auth.service=kanban-auth
-      - traefik.http.services.kanban-auth.loadbalancer.server.port=3000
-    depends_on:
-      kanban-postgres:
-        condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
-    healthcheck:
-      test:
-        - CMD
-        - /nodejs/bin/node
-        - -e
-        - "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
       start_interval: 1s
 
   db-dump:
@@ -108,8 +44,6 @@ services:
     depends_on:
       kanban-postgres:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "find /dumps/kanban.dump -mmin -130 | grep -q ."]
       interval: 30s

@@ -17,12 +17,6 @@ COPY prisma ./prisma
 RUN bun install --frozen-lockfile --ignore-scripts \
   && bunx prisma generate
 
-FROM deps AS migrate
-
-RUN chown -R node:node /app
-USER node
-CMD ["bunx", "prisma", "migrate", "deploy"]
-
 FROM deps AS migrator
 
 WORKDIR /migrator
