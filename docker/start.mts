@@ -21,4 +21,11 @@ if (migration.status !== 0) {
   process.exit(migration.status ?? 1);
 }
 
+const drainMilliseconds = 5000;
+
+process.on("SIGTERM", () => {
+  process.env.SHUTTING_DOWN = "true";
+  setTimeout(() => process.exit(0), drainMilliseconds);
+});
+
 await import(join(import.meta.dirname, "server.js"));
