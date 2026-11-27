@@ -26,6 +26,7 @@ import type { CardDescriptionState } from "@/features/boards/hooks/use-card-desc
 import type { ChecklistFormsState } from "@/features/boards/hooks/use-checklist-forms";
 import type { CommentFormsState } from "@/features/boards/hooks/use-comment-forms";
 import { deleteCardAction } from "@/features/boards/server/card-actions";
+import { cn } from "@/lib/utils";
 
 type CardDialogBodyProps = {
   workspaceId: string;
@@ -63,6 +64,35 @@ export function CardDialogBody({
   onUpdateCard,
 }: CardDialogBodyProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const footerOf = (visibility: string) => (
+    <div className={cn("flex-col gap-4", visibility)}>
+      <Separator />
+      <div className="flex items-center justify-between gap-2">
+        <Button
+          variant="outline"
+          disabled={description.isSaving}
+          onClick={() => {
+            setIsDeleting(true);
+          }}
+          className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
+        >
+          Excluir card
+        </Button>
+        {description.isEditing ? (
+          <CardDescriptionActions state={description} />
+        ) : (
+          <CardMoveMenu
+            cardId={card.id}
+            column={column}
+            index={index}
+            columns={columns}
+            canReorder={canReorder}
+            onMove={onMoveCard}
+          />
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -114,35 +144,10 @@ export function CardDialogBody({
             forms={checklistForms}
           />
 
-          <Separator className="order-2 lg:order-none" />
-
-          <div className="order-2 flex items-center justify-between gap-2 lg:order-none">
-            <Button
-              variant="outline"
-              disabled={description.isSaving}
-              onClick={() => {
-                setIsDeleting(true);
-              }}
-              className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
-            >
-              Excluir card
-            </Button>
-            {description.isEditing ? (
-              <CardDescriptionActions state={description} />
-            ) : (
-              <CardMoveMenu
-                cardId={card.id}
-                column={column}
-                index={index}
-                columns={columns}
-                canReorder={canReorder}
-                onMove={onMoveCard}
-              />
-            )}
-          </div>
+          {footerOf("hidden lg:flex")}
         </div>
 
-        <div className="order-1 lg:order-none lg:min-h-0 lg:overflow-y-auto lg:border-l lg:px-5 lg:pt-4 lg:pb-5">
+        <div className="lg:min-h-0 lg:overflow-y-auto lg:border-l lg:px-5 lg:pt-4 lg:pb-5">
           <CardComments
             workspaceId={workspaceId}
             boardId={boardId}
@@ -152,6 +157,8 @@ export function CardDialogBody({
             forms={commentForms}
           />
         </div>
+
+        {footerOf("flex lg:hidden")}
       </div>
 
       <ConfirmDialog
