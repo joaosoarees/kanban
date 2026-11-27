@@ -59,6 +59,6 @@ COPY --from=migrator --chown=nonroot:nonroot /migrator ./migrator
 COPY --chown=nonroot:nonroot docker/start.mts ./start.mts
 
 EXPOSE 3000
-HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=60s --start-interval=1s \
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=300s --start-interval=1s \
   CMD ["/nodejs/bin/node", "-e", "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
 CMD ["start.mts"]

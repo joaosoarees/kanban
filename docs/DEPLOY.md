@@ -65,6 +65,12 @@ http:
 
 O roteador `kanban-auth` aplica esse limite só a `POST` em `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password` e `/reset-password`. As Server Actions das telas de entrada fazem `POST` no caminho da própria página, então o limite cobre login, cadastro, confirmação de e-mail, redefinição de senha e os reenvios de código.
 
+## Migrations longas
+
+O contêiner do app roda `prisma migrate deploy` ao iniciar, antes do servidor, e o `HEALTHCHECK` da imagem dá a ele até 300 s para ficar saudável. Uma migration que passe disso faz o contêiner ser dado como doente no meio dela; se o Coolify o parar, a migration fica pela metade, marcada como falha, e os deploys seguintes param com `P3018` até alguém resolvê-la com `prisma migrate resolve`.
+
+Uma migration que possa passar de alguns minutos (um índice numa tabela grande, um backfill) roda à mão antes do deploy, com `prisma migrate deploy` contra o banco de produção; o deploy depois só encontra "No pending migrations".
+
 ## Rollback
 
 Reverter o commit com `git revert` num PR. O merge dispara um deploy novo. As migrations são sempre compatíveis com a versão anterior do código (expand/contract), então voltar o código nunca exige desfazer o banco.
