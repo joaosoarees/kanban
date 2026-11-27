@@ -110,8 +110,8 @@ export async function signInAction(input: unknown): Promise<ActionResult> {
 }
 
 export async function signOutAction(): Promise<ActionResult> {
-  await endSession();
   await forgetInvite();
+  await endSession();
   return { status: "success", data: undefined };
 }
 
