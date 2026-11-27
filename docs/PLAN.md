@@ -265,7 +265,14 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 - Hoje o Coolify publica o `compose.prod.yaml` inteiro e, a cada deploy, para todos os contêineres antes de subir os novos: o app fica fora enquanto o Postgres reinicia, o `migrate` roda e o app novo passa no healthcheck.
 - O app sai do compose e vira um Application de Dockerfile no Coolify, com rolling update: o contêiner novo sobe, passa no healthcheck e só então o antigo sai. Postgres, `db-dump` e backup ficam no compose e deixam de reiniciar a cada deploy.
 - O `migrate` roda antes do app novo, com o antigo ainda no ar. Isso já é a regra deste plano: migrations sempre compatíveis com a versão anterior do código.
-- A conferir antes de começar: em que contêiner o Coolify roda o comando de pré-deploy, como o app alcança o Postgres de outro recurso pela rede, e como ficam os labels de rate limit do Traefik e o job `deploy` do CI.
+- Pronto quando `scripts/watch-health.mjs` (consulta `/api/health` a cada 0,5 s, URL por argumento) contar zero falhas em dois deploys seguidos, um deles com a migration `slow_migration_probe` (`SELECT pg_sleep(20);`), que segura o contêiner novo sem mudar o schema.
+- O banco fica no recurso compose atual, para manter o volume `pgdata`; o app é um recurso novo. A imagem continua sendo construída na VPS.
+- O comando de pré-deploy do Coolify roda com `sh` dentro do contêiner antigo, antes do build; no runner distroless não há `sh` nem o CLI do Prisma. Por isso o contêiner novo roda o `migrate` ao iniciar, num `start.mjs`, e só depois sobe o `server.js`. Se a migration falha, ele nunca fica saudável e o antigo continua no ar.
+- O healthcheck é um `HEALTHCHECK` em forma exec no `Dockerfile.prod`, com o da interface do Coolify desligado: o do Coolify roda `curl` ou `wget` dentro do contêiner, que o distroless não tem, e sem healthcheck nenhum o Coolify dá o novo por saudável na hora.
+- No desligamento, o Coolify espera 5 s com o tráfego já no contêiner novo e manda SIGTERM ao antigo, que o Next trata. Um desligamento próprio, com `NEXT_MANUAL_SIG_HANDLE`, só entra se a medição acusar falhas.
+- O app alcança o banco pela rede predefinida ligada no recurso do banco; o host `postgres-<uuid>` fica numa variável do Coolify. Os labels do Traefik, do roteador principal e do `kanban-auth`, ficam completos na Application, porque labels próprios substituem os gerados.
+- O CI publica só a Application. O recurso do banco é republicado à mão, só quando o compose dele muda: o Coolify recria todos os contêineres do compose a cada deploy, Postgres incluído.
+- A virada, com duas janelas curtas avisadas antes: o PR 1 leva a imagem nova, que funciona nos dois modelos; liga-se a rede predefinida no banco e republica-se (janela 1); a Application sobe num subdomínio temporário e é medida; o domínio e o `COOLIFY_APP_UUID` passam para ela; o PR 2 tira o `app` e o `migrate` do compose; o banco é republicado (janela 2).
 - Skills: `ci-cd-pipeline-fundamentals`, `github-actions-ci-workflow`, `prisma-schema-and-migrations` (`migrate deploy`).
 
 ## Processo
