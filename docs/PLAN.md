@@ -175,7 +175,7 @@ As leituras usam a chave primária de `email_codes` e o `email` único de `users
 ### Convites com aceite (fatia 15)
 
 - O convite substitui o "adicionar pelo e-mail". OWNER e ADMIN convidam com o papel MEMBER ou ADMIN, nunca OWNER. A resposta é sempre "Convite enviado para x", com ou sem conta, e o rate limit de enumeração do adicionar sai junto. A única recusa é para quem já é membro ("Esta pessoa já faz parte do workspace"), que quem convida já vê na lista.
-- O link `/invite/<token>` leva um token de 32 bytes aleatórios. O banco guarda só o SHA-256: com essa entropia, um hash rápido basta. O convite vale por 7 dias e uma vez só.
+- O link `/invite#<token>` leva um token de 32 bytes aleatórios no fragmento, que o navegador não manda ao servidor; a página o envia no corpo de uma Server Action, então ele fica fora dos logs de acesso. O banco guarda só o SHA-256: com essa entropia, um hash rápido basta. O convite vale por 7 dias e uma vez só.
 - Aceitar exige estar logado com o e-mail convidado, já verificado. Com outra conta aberta, a tela diz "Este convite é para outro e-mail" e oferece trocar de conta.
 - Sem sessão, a página mostra o workspace e quem convidou, com "Entrar" e "Criar conta"; o cadastro vem com o e-mail preenchido e travado. O token fica num cookie `pending_invite` (JWT com `aud` próprio e a validade do convite), e o aceite acontece depois do login ou da verificação do e-mail, levando ao workspace.
 - Token errado, vencido ou revogado caem na mesma tela: "Este convite não vale mais. Peça um novo a quem convidou."
