@@ -124,7 +124,7 @@ export function CardDialog({
     >
       <DialogContent
         showCloseButton={false}
-        className="top-3 flex max-h-[calc(100svh-1.5rem)] translate-y-0 flex-col gap-4 overflow-y-auto p-5 sm:top-[88px] sm:max-h-[calc(100svh-7rem)] sm:max-w-[600px]"
+        className="top-3 flex max-h-[calc(100svh-1.5rem)] translate-y-0 flex-col gap-4 overflow-y-auto p-5 sm:top-[88px] sm:max-h-[calc(100svh-7rem)] sm:max-w-[600px] lg:max-w-[960px] lg:gap-0 lg:overflow-hidden lg:p-0"
       >
         <CardDialogBody
           key={card.id}

@@ -59,7 +59,7 @@ export function CardDialogBody({
 
   return (
     <>
-      <div className="flex items-start gap-2">
+      <div className="flex items-start gap-2 lg:px-5 lg:pt-5 lg:pb-4">
         <div className="min-w-0 flex-1">
           <div className="-mx-1.5">
             <CardTitle
@@ -87,50 +87,56 @@ export function CardDialogBody({
         </DialogClose>
       </div>
 
-      <CardProperties
-        workspaceId={workspaceId}
-        boardId={boardId}
-        card={card}
-        columns={columns}
-        onUpdateCard={onUpdateCard}
-      />
-
-      <CardDescription cardId={card.id} state={description} />
-
-      <CardComments
-        workspaceId={workspaceId}
-        boardId={boardId}
-        cardId={card.id}
-        count={card.commentCount}
-        comments={comments}
-        forms={commentForms}
-      />
-
-      <Separator />
-
-      <div className="flex items-center justify-between gap-2">
-        <Button
-          variant="outline"
-          disabled={description.isSaving}
-          onClick={() => {
-            setIsDeleting(true);
-          }}
-          className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
-        >
-          Excluir card
-        </Button>
-        {description.isEditing ? (
-          <CardDescriptionActions state={description} />
-        ) : (
-          <CardMoveMenu
-            cardId={card.id}
-            column={column}
-            index={index}
+      <div className="flex flex-col gap-4 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_360px] lg:grid-rows-[minmax(0,1fr)] lg:gap-0 lg:border-t">
+        <div className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-4 lg:overflow-y-auto lg:px-5 lg:pt-4 lg:pb-5">
+          <CardProperties
+            workspaceId={workspaceId}
+            boardId={boardId}
+            card={card}
             columns={columns}
-            canReorder={canReorder}
-            onMove={onMoveCard}
+            onUpdateCard={onUpdateCard}
           />
-        )}
+
+          <CardDescription cardId={card.id} state={description} />
+
+          <Separator className="order-2 lg:order-none" />
+
+          <div className="order-2 flex items-center justify-between gap-2 lg:order-none">
+            <Button
+              variant="outline"
+              disabled={description.isSaving}
+              onClick={() => {
+                setIsDeleting(true);
+              }}
+              className="h-11 border-danger-border px-3.5 text-danger-text hover:bg-danger-bg hover:text-danger-text sm:h-9"
+            >
+              Excluir card
+            </Button>
+            {description.isEditing ? (
+              <CardDescriptionActions state={description} />
+            ) : (
+              <CardMoveMenu
+                cardId={card.id}
+                column={column}
+                index={index}
+                columns={columns}
+                canReorder={canReorder}
+                onMove={onMoveCard}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="order-1 lg:order-none lg:min-h-0 lg:overflow-y-auto lg:border-l lg:px-5 lg:pt-4 lg:pb-5">
+          <CardComments
+            workspaceId={workspaceId}
+            boardId={boardId}
+            cardId={card.id}
+            count={card.commentCount}
+            comments={comments}
+            forms={commentForms}
+          />
+        </div>
       </div>
 
       <ConfirmDialog
