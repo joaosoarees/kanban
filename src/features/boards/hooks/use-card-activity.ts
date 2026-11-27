@@ -5,11 +5,13 @@ import * as z from "zod";
 import {
   cardActivitySchema,
   mergeActivities,
+  refreshActivities,
   type ActivityPage,
-  type CardActivity,
 } from "@/features/boards/lib/card-activity";
 
 const REFRESH_DELAY_MS = 800;
+
+const EMPTY_PAGE: ActivityPage = { activities: [], nextCursor: null };
 
 const activitySchema = cardActivitySchema.and(
   z.object({ id: z.string(), createdAt: z.string(), byViewer: z.boolean() }),
@@ -64,17 +66,23 @@ export function useCardActivity({
 }: UseCardActivityOptions) {
   const url = `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/activity`;
   const [status, setStatus] = useState<ListStatus>("idle");
-  const [activities, setActivities] = useState<CardActivity[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [list, setList] = useState(EMPTY_PAGE);
   const [older, setOlder] = useState<OlderStatus>("idle");
-  const [loadedVersion, setLoadedVersion] = useState(version);
+  const [seenVersion, setSeenVersion] = useState(version);
+  const [changes, setChanges] = useState(0);
+  const [loadedChanges, setLoadedChanges] = useState(0);
+
+  if (version !== seenVersion) {
+    setSeenVersion(version);
+    setChanges((count) => count + 1);
+  }
 
   if (isOpen && status === "idle") {
     setStatus("loading");
   }
 
   const isLoading = status === "loading";
-  const isStale = status === "ready" && loadedVersion !== version;
+  const isStale = status === "ready" && loadedChanges !== changes;
 
   useEffect(() => {
     let ignore = false;
@@ -87,9 +95,8 @@ export function useCardActivity({
         setStatus("failed");
         return;
       }
-      setActivities(page.activities);
-      setNextCursor(page.nextCursor);
-      setLoadedVersion(version);
+      setList(page);
+      setLoadedChanges(changes);
       setStatus("ready");
     };
     if (isLoading) {
@@ -98,7 +105,7 @@ export function useCardActivity({
     return () => {
       ignore = true;
     };
-  }, [url, isLoading, version]);
+  }, [url, isLoading, changes]);
 
   useEffect(() => {
     let ignore = false;
@@ -107,10 +114,11 @@ export function useCardActivity({
       if (ignore) {
         return;
       }
-      if (page !== null) {
-        setActivities((current) => mergeActivities(current, page.activities));
+      if (page === null) {
+        return;
       }
-      setLoadedVersion(version);
+      setList((current) => refreshActivities(current, page));
+      setLoadedChanges(changes);
     };
     const timer =
       isOpen && isStale
@@ -120,28 +128,30 @@ export function useCardActivity({
       ignore = true;
       clearTimeout(timer);
     };
-  }, [url, isOpen, isStale, version]);
+  }, [url, isOpen, isStale, changes]);
 
   return {
     status,
-    activities,
-    hasOlder: nextCursor !== null,
+    activities: list.activities,
+    hasOlder: list.nextCursor !== null,
     older,
     retry: () => {
       setStatus("loading");
     },
     loadOlder: async () => {
-      if (nextCursor === null || older === "loading") {
+      if (list.nextCursor === null || older === "loading") {
         return;
       }
       setOlder("loading");
-      const page = await fetchActivityPage(url, nextCursor);
+      const page = await fetchActivityPage(url, list.nextCursor);
       if (page === null) {
         setOlder("failed");
         return;
       }
-      setActivities((current) => mergeActivities(current, page.activities));
-      setNextCursor(page.nextCursor);
+      setList((current) => ({
+        activities: mergeActivities(current.activities, page.activities),
+        nextCursor: page.nextCursor,
+      }));
       setOlder("idle");
     },
   };

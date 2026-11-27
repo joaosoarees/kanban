@@ -88,3 +88,23 @@ export function mergeActivities(current: CardActivity[], page: CardActivity[]) {
   );
   return [...byId.values()].toSorted((a, b) => (a.id < b.id ? 1 : -1));
 }
+
+export function refreshActivities(
+  current: ActivityPage,
+  fresh: ActivityPage,
+): ActivityPage {
+  const newestLoaded = current.activities.at(0);
+  const oldestFresh = fresh.activities.at(-1);
+  const leavesGap =
+    fresh.nextCursor !== null &&
+    oldestFresh !== undefined &&
+    newestLoaded !== undefined &&
+    oldestFresh.id > newestLoaded.id;
+  if (newestLoaded === undefined || leavesGap) {
+    return fresh;
+  }
+  return {
+    activities: mergeActivities(current.activities, fresh.activities),
+    nextCursor: current.nextCursor,
+  };
+}
