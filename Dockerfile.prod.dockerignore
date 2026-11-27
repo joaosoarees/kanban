@@ -11,3 +11,5 @@
 !src
 src/generated
 !docker/start.mts
+!docker/migrator/package.json
+!docker/migrator/bun.lock

@@ -26,16 +26,16 @@ CMD ["bunx", "prisma", "migrate", "deploy"]
 FROM deps AS migrator
 
 WORKDIR /migrator
-RUN node -e ' \
-    const version = (name) => require(`/app/node_modules/${name}/package.json`).version; \
-    const manifest = { \
-      private: true, \
-      dependencies: { prisma: version("prisma"), dotenv: version("dotenv") }, \
-      trustedDependencies: ["prisma", "@prisma/engines"], \
-    }; \
-    require("fs").writeFileSync("package.json", JSON.stringify(manifest)); \
+COPY docker/migrator/package.json docker/migrator/bun.lock ./
+RUN bun install --frozen-lockfile --production \
+  && node -e ' \
+    const app = require("/app/node_modules/prisma/package.json").version; \
+    const migrator = require("./node_modules/prisma/package.json").version; \
+    if (app !== migrator) { \
+      console.error(`docker/migrator has prisma ${migrator}, the app has ${app}: update docker/migrator/package.json and its bun.lock`); \
+      process.exit(1); \
+    } \
   ' \
-  && bun install --production \
   && cp -r /app/prisma7.config.ts /app/prisma ./
 
 FROM deps AS build
