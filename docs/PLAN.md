@@ -284,7 +284,7 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 - O item tem texto puro de até 200 caracteres, posição e `completedAt`. Concluir um item não conclui o card, e concluir o card não mexe nos itens.
 - Até 50 itens por card, contados sob o lock do card: nenhuma constraint conta linhas, e sem o lock duas requisições juntas passariam do limite.
 - Qualquer membro cria, edita, marca, reordena e exclui itens. Criar e editar o texto vão pelo `useActionForm` e aparecem quando a action termina, sem ser otimistas, para o texto não sumir numa falha, como nos comentários. Marcar, reordenar e excluir chamam `runAction` e salvam na hora, de forma otimista e idempotente, como as etiquetas. A posição usa a mesma chave de ordenação dos cards, com `COLLATE "C"` na migration.
-- O card no quadro mostra "3/5" quando tem itens, sem coluna de contador: a tabela é pequena, e um contador cobraria em toda escrita. O total vem do `_count` na consulta do quadro; os concluídos, de um `groupBy` por `cardId` com `completedAt` preenchido, porque o `_count` conta cada relação uma vez só.
+- O card no quadro mostra "3/5" quando tem itens, sem coluna de contador: a tabela é pequena, e um contador cobraria em toda escrita. A consulta do quadro, que já é SQL, conta o total e os concluídos numa subconsulta `LATERAL` por card, com `count(*) FILTER (WHERE "completedAt" IS NOT NULL)`.
 - Skills: `modeling-entity-relationships` (1:N com cascata, limite entre linhas sob lock), `precomputed-counters` (por que não ter contador), `prisma-schema-and-migrations`, `react-query-optimistic-updates`, `motion-reorder`, `craft`.
 
 ```
