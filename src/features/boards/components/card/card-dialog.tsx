@@ -95,10 +95,12 @@ export function CardDialog({
     comments,
   });
 
-  const isDirty =
-    description.isDirty ||
-    checklistForms.isDirty ||
-    commentForms.unsaved !== null;
+  const unsavedCount = [
+    description.isDirty,
+    checklistForms.isDirty,
+    commentForms.unsaved !== null,
+  ].filter(Boolean).length;
+  const isDirty = unsavedCount > 0;
   const isLeaving = cardId !== null && requestedId !== cardId && isDirty;
 
   if (requestedId !== shownId && !isLeaving) {
@@ -188,15 +190,17 @@ export function CardDialog({
           }}
           title="Descartar as alterações?"
           description={
-            description.isDirty
-              ? "A descrição editada ainda não foi salva e será perdida."
-              : checklistForms.isDirty
-                ? "O item do checklist ainda não foi salvo e será perdido."
-                : commentForms.unsaved === "both"
-                  ? "Há comentários escritos ou editados que ainda não foram salvos e serão perdidos."
-                  : commentForms.unsaved === "edit"
-                    ? "A edição do comentário ainda não foi salva e será perdida."
-                    : "O comentário escrito ainda não foi enviado e será perdido."
+            unsavedCount > 1
+              ? "Há alterações no card que ainda não foram salvas e serão perdidas."
+              : description.isDirty
+                ? "A descrição editada ainda não foi salva e será perdida."
+                : checklistForms.isDirty
+                  ? "O item do checklist ainda não foi salvo e será perdido."
+                  : commentForms.unsaved === "both"
+                    ? "Há comentários escritos ou editados que ainda não foram salvos e serão perdidos."
+                    : commentForms.unsaved === "edit"
+                      ? "A edição do comentário ainda não foi salva e será perdida."
+                      : "O comentário escrito ainda não foi enviado e será perdido."
           }
           confirmLabel="Descartar"
           pendingLabel="Descartando…"
