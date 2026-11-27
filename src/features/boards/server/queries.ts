@@ -32,7 +32,7 @@ export const requireBoard = cache(
       notFound();
     }
 
-    const board = await db.board.findFirst({
+    const board = await db.board.findUnique({
       where: { id: id.data, workspaceId },
       select: {
         id: true,
@@ -110,7 +110,7 @@ export async function getCardDescription(
     return null;
   }
 
-  return db.card.findFirst({
+  return db.card.findUnique({
     where: {
       id: ref.data.cardId,
       column: { boardId: ref.data.boardId, board: { workspaceId } },

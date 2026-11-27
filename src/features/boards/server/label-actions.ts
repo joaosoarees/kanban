@@ -221,7 +221,7 @@ export async function addCardLabelAction(
       return null;
     }
 
-    const card = await tx.card.findFirst({
+    const card = await tx.card.findUnique({
       where: { id: cardRef, column: { boardId: lockedBoardId } },
       select: {
         labels: { where: { labelId: labelRef }, select: { labelId: true } },
@@ -234,7 +234,7 @@ export async function addCardLabelAction(
       return null;
     }
 
-    const label = await tx.label.findFirst({
+    const label = await tx.label.findUnique({
       where: { id: labelRef, boardId: lockedBoardId },
       select: { id: true },
     });
