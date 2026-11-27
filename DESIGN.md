@@ -124,7 +124,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-25 — A senha nova avisa que as outras sessões serão encerradas — explica por que outro aparelho pede login de novo.
 - 2026-11-25 — Texto tem no mínimo 13px; só etiquetas e contadores podem ter 12px — a referência pede evitar texto pequeno, e etiquetas e contadores precisam caber no card e na coluna.
 - 2026-11-25 — Sem preferência de densidade por enquanto — quadros de times pequenos têm poucos cards, e um modo compacto dobraria as versões do card nos dois temas.
-- 2026-11-26 — Telas de convite desenhadas no canvas da fatia 15 (https://claude.ai/artifact/E894WS7A1kDnbWz6WUePhz, pranchas 15.1 a 15.8, claro e escuro), aprovadas — `/invite/[token]` usa a casca das telas de entrada, fora do grupo `(auth)`, porque abre com ou sem sessão.
+- 2026-11-26 — Telas de convite desenhadas no canvas da fatia 15 (https://claude.ai/artifact/E894WS7A1kDnbWz6WUePhz, pranchas 15.1 a 15.8, claro e escuro), aprovadas — `/invite` usa a casca das telas de entrada, fora do grupo `(auth)`, porque abre com ou sem sessão.
 - 2026-11-26 — Sem sessão, "Criar conta" é a ação principal do convite e "Entrar" a secundária — o caso comum é quem ainda não tem conta, e a tela não pode revelar se o e-mail já tem.
 - 2026-11-26 — Aviso do convite: faixa na cor de destaque acima do título de entrar, criar conta e confirmar o e-mail, com "Seguir sem o convite" — lembra por que a pessoa está ali e dá uma saída. No cadastro, o e-mail vem travado, em cinza com cadeado.
 - 2026-11-26 — O e-mail do convite tem um botão "Ver convite" e o endereço em texto embaixo, exceção à regra dos e-mails sem links — o convite precisa abrir em outro navegador ou aparelho, e não traz código.
@@ -145,7 +145,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-26 — "Editar" e "Excluir" ficam no cabeçalho do comentário, sempre visíveis; no celular descem para baixo do texto. O autor edita e exclui; ADMIN e OWNER só excluem os dos outros. Excluir pede confirmação.
 - 2026-11-26 — No card do quadro, o número de comentários vem com o ícone `MessageSquare` em 12px ao lado do avatar e some quando é zero.
 - 2026-11-26 — O link do convite é `/invite#<token>`: o token fica fora do log de acesso, e o navegador busca a prévia. Enquanto carrega, um esqueleto do tamanho da tela de convidado; depois de 2 s, a linha de baixo vira "Ainda carregando o convite…".
-- 2026-11-26 — Se a prévia do convite não carrega, a tela diz "Não foi possível carregar o convite" com "Tentar de novo", no layout de "Este convite não vale mais", e não chama de inválido um link que pode estar certo. Sem token ou com token mal formado, vale a tela "Este convite não vale mais"; o link antigo `/invite/<token>` redireciona para `/invite#<token>`.
+- 2026-11-26 — Se a prévia do convite não carrega, a tela diz "Não foi possível carregar o convite" com "Tentar de novo", no layout de "Este convite não vale mais", e não chama de inválido um link que pode estar certo. Sem token ou com token mal formado, vale a tela "Este convite não vale mais"; o token só viaja no fragmento (`/invite#<token>`), e `/invite/<token>` responde 404 para o token não ir ao log de acesso.
 
 ## Perguntas abertas
 
