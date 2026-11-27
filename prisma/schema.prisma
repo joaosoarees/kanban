@@ -150,10 +150,11 @@ model Card {
   completedAt DateTime? @db.Timestamptz(3)
   createdAt   DateTime  @default(now()) @db.Timestamptz(3)
 
-  column   Column      @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  assignee User?       @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
-  labels   CardLabel[]
-  comments Comment[]
+  column         Column          @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  assignee       User?           @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+  labels         CardLabel[]
+  comments       Comment[]
+  checklistItems ChecklistItem[]
 
   @@unique([columnId, position])
   @@index([assigneeId])
@@ -174,6 +175,20 @@ model Comment {
   @@index([cardId, id])
   @@index([authorId])
   @@map("comments")
+}
+
+model ChecklistItem {
+  id          String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  cardId      String    @db.Uuid
+  text        String
+  position    String
+  completedAt DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, position])
+  @@map("checklist_items")
 }
 
 enum LabelColor {
