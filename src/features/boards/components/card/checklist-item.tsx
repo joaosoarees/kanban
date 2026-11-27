@@ -24,6 +24,7 @@ type ChecklistItemProps = {
   index: number;
   count: number;
   editor: ReactNode;
+  disabled: boolean;
   textButtonRef: (node: HTMLButtonElement | null) => void;
   wasDragged: () => boolean;
   onToggle: (completed: boolean) => void;
@@ -37,6 +38,7 @@ export function ChecklistItem({
   index,
   count,
   editor,
+  disabled,
   textButtonRef,
   wasDragged,
   onToggle,
@@ -53,7 +55,7 @@ export function ChecklistItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: item.id, disabled: editor !== null });
+  } = useSortable({ id: item.id, disabled: disabled || editor !== null });
   const label = item.text;
 
   return (
@@ -77,16 +79,18 @@ export function ChecklistItem({
       >
         <DropdownMenuTrigger
           ref={setActivatorNodeRef}
-          disabled={editor !== null}
+          disabled={disabled || editor !== null}
           aria-label={`Mover o item ${label}`}
           onPointerDown={(event) => {
             pointerType.current = event.pointerType;
-            if (event.pointerType === "mouse") {
+            if (event.pointerType !== "touch") {
               listeners?.onPointerDown(event);
             }
           }}
           onClick={() => {
-            if (pointerType.current === "mouse" && !wasDragged()) {
+            const isPointer =
+              pointerType.current !== "" && pointerType.current !== "touch";
+            if (isPointer && !wasDragged()) {
               setIsMenuOpen(true);
             }
             pointerType.current = "";
@@ -125,12 +129,13 @@ export function ChecklistItem({
       <label
         className={cn(
           ICON_BUTTON,
-          "cursor-pointer has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+          "cursor-pointer has-disabled:cursor-default has-disabled:opacity-40 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
         )}
       >
         <input
           type="checkbox"
           checked={item.completed}
+          disabled={disabled}
           onChange={(event) => {
             onToggle(event.target.checked);
           }}
@@ -147,6 +152,7 @@ export function ChecklistItem({
           <button
             ref={textButtonRef}
             type="button"
+            disabled={disabled}
             onClick={onEdit}
             aria-label={`Editar o item ${label}`}
             className={cn(
@@ -158,11 +164,12 @@ export function ChecklistItem({
           </button>
           <button
             type="button"
+            disabled={disabled}
             onClick={onRemove}
             aria-label={`Excluir o item ${label}`}
             className={cn(
               ICON_BUTTON,
-              "text-muted-foreground hover:bg-muted-strong hover:text-foreground",
+              "text-muted-foreground hover:bg-muted-strong hover:text-foreground disabled:pointer-events-none disabled:opacity-40",
             )}
           >
             <X aria-hidden className="size-4" />

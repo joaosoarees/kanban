@@ -184,6 +184,7 @@ export function CardChecklist({
                   item={item}
                   index={index}
                   count={items.length}
+                  disabled={status === "reloading"}
                   textButtonRef={forms.edit.textButtonRef(item.id)}
                   wasDragged={() => Date.now() - dragEndedAt.current < 300}
                   editor={
@@ -206,6 +207,13 @@ export function CardChecklist({
                     forms.edit.start(item);
                   }}
                   onRemove={() => {
+                    const neighbor =
+                      index + 1 < items.length
+                        ? items[index + 1]
+                        : index > 0
+                          ? items[index - 1]
+                          : null;
+                    forms.focusAfterRemove(neighbor?.id ?? null);
                     checklist.remove(item.id);
                   }}
                   onMove={(target) => {

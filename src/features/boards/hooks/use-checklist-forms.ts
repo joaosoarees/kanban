@@ -113,7 +113,8 @@ export function useChecklistForms({
 
   const addText = useWatch({ control: add.form.control, name: "text" });
   const { isDirty: isEditChanged } = edit.form.formState;
-  const hasDraft = isAdding && hasVisibleText(addText);
+  const hasDraft =
+    isAdding && checklist.status !== "failed" && hasVisibleText(addText);
   const hasEdit = editingId !== null && isEditChanged;
   const isDirty = hasDraft || hasEdit;
   const isBusy = add.isPending || edit.isPending;
@@ -136,6 +137,10 @@ export function useChecklistForms({
   return {
     isDirty,
     isBusy,
+    focusAfterRemove: (neighborId: string | null) => {
+      refocusTextOf.current = neighborId;
+      refocusAddButton.current = neighborId === null;
+    },
     discard: () => {
       refocusTextOf.current = null;
       add.form.reset({ text: "" });
