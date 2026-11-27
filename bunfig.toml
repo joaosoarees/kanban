@@ -4,3 +4,4 @@ ignorePatterns = ["bun.lock", "src/generated", "prisma/migrations", ".next"]
 
 [test]
 randomize = true
+preload = ["./test-setup.ts"]
