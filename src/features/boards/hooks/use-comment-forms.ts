@@ -37,12 +37,33 @@ export function useCommentForms({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nextEdit, setNextEdit] = useState<CardComment | null>(null);
   const composerFieldRef = useRef<HTMLTextAreaElement>(null);
+  const composerFocusFrame = useRef(0);
+  const refocusEditOf = useRef<string | null>(null);
   const [formsCardId, setFormsCardId] = useState(cardId);
   if (formsCardId !== cardId) {
     setFormsCardId(cardId);
     setEditingId(null);
     setNextEdit(null);
   }
+
+  const focusComposer = () => {
+    cancelAnimationFrame(composerFocusFrame.current);
+    composerFocusFrame.current = requestAnimationFrame(() => {
+      composerFieldRef.current?.focus();
+    });
+  };
+
+  const closeEdit = (commentId: string | null) => {
+    refocusEditOf.current = commentId;
+    setEditingId(null);
+  };
+
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(composerFocusFrame.current);
+    },
+    [],
+  );
 
   const composer = useActionForm({
     schema: commentSchema,
@@ -55,7 +76,7 @@ export function useCommentForms({
     onSuccess: (comment) => {
       composer.form.reset({ body: "" });
       comments.put(comment);
-      requestAnimationFrame(() => composerFieldRef.current?.focus());
+      focusComposer();
     },
   });
   const edit = useActionForm({
@@ -68,7 +89,7 @@ export function useCommentForms({
     failure: EDIT_FAILED,
     onSuccess: (comment) => {
       comments.put(comment);
-      setEditingId(null);
+      closeEdit(comment.id);
     },
     onError: (error) => {
       if (error.gone === true && editingId !== null) {
@@ -140,6 +161,7 @@ export function useCommentForms({
       body: composerBody,
       hasDraft,
       fieldRef: composerFieldRef,
+      focus: focusComposer,
     },
     edit: {
       ...edit,
@@ -157,8 +179,15 @@ export function useCommentForms({
         openEdit(comment);
       },
       cancel: () => {
-        setEditingId(null);
+        closeEdit(editingId);
       },
+      editButtonRef:
+        (commentId: string) => (node: HTMLButtonElement | null) => {
+          if (node !== null && refocusEditOf.current === commentId) {
+            refocusEditOf.current = null;
+            node.focus();
+          }
+        },
       keepEditing: () => {
         setNextEdit(null);
         edit.form.setFocus("body");
@@ -172,7 +201,7 @@ export function useCommentForms({
           return;
         }
         setNextEdit(null);
-        setEditingId(null);
+        closeEdit(editingId);
       },
     },
   };
