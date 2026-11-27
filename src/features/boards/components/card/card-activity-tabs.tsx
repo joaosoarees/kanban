@@ -8,10 +8,10 @@ import { useCardActivity } from "@/features/boards/hooks/use-card-activity";
 type ActivityTab = "comments" | "history";
 
 const TAB_CLASSES =
-  "-mb-px inline-flex h-10 items-center gap-1.5 rounded-t-sm border-b-2 border-transparent px-0.5 text-sm font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-active:border-brand-fg data-active:text-foreground";
+  "-mb-px inline-flex h-10 items-center gap-1.5 rounded-t-sm border-b-2 border-transparent px-0.5 text-sm font-medium text-muted-foreground outline-hidden hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-active:border-brand-fg data-active:text-foreground";
 
 const PANEL_CLASSES =
-  "rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
+  "rounded-sm outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50";
 
 const numberFormat = new Intl.NumberFormat("pt-BR");
 
