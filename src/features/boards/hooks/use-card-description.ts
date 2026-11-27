@@ -6,6 +6,7 @@ import * as z from "zod";
 import { cardDescriptionSchema } from "@/features/boards/lib/card-schemas";
 import { updateCardDescriptionAction } from "@/features/boards/server/card-actions";
 import { useActionForm } from "@/hooks/use-action-form";
+import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
 import type { ActionError } from "@/lib/action-result";
 
 const LOAD_FAILED = "Não foi possível abrir o card. Tente de novo.";
@@ -113,17 +114,7 @@ export function useCardDescription({
     };
   }, [isLoading, workspaceId, boardId, cardId]);
 
-  useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
-      if (isDirty) {
-        event.preventDefault();
-      }
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => {
-      window.removeEventListener("beforeunload", warn);
-    };
-  }, [isDirty]);
+  useUnsavedChangesWarning(isDirty);
 
   return {
     saved,

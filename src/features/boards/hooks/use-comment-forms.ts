@@ -11,6 +11,7 @@ import {
   editCommentAction,
 } from "@/features/boards/server/comment-actions";
 import { useActionForm } from "@/hooks/use-action-form";
+import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
 import type { ActionError } from "@/lib/action-result";
 import { hasVisibleText } from "@/lib/text";
 
@@ -131,17 +132,7 @@ export function useCommentForms({
       : null;
   const isBusy = composer.isPending || edit.isPending;
 
-  useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
-      if (unsaved !== null) {
-        event.preventDefault();
-      }
-    };
-    window.addEventListener("beforeunload", warn);
-    return () => {
-      window.removeEventListener("beforeunload", warn);
-    };
-  }, [unsaved]);
+  useUnsavedChangesWarning(unsaved !== null);
 
   const openEdit = (comment: CardComment) => {
     refocusEditOf.current = null;
