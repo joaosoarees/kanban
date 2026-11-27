@@ -71,10 +71,6 @@ export function CodeForm({
     }
   }, [focusOnMount, setFocus]);
 
-  const expire = () => {
-    onExpired();
-  };
-
   const switchEmail = () => {
     startSwitch(async () => {
       const result = await runAction(async () => {
@@ -177,7 +173,7 @@ export function CodeForm({
       <ResendCode
         action={resendAction}
         initialWait={initialWait}
-        onExpired={expire}
+        onExpired={onExpired}
       />
       <form
         action={switchAction}
