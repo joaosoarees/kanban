@@ -34,7 +34,7 @@ function card(
 }
 
 describe("parseBoardFilter", () => {
-  it("reads labels and assignee", () => {
+  it("should read labels and assignee", () => {
     expect(parse("labels=bug,ux&assignee=ana&due=week")).toEqual({
       labelIds: ["bug", "ux"],
       assignee: "ana",
@@ -42,11 +42,11 @@ describe("parseBoardFilter", () => {
     });
   });
 
-  it("reads the no-assignee option", () => {
+  it("should read the no-assignee option", () => {
     expect(parse("assignee=none").assignee).toBe(NO_ASSIGNEE);
   });
 
-  it("ignores unknown and repeated ids", () => {
+  it("should ignore unknown and repeated ids", () => {
     expect(parse("labels=bug,gone,bug,&assignee=left&due=later")).toEqual({
       labelIds: ["bug"],
       assignee: null,
@@ -54,13 +54,13 @@ describe("parseBoardFilter", () => {
     });
   });
 
-  it("returns no filter without params", () => {
+  it("should return no filter without params", () => {
     expect(parse("card=1")).toEqual(NO_FILTER);
   });
 });
 
 describe("writeBoardFilter", () => {
-  it("sets params and keeps the others", () => {
+  it("should set params and keep the others", () => {
     const params = new URLSearchParams("card=1");
     writeBoardFilter(params, {
       labelIds: ["bug", "ux"],
@@ -72,7 +72,7 @@ describe("writeBoardFilter", () => {
     );
   });
 
-  it("removes params when the filter is cleared", () => {
+  it("should remove params when the filter is cleared", () => {
     const params = new URLSearchParams(
       "labels=bug&assignee=none&due=none&card=1",
     );
@@ -82,7 +82,7 @@ describe("writeBoardFilter", () => {
 });
 
 describe("activeFilterCount", () => {
-  it("counts each label and the assignee", () => {
+  it("should count each label and the assignee", () => {
     expect(
       activeFilterCount({
         labelIds: ["bug", "ux"],
@@ -95,19 +95,19 @@ describe("activeFilterCount", () => {
 });
 
 describe("filterKey", () => {
-  it("changes with the due filter", () => {
+  it("should change with the due filter", () => {
     expect(
       filterKey({ labelIds: [], assignee: null, due: "overdue" }, TODAY),
     ).not.toBe(filterKey({ labelIds: [], assignee: null, due: "week" }, TODAY));
   });
 
-  it("changes with the day only for dated filters", () => {
+  it("should change with the day only for dated filters", () => {
     const overdue = { labelIds: [], assignee: null, due: "overdue" as const };
     expect(filterKey(overdue, TODAY)).not.toBe(filterKey(overdue, null));
     expect(filterKey(NO_FILTER, TODAY)).toBe(filterKey(NO_FILTER, null));
   });
 
-  it("ignores label order", () => {
+  it("should ignore label order", () => {
     expect(
       filterKey({ labelIds: ["ux", "bug"], assignee: null, due: null }, TODAY),
     ).toBe(
@@ -120,11 +120,11 @@ describe("matchesFilter", () => {
   const assigned = card("1", "ana", ["bug", "api"]);
   const free = card("2", null, []);
 
-  it("matches everything without a filter", () => {
+  it("should match everything without a filter", () => {
     expect(matchesFilter(free, NO_FILTER, TODAY)).toBe(true);
   });
 
-  it("matches any of the labels", () => {
+  it("should match any of the labels", () => {
     expect(
       matchesFilter(
         assigned,
@@ -141,7 +141,7 @@ describe("matchesFilter", () => {
     ).toBe(false);
   });
 
-  it("requires labels and assignee together", () => {
+  it("should require labels and assignee together", () => {
     expect(
       matchesFilter(
         assigned,
@@ -165,7 +165,7 @@ describe("matchesFilter", () => {
     ).toBe(false);
   });
 
-  it("matches cards without assignee", () => {
+  it("should match cards without assignee", () => {
     const filter = { labelIds: [], assignee: NO_ASSIGNEE, due: null };
     expect(matchesFilter(free, filter, TODAY)).toBe(true);
     expect(matchesFilter(assigned, filter, TODAY)).toBe(false);
@@ -188,19 +188,19 @@ describe("matchesFilter by due date", () => {
       .map(({ id }) => id);
   }
 
-  it("keeps overdue cards that are not done", () => {
+  it("should keep overdue cards that are not done", () => {
     expect(shown("overdue")).toEqual(["1"]);
   });
 
-  it("keeps cards due from today to seven days ahead", () => {
+  it("should keep cards due from today to seven days ahead", () => {
     expect(shown("week")).toEqual(["3"]);
   });
 
-  it("keeps cards without a due date", () => {
+  it("should keep cards without a due date", () => {
     expect(shown("none")).toEqual(["5"]);
   });
 
-  it("combines the due date with the other filters", () => {
+  it("should combine the due date with the other filters", () => {
     const ana = card("6", "ana", ["bug"], "2026-11-20");
     expect(
       matchesFilter(
@@ -219,13 +219,13 @@ describe("matchesFilter by due date", () => {
   });
 
   it.each(["overdue", "week"] as const)(
-    "matches no card with the %s filter before the viewer's day is known",
+    "should match no card with the %s filter before the viewer's day is known",
     (due) => {
       expect(shown(due, null)).toEqual([]);
     },
   );
 
-  it("keeps cards without a due date before the viewer's day is known", () => {
+  it("should keep cards without a due date before the viewer's day is known", () => {
     expect(shown("none", null)).toEqual(["5"]);
   });
 });
@@ -238,31 +238,31 @@ describe("isCardVisible", () => {
     TODAY,
   );
 
-  it("keeps a card that stopped matching", () => {
+  it("should keep a card that stopped matching", () => {
     expect(isCardVisible(card("1", null, []), filter, snapshot, TODAY)).toBe(
       true,
     );
   });
 
-  it("hides a known card that never matched", () => {
+  it("should hide a known card that never matched", () => {
     expect(
       isCardVisible(card("2", null, ["ux"]), filter, snapshot, TODAY),
     ).toBe(false);
   });
 
-  it("shows a known card that started matching", () => {
+  it("should show a known card that started matching", () => {
     expect(
       isCardVisible(card("2", null, ["bug"]), filter, snapshot, TODAY),
     ).toBe(true);
   });
 
-  it("hides a new card from someone else that does not match", () => {
+  it("should hide a new card from someone else that does not match", () => {
     expect(isCardVisible(card("3", null, []), filter, snapshot, TODAY)).toBe(
       false,
     );
   });
 
-  it("shows a revealed card that does not match", () => {
+  it("should show a revealed card that does not match", () => {
     expect(
       isCardVisible(
         card("3", null, []),
