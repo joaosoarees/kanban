@@ -47,7 +47,7 @@ export async function moveCardAction(
       return BOARD_GONE;
     }
 
-    const card = await tx.card.findFirst({
+    const card = await tx.card.findUnique({
       where: { id: cardId, column: { boardId: lockedBoardId } },
       select: { id: true },
     });
@@ -55,7 +55,7 @@ export async function moveCardAction(
       return CARD_GONE;
     }
 
-    const column = await tx.column.findFirst({
+    const column = await tx.column.findUnique({
       where: { id: columnId, boardId: lockedBoardId },
       select: {
         id: true,

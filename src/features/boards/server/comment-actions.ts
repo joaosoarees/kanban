@@ -56,7 +56,7 @@ export async function createCommentAction(
     return invalidFields(parsed.error);
   }
 
-  const card = await db.card.findFirst({
+  const card = await db.card.findUnique({
     where: cardScope(ref, actor.workspaceId),
     select: { id: true },
   });
@@ -152,7 +152,7 @@ export async function deleteCommentAction(
   }
 
   const result = await db.$transaction(async (tx): Promise<ActionResult> => {
-    const comment = await tx.comment.findFirst({
+    const comment = await tx.comment.findUnique({
       where: { id: id.data, card: cardScope(ref, actor.workspaceId) },
       select: { authorId: true },
     });

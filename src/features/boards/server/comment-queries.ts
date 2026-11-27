@@ -20,7 +20,7 @@ export async function getCardComments(
   ref: { boardId: string; cardId: string },
   before: string | null,
 ): Promise<CommentPage | null> {
-  const card = await db.card.findFirst({
+  const card = await db.card.findUnique({
     where: {
       id: ref.cardId,
       column: {
