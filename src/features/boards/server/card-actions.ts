@@ -53,7 +53,7 @@ export async function createCardAction(
       return BOARD_GONE;
     }
 
-    const column = await tx.column.findFirst({
+    const column = await tx.column.findUnique({
       where: { id: parsed.data.columnId, boardId: lockedBoardId },
       select: { id: true },
     });

@@ -209,7 +209,7 @@ export async function resendInvite(
       return denied;
     }
 
-    const invite = await tx.invite.findFirst({
+    const invite = await tx.invite.findUnique({
       where: { id: inviteId, workspaceId: actor.workspaceId },
       select: { email: true, sentAt: true, expiresAt: true },
     });
