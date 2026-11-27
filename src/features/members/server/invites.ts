@@ -28,7 +28,7 @@ type InviteDelivery = {
 
 export type InviteSent = { email: string; delivered: boolean };
 
-const INVITE_CHANGED: ActionError = {
+const PENDING_INVITE_GONE: ActionError = {
   status: "error",
   message: "Esse convite não existe mais.",
 };
@@ -214,7 +214,7 @@ export async function resendInvite(
       select: { email: true, sentAt: true, expiresAt: true },
     });
     if (!invite) {
-      return INVITE_CHANGED;
+      return PENDING_INVITE_GONE;
     }
     const waitSeconds = secondsUntilInviteResend(invite.sentAt, now);
     if (waitSeconds > 0) {
