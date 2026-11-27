@@ -27,6 +27,12 @@ export const COMMENT_GONE: ActionError = {
   gone: true,
 };
 
+export const CHECKLIST_ITEM_GONE: ActionError = {
+  status: "error",
+  message: "Esse item não existe mais. O card foi atualizado.",
+  gone: true,
+};
+
 export function parseCardRef(boardId: unknown, cardId: unknown) {
   const board = z.uuid().safeParse(boardId);
   const card = z.uuid().safeParse(cardId);
@@ -54,4 +60,21 @@ export async function lockBoard(
     FOR UPDATE
   `;
   return locked.length === 0 ? null : id.data;
+}
+
+export async function lockCard(
+  tx: Prisma.TransactionClient,
+  workspaceId: string,
+  ref: { boardId: string; cardId: string },
+) {
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT card.id FROM cards card
+    JOIN columns board_column ON board_column.id = card."columnId"
+    JOIN boards board ON board.id = board_column."boardId"
+    WHERE card.id = ${ref.cardId}::uuid
+      AND board_column."boardId" = ${ref.boardId}::uuid
+      AND board."workspaceId" = ${workspaceId}::uuid
+    FOR NO KEY UPDATE OF card
+  `;
+  return locked.length > 0;
 }
