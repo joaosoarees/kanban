@@ -81,6 +81,7 @@ export function useCardChecklist({
   const [notice, setNotice] = useState<ChecklistNotice | null>(null);
   const [loadedUrl, setLoadedUrl] = useState(url);
   const [request, setRequest] = useState(0);
+  const [settledWrites, setSettledWrites] = useState(0);
   const currentUrl = useRef(url);
   const cardGone = useEffectEvent(onCardGone);
   const syncs = useRef(new Map<string, ChecklistSync>());
@@ -176,6 +177,7 @@ export function useCardChecklist({
     if (currentUrl.current !== requestUrl) {
       return;
     }
+    setSettledWrites((count) => count + 1);
     if (result.status === "error" && result.gone === true) {
       setNotice({ tone: "info", message: result.message });
     } else if (result.status === "error") {
@@ -193,6 +195,7 @@ export function useCardChecklist({
     status,
     items,
     notice,
+    settledWrites,
     retry: () => {
       setStatus("loading");
       setRequest((count) => count + 1);

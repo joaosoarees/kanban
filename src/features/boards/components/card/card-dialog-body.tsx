@@ -77,6 +77,7 @@ export function CardDialogBody({
     card.dueOn,
     card.completed,
     card.checklistDone,
+    checklist.settledWrites,
     description.saved,
   ]);
   const footerOf = (visibility: string) => (
