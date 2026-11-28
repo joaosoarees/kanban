@@ -35,12 +35,16 @@ async function fetchActivityPage(
   url: string,
   before: string | null,
 ): Promise<ActivityPage | null> {
-  const query = before === null ? "" : `?before=${before}`;
+  const query =
+    before === null ? "" : `?${new URLSearchParams({ before }).toString()}`;
   try {
     const response = await fetch(`${url}${query}`, {
       cache: "no-store",
       redirect: "error",
     });
+    if (!response.ok) {
+      return null;
+    }
     const result = pageResponseSchema.parse(await response.json());
     return result.status === "success" ? result.data : null;
   } catch (caught) {
