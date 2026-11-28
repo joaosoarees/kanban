@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import * as z from "zod";
 import {
   moveToIndex,
@@ -86,7 +86,7 @@ export function useCardChecklist({
   const [notice, setNotice] = useState<ChecklistNotice | null>(null);
   const [loadedUrl, setLoadedUrl] = useState(url);
   const currentUrl = useRef(url);
-  const cardGone = useRef(onCardGone);
+  const cardGone = useEffectEvent(onCardGone);
   const sync = useRef(IDLE_SYNC);
   const loaded = useRef(false);
 
@@ -103,8 +103,7 @@ export function useCardChecklist({
       loaded.current = false;
     }
     currentUrl.current = url;
-    cardGone.current = onCardGone;
-  });
+  }, [url]);
 
   const isFetching = status === "loading" || status === "reloading";
 
@@ -117,7 +116,7 @@ export function useCardChecklist({
         return;
       }
       if (result === "gone") {
-        cardGone.current();
+        cardGone();
         return;
       }
       if (result === "failed") {

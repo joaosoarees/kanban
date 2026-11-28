@@ -56,7 +56,6 @@ export function ChecklistItem({
     transition,
     isDragging,
   } = useSortable({ id: item.id, disabled: disabled || editor !== null });
-  const label = item.text;
 
   return (
     <li
@@ -80,7 +79,7 @@ export function ChecklistItem({
         <DropdownMenuTrigger
           ref={setActivatorNodeRef}
           disabled={disabled || editor !== null}
-          aria-label={`Mover o item ${label}`}
+          aria-label={`Mover o item ${item.text}`}
           onPointerDown={(event) => {
             pointerType.current = event.pointerType;
             if (event.pointerType !== "touch") {
@@ -139,7 +138,7 @@ export function ChecklistItem({
           onChange={(event) => {
             onToggle(event.target.checked);
           }}
-          aria-label={`Concluir: ${label}`}
+          aria-label={`Concluir: ${item.text}`}
           className="sr-only"
         />
         <span className="transition-transform duration-140 active:scale-90 motion-reduce:transition-none">
@@ -154,7 +153,7 @@ export function ChecklistItem({
             type="button"
             disabled={disabled}
             onClick={onEdit}
-            aria-label={`Editar o item ${label}`}
+            aria-label={`Editar o item ${item.text}`}
             className={cn(
               "min-h-11 min-w-0 flex-1 cursor-text rounded-sm py-3 text-left text-[15px]/5 wrap-anywhere outline-hidden focus-visible:ring-3 focus-visible:ring-ring/50 sm:min-h-8 sm:py-1.5 sm:text-sm/5",
               item.completed && "text-fg-muted line-through",
@@ -166,7 +165,7 @@ export function ChecklistItem({
             type="button"
             disabled={disabled}
             onClick={onRemove}
-            aria-label={`Excluir o item ${label}`}
+            aria-label={`Excluir o item ${item.text}`}
             className={cn(
               ICON_BUTTON,
               "text-muted-foreground hover:bg-muted-strong hover:text-foreground disabled:pointer-events-none disabled:opacity-40",
