@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isForeignKeyViolation, isUniqueViolation } from "./prisma-errors";
+import {
+  isForeignKeyViolation,
+  isUniqueViolation,
+  isWriteConflict,
+} from "./prisma-errors";
 
 function foreignKeyError(index: string) {
   return {
@@ -47,5 +51,45 @@ describe("isForeignKeyViolation", () => {
     };
 
     expect(isForeignKeyViolation(error, "cards_assigneeId_fkey")).toBe(false);
+  });
+});
+
+describe("isWriteConflict", () => {
+  it.each(["40P01", "40001"])(
+    "should recognise the SQLSTATE %s in the meta of a failed query",
+    (originalCode) => {
+      const error = {
+        code: "P2010",
+        meta: { driverAdapterError: { cause: { originalCode } } },
+      };
+
+      expect(isWriteConflict(error)).toBe(true);
+    },
+  );
+
+  it("should recognise a P2034 error", () => {
+    expect(isWriteConflict({ code: "P2034" })).toBe(true);
+  });
+
+  it("should recognise a conflict raised by the commit itself", () => {
+    const error = {
+      name: "DriverAdapterError",
+      cause: { originalCode: "40P01" },
+    };
+
+    expect(isWriteConflict(error)).toBe(true);
+  });
+
+  it.each([
+    {
+      code: "P2010",
+      meta: { driverAdapterError: { cause: { originalCode: "23505" } } },
+    },
+    { code: "P2002" },
+    { cause: { originalCode: "23503" } },
+    null,
+    "40P01",
+  ])("should refuse anything else: %j", (error) => {
+    expect(isWriteConflict(error)).toBe(false);
   });
 });

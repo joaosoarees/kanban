@@ -19,7 +19,7 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 
 const BOARD_CHANGED: ActionError = {
   status: "error",
@@ -42,7 +42,7 @@ export async function moveCardAction(
   }
   const { cardId, columnId, previousCardId } = parsed.data;
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
     if (lockedBoardId === null) {
       return BOARD_GONE;

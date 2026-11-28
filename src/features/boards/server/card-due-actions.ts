@@ -16,7 +16,7 @@ import {
   revalidateWorkspace,
 } from "@/features/workspaces/server/access";
 import { FORBIDDEN, INVALID, type ActionResult } from "@/lib/action-result";
-import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 
 export async function setCardDueAction(
   workspaceId: unknown,
@@ -40,7 +40,7 @@ export async function setCardDueAction(
   }
   const { dueOn } = parsed.data;
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     if (!(await lockCard(tx, actor.workspaceId, ref))) {
       return CARD_GONE;
     }
@@ -92,7 +92,7 @@ export async function setCardCompletionAction(
   }
   const { completed } = parsed.data;
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     if (!(await lockCard(tx, actor.workspaceId, ref))) {
       return CARD_GONE;
     }

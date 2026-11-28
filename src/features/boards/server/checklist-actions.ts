@@ -28,6 +28,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 
 const CHECKLIST_LIMIT: ActionError = {
   status: "error",
@@ -93,7 +94,7 @@ export async function createChecklistItemAction(
     return invalidFields(parsed.error);
   }
 
-  const result = await db.$transaction(async (tx) => {
+  const result = await transact(async (tx) => {
     if (!(await lockCard(tx, actor.workspaceId, ref))) {
       return CARD_GONE;
     }
@@ -179,7 +180,7 @@ export async function moveChecklistItemAction(
   }
   const { itemId, previousItemId } = parsed.data;
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     if (!(await lockCard(tx, actor.workspaceId, ref))) {
       return CARD_GONE;
     }

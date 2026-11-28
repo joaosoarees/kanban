@@ -28,7 +28,7 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 
 const MEMBER_GONE: ActionError = {
   status: "error",
@@ -50,7 +50,7 @@ export async function createCardAction(
     return invalidFields(parsed.error);
   }
 
-  const result = await db.$transaction(async (tx) => {
+  const result = await transact(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
     if (lockedBoardId === null) {
       return BOARD_GONE;
@@ -112,7 +112,7 @@ async function updateCard(
     return data;
   }
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     if (!(await lockCard(tx, actor.workspaceId, ref))) {
       return CARD_GONE;
     }
@@ -192,7 +192,7 @@ export async function setCardAssigneeAction(
   }
   const { assigneeId } = parsed.data;
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     let assigneeName: string | null = null;
     if (assigneeId !== null) {
       const members = await tx.$queryRaw<{ name: string }[]>`
@@ -252,7 +252,7 @@ export async function deleteCardAction(
     return CARD_GONE;
   }
 
-  await db.$transaction(async (tx) => {
+  await transact(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, ref.boardId);
     if (lockedBoardId !== null) {
       await tx.card.deleteMany({

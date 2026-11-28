@@ -36,3 +36,24 @@ export function isForeignKeyViolation(
 ): boolean {
   return hasCode(error, "P2003") && violatedConstraint(error) === constraint;
 }
+
+const writeConflictCause = z.object({
+  originalCode: z.enum(["40001", "40P01"]),
+});
+
+const writeConflictMeta = z.object({
+  driverAdapterError: z.object({ cause: writeConflictCause }),
+});
+
+export function isWriteConflict(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+  if (hasCode(error, "P2034")) {
+    return true;
+  }
+  if ("meta" in error && writeConflictMeta.safeParse(error.meta).success) {
+    return true;
+  }
+  return "cause" in error && writeConflictCause.safeParse(error.cause).success;
+}
