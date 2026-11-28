@@ -69,7 +69,10 @@ function CardContent({ card }: { card: BoardCardData }) {
                   {card.checklistDone}/{card.checklistTotal}
                 </span>
                 <span className="sr-only">
-                  {card.checklistDone} de {card.checklistTotal} itens concluídos
+                  {card.checklistDone} de {card.checklistTotal}{" "}
+                  {card.checklistTotal === 1
+                    ? "item concluído"
+                    : "itens concluídos"}
                 </span>
               </span>
             )}
