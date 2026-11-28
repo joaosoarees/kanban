@@ -41,7 +41,9 @@ export function ChecklistTextForm({
 
   const { ref: fieldRef, ...field } = form.register("text", {
     onChange: () => {
-      form.clearErrors("root");
+      if (errors.root !== undefined) {
+        form.clearErrors("root");
+      }
     },
   });
 
