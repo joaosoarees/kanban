@@ -9,7 +9,6 @@ import {
   BOARD_GONE,
   CARD_GONE,
   lockBoard,
-  lockCard,
 } from "@/features/boards/server/access";
 import { recordActivity } from "@/features/boards/server/activity";
 import {
@@ -125,12 +124,8 @@ export async function removeCardLabelAction(
     return FORBIDDEN;
   }
 
-  const boardRef = parseId(boardId);
   const cardRef = parseId(cardId);
   const labelRef = parseId(labelId);
-  if (boardRef === null) {
-    return BOARD_GONE;
-  }
   if (cardRef === null) {
     return CARD_GONE;
   }
@@ -138,26 +133,39 @@ export async function removeCardLabelAction(
     return LABEL_GONE;
   }
 
-  await db.$transaction(async (tx) => {
-    const ref = { boardId: boardRef, cardId: cardRef };
-    if (!(await lockCard(tx, actor.workspaceId, ref))) {
-      return;
+  const failure = await db.$transaction(async (tx) => {
+    const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
+    if (lockedBoardId === null) {
+      return BOARD_GONE;
     }
-    const applied = { cardId: cardRef, labelId: labelRef };
-    const removed = await tx.cardLabel.findUnique({
-      where: { cardId_labelId: applied },
-      select: { label: { select: { name: true, color: true } } },
+    const card = await tx.card.findUnique({
+      where: { id: cardRef, column: { boardId: lockedBoardId } },
+      select: {
+        labels: {
+          where: { labelId: labelRef },
+          select: { label: { select: { name: true, color: true } } },
+        },
+      },
     });
-    if (!removed) {
-      return;
+    if (!card) {
+      return CARD_GONE;
     }
-    await tx.cardLabel.delete({ where: { cardId_labelId: applied } });
-    await recordActivity(tx, cardRef, {
-      type: "LABEL_REMOVED",
-      ...removed.label,
+    const applied = card.labels.at(0);
+    if (applied === undefined) {
+      return null;
+    }
+    const { count } = await tx.cardLabel.deleteMany({
+      where: { cardId: cardRef, labelId: labelRef },
     });
+    if (count > 0) {
+      await recordActivity(tx, cardRef, {
+        type: "LABEL_REMOVED",
+        ...applied.label,
+      });
+    }
+    return null;
   });
 
   revalidateWorkspace(actor.slug);
-  return SUCCESS;
+  return failure ?? SUCCESS;
 }

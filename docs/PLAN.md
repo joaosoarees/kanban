@@ -299,6 +299,7 @@ ChecklistItem (id, cardId, text, position, completedAt?)
 - Entram: card criado, movido de coluna, título alterado, descrição editada (sem o texto), prazo definido ou removido, concluído ou reaberto, responsável trocado, etiqueta adicionada ou removida e item do checklist concluído ou reaberto.
 - Ficam de fora: reordenar dentro da mesma coluna e os comentários, que já têm a lista deles.
 - Uma action idempotente que não muda nada, como reaplicar uma etiqueta que o card já tem, não grava evento.
+- Tirar uma etiqueta do card trava o quadro, como pôr a etiqueta e excluí-la do quadro: sem essa trava, tirar e excluir ao mesmo tempo gravavam o evento de remoção duas vezes. O evento só é gravado quando a linha foi de fato apagada.
 - O evento guarda um retrato do que mudou (nomes de colunas, etiquetas e pessoas na hora), para o histórico não mudar quando algo é renomeado ou excluído depois. O formato de `data` é uma união discriminada por `type`, validada com Zod em `lib/`.
 - O retrato guarda também o nome de quem fez a mudança, então o evento continua com o nome mesmo se a conta deixar de existir e o `actorId` virar nulo. Quem sai do workspace deixa os eventos. Os eventos caem com o card.
 - O histórico carrega quando o diálogo abre, fora da consulta do quadro: os 30 mais recentes, e "Ver anteriores" busca mais com cursor pelo id (uuid v7), como os comentários. Se ele aparece junto com os comentários ou numa seção à parte, o `craft` decide nas telas.
