@@ -9,7 +9,7 @@ Kanban por workspaces para times pequenos (2 a 10 pessoas). O time entra num wor
 - Hierarquia: Workspace → Quadro → Coluna → Card (título, descrição, responsável, etiquetas). Papéis fixos: Dono, Admin, Membro.
 - Entrada com e-mail e senha, sem login social. Quem administra convida pelo e-mail, e a pessoa entra depois de aceitar, com ou sem conta.
 - Sem tempo real: o que outras pessoas mudam aparece ao recarregar ou navegar. Mover uma coluna aparece na hora, antes de o servidor confirmar, e um erro desfaz o movimento com uma mensagem clara. Criar, renomear e excluir aparecem quando o servidor confirma.
-- Fora do escopo por enquanto: anexos, histórico de atividade, busca.
+- Fora do escopo por enquanto: anexos, busca.
 - Princípios: o quadro é o produto, e tudo o mais serve para chegar a ele rápido; simplicidade antes de recurso.
 - Não há logo além da marca de barras, ilustrações, depoimentos nem dados reais: nenhuma tela inventa clientes, números ou depoimentos.
 
@@ -155,6 +155,12 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-27 — Adicionar e editar item esperam o servidor, com o campo só leitura e o spinner no botão; marcar, mover e excluir são otimistas e, se falharem, voltam e mostram "Não foi possível salvar. Tente de novo." na linha ao lado de "Adicionar item". O campo de adicionar continua aberto depois de salvar; Enter envia, Esc fecha.
 - 2026-11-27 — Com 50 itens, "Adicionar item" fica desabilitado com "Limite de 50 itens" ao lado. Enquanto o checklist carrega, o esqueleto tem tantas linhas quanto o total já conhecido pelo quadro.
 - 2026-11-27 — No card do quadro, o progresso do checklist vem com o ícone `ListChecks` em 12px e "3/5" antes do número de comentários; "5/5" usa `success-bg` e `success-fg`; some quando o card não tem itens.
+- 2026-11-27 — Histórico do card desenhado no canvas da fatia 21 (https://claude.ai/artifact/1W6twkK5RGZRXrQ2Xoy82T, telas 21.1 a 21.3, claro e escuro), aprovado.
+- 2026-11-27 — A coluna direita do diálogo ganha as abas "Comentários" (com o número) e "Histórico", no visual das abas das configurações; o diálogo abre em Comentários. No celular, as abas ficam no lugar da seção de comentários — juntar comentários e eventos num feed só pediria duas listas paginadas numa, e esconderia os comentários.
+- 2026-11-27 — O histórico carrega na primeira vez que a aba abre e recarrega sem esqueleto depois de uma mudança feita no próprio diálogo. Falha ao carregar mostra "Não foi possível carregar o histórico." com "Tentar de novo" dentro da aba; falha em "Ver anteriores" mostra a mensagem ao lado do botão.
+- 2026-11-27 — Cada evento é um ícone de 28px numa linha do tempo, a frase com os nomes em destaque e a data no formato dos comentários; concluir usa `success-bg`/`success-fg`. Sem avatar: o ícone diz o que mudou e o nome já está na frase. Quem fez a mudança aparece como "Você" quando é a própria pessoa.
+- 2026-11-27 — Renomear mostra o título antigo riscado e o novo, até 2 linhas cada; editar a descrição não mostra o texto. Card sem eventos (de antes da fatia 21) mostra "Nenhuma alteração registrada ainda." As frases usam `text-wrap: pretty`.
+- 2026-11-27 — "assumiu o card" aparece quando o nome do responsável é igual ao de quem atribuiu: os eventos guardam só nomes, então dois membros com o mesmo nome podem fazer uma atribuição parecer que a pessoa assumiu o card. Aceito como limitação conhecida.
 
 ## Perguntas abertas
 

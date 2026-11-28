@@ -49,11 +49,7 @@ export async function GET(
     return reply(INVALID, 400);
   }
 
-  const page = await getCardActivities(
-    actor.workspaceId,
-    ref,
-    query.data.before,
-  );
+  const page = await getCardActivities(actor, ref, query.data.before);
   return page
     ? reply({ status: "success", data: page }, 200)
     : reply(CARD_GONE, 404);

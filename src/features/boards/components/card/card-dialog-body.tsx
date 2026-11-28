@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { CardActivityTabs } from "@/features/boards/components/card/card-activity-tabs";
 import { CardChecklist } from "@/features/boards/components/card/card-checklist";
 import { CardComments } from "@/features/boards/components/card/card-comments";
 import {
@@ -64,6 +65,16 @@ export function CardDialogBody({
   onUpdateCard,
 }: CardDialogBodyProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const historyVersion = JSON.stringify([
+    column.id,
+    card.title,
+    card.assigneeId,
+    card.labelIds,
+    card.dueOn,
+    card.completed,
+    card.checklistDone,
+    description.saved,
+  ]);
   const footerOf = (visibility: string) => (
     <div className={cn("flex-col gap-4", visibility)}>
       <Separator />
@@ -148,13 +159,21 @@ export function CardDialogBody({
         </div>
 
         <div className="lg:min-h-0 lg:overflow-y-auto lg:border-l lg:px-5 lg:pt-4 lg:pb-5">
-          <CardComments
+          <CardActivityTabs
             workspaceId={workspaceId}
             boardId={boardId}
             cardId={card.id}
-            count={card.commentCount}
-            comments={comments}
-            forms={commentForms}
+            commentCount={card.commentCount}
+            version={historyVersion}
+            comments={
+              <CardComments
+                workspaceId={workspaceId}
+                boardId={boardId}
+                cardId={card.id}
+                comments={comments}
+                forms={commentForms}
+              />
+            }
           />
         </div>
 
