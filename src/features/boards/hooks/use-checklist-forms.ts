@@ -35,7 +35,10 @@ export function useChecklistForms({
   checklist,
 }: ChecklistFormsOptions) {
   const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [requestedEditId, setEditingId] = useState<string | null>(null);
+  const editingId = checklist.items.some(({ id }) => id === requestedEditId)
+    ? requestedEditId
+    : null;
   const [nextEdit, setNextEdit] = useState<ChecklistEntry | null>(null);
   const [formsCardId, setFormsCardId] = useState(cardId);
   const refocusAddButton = useRef(false);

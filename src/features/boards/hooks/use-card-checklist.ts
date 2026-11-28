@@ -9,6 +9,12 @@ import {
   type ChecklistEntry,
 } from "@/features/boards/lib/checklist-list";
 import {
+  finishWrite,
+  IDLE_SYNC,
+  receiveList,
+  startWrite,
+} from "@/features/boards/lib/checklist-sync";
+import {
   deleteChecklistItemAction,
   moveChecklistItemAction,
 } from "@/features/boards/server/checklist-actions";
@@ -17,6 +23,8 @@ import type { ActionResult } from "@/lib/action-result";
 import { runAction } from "@/lib/run-action";
 
 const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";
+const RELOAD_FAILED =
+  "Não foi possível atualizar o checklist. Feche e abra o card de novo.";
 
 const itemSchema = z.object({
   id: z.string(),
@@ -79,6 +87,8 @@ export function useCardChecklist({
   const [loadedUrl, setLoadedUrl] = useState(url);
   const currentUrl = useRef(url);
   const cardGone = useRef(onCardGone);
+  const sync = useRef(IDLE_SYNC);
+  const loaded = useRef(false);
 
   if (loadedUrl !== url) {
     setLoadedUrl(url);
@@ -88,6 +98,10 @@ export function useCardChecklist({
   }
 
   useEffect(() => {
+    if (currentUrl.current !== url) {
+      sync.current = IDLE_SYNC;
+      loaded.current = false;
+    }
     currentUrl.current = url;
     cardGone.current = onCardGone;
   });
@@ -97,6 +111,7 @@ export function useCardChecklist({
   useEffect(() => {
     let ignore = false;
     const load = async (listUrl: string) => {
+      const startedWhenSent = sync.current.started;
       const result = await fetchChecklist(listUrl);
       if (ignore) {
         return;
@@ -106,10 +121,24 @@ export function useCardChecklist({
         return;
       }
       if (result === "failed") {
-        setStatus((current) => (current === "loading" ? "failed" : "ready"));
+        if (loaded.current) {
+          setNotice({ tone: "error", message: RELOAD_FAILED });
+          setStatus("ready");
+        } else {
+          setStatus("failed");
+        }
         return;
       }
-      setItems(result);
+      const received = receiveList(sync.current, startedWhenSent);
+      sync.current = received.sync;
+      if (received.apply) {
+        setItems(result);
+      }
+      loaded.current = true;
+      if (received.reload) {
+        void load(listUrl);
+        return;
+      }
       setStatus("ready");
     };
     if (isFetching && url !== null) {
@@ -128,17 +157,23 @@ export function useCardChecklist({
     revert: () => void,
   ) => {
     const requestUrl = url;
+    sync.current = startWrite(sync.current);
     const result = await runAction(write, SAVE_FAILED);
-    if (result.status === "success" || !isCurrent(requestUrl)) {
+    if (!isCurrent(requestUrl)) {
       return;
     }
-    if (result.gone === true) {
+    const saved = result.status === "success";
+    if (result.status === "error" && result.gone === true) {
       setNotice({ tone: "info", message: result.message });
-      setStatus("reloading");
-      return;
+    } else if (!saved) {
+      revert();
+      setNotice({ tone: "error", message: SAVE_FAILED });
     }
-    revert();
-    setNotice({ tone: "error", message: SAVE_FAILED });
+    const finished = finishWrite(sync.current, saved);
+    sync.current = finished.sync;
+    if (finished.reload) {
+      setStatus("reloading");
+    }
   };
 
   const ref = { workspaceId, boardId, cardId };
