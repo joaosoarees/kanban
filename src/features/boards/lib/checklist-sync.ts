@@ -14,6 +14,10 @@ export function startWrite(sync: ChecklistSync): ChecklistSync {
   return { ...sync, pending: sync.pending + 1, started: sync.started + 1 };
 }
 
+export function markChanged(sync: ChecklistSync): ChecklistSync {
+  return { ...sync, started: sync.started + 1 };
+}
+
 export function finishWrite(
   sync: ChecklistSync,
   saved: boolean,
