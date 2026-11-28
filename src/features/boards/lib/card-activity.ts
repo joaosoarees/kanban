@@ -82,29 +82,23 @@ export function parseCardActivity(type: string, data: unknown) {
   return entry.success ? entry.data : null;
 }
 
-export function mergeActivities(current: CardActivity[], page: CardActivity[]) {
-  const byId = new Map(
-    [...current, ...page].map((activity) => [activity.id, activity]),
-  );
-  return [...byId.values()].toSorted((a, b) => (a.id < b.id ? 1 : -1));
+function withoutListed(page: CardActivity[], listed: CardActivity[]) {
+  const ids = new Set(listed.map(({ id }) => id));
+  return page.filter(({ id }) => !ids.has(id));
 }
 
 export function refreshActivities(
   current: ActivityPage,
   fresh: ActivityPage,
 ): ActivityPage {
-  const newestLoaded = current.activities.at(0);
-  const oldestFresh = fresh.activities.at(-1);
-  const leavesGap =
-    fresh.nextCursor !== null &&
-    oldestFresh !== undefined &&
-    newestLoaded !== undefined &&
-    oldestFresh.id > newestLoaded.id;
-  if (newestLoaded === undefined || leavesGap) {
+  const older = withoutListed(current.activities, fresh.activities);
+  const reachesLoaded = older.length < current.activities.length;
+  const leavesGap = fresh.nextCursor !== null && !reachesLoaded;
+  if (current.activities.length === 0 || leavesGap) {
     return fresh;
   }
   return {
-    activities: mergeActivities(current.activities, fresh.activities),
+    activities: [...fresh.activities, ...older],
     nextCursor: current.nextCursor,
   };
 }
@@ -118,7 +112,10 @@ export function appendOlderActivities(
     return current;
   }
   return {
-    activities: mergeActivities(current.activities, older.activities),
+    activities: [
+      ...current.activities,
+      ...withoutListed(older.activities, current.activities),
+    ],
     nextCursor: older.nextCursor,
   };
 }
