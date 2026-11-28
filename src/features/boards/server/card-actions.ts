@@ -78,7 +78,7 @@ export async function createCardAction(
       },
       select: { id: true },
     });
-    await recordActivity(tx, card.id, {
+    await recordActivity(tx, actor.userId, card.id, {
       type: "CARD_CREATED",
       column: column.name,
     });
@@ -138,7 +138,7 @@ async function updateCard(
       data,
       select: { id: true },
     });
-    await recordActivity(tx, ref.cardId, event);
+    await recordActivity(tx, actor.userId, ref.cardId, event);
     return null;
   });
 
@@ -225,7 +225,7 @@ export async function setCardAssigneeAction(
       data: { assigneeId },
       select: { id: true },
     });
-    await recordActivity(tx, ref.cardId, {
+    await recordActivity(tx, actor.userId, ref.cardId, {
       type: "ASSIGNEE_CHANGED",
       from: current.assignee?.name ?? null,
       to: assigneeName,

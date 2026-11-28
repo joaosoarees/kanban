@@ -58,7 +58,7 @@ export async function setCardDueAction(
       data: { dueOn: dueOn === null ? null : new Date(`${dueOn}T00:00:00Z`) },
       select: { id: true },
     });
-    await recordActivity(tx, ref.cardId, {
+    await recordActivity(tx, actor.userId, ref.cardId, {
       type: "DUE_CHANGED",
       from: previousDue,
       to: dueOn,
@@ -109,7 +109,7 @@ export async function setCardCompletionAction(
       SET "completedAt" = CASE WHEN ${completed}::boolean THEN now() END
       WHERE id = ${ref.cardId}::uuid
     `;
-    await recordActivity(tx, ref.cardId, {
+    await recordActivity(tx, actor.userId, ref.cardId, {
       type: "COMPLETION_CHANGED",
       completed,
     });
