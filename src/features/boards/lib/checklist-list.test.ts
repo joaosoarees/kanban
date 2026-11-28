@@ -81,7 +81,10 @@ describe("moveToIndex", () => {
   it("should clamp an index past the end", () => {
     const sut = moveToIndex(LIST, "a", 9);
 
-    expect(sut?.previousId).toBe("c");
+    expect(sut).toEqual({
+      items: [LIST[1], LIST[2], LIST[0]],
+      previousId: "c",
+    });
   });
 
   it("should return null when the item is not in the list", () => {
