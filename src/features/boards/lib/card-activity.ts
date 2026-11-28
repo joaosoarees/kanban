@@ -108,3 +108,17 @@ export function refreshActivities(
     nextCursor: current.nextCursor,
   };
 }
+
+export function appendOlderActivities(
+  current: ActivityPage,
+  cursor: string,
+  older: ActivityPage,
+): ActivityPage {
+  if (current.nextCursor !== cursor) {
+    return current;
+  }
+  return {
+    activities: mergeActivities(current.activities, older.activities),
+    nextCursor: older.nextCursor,
+  };
+}

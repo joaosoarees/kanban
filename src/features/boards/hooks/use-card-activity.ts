@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import * as z from "zod";
 import {
+  appendOlderActivities,
   cardActivitySchema,
-  mergeActivities,
   refreshActivities,
   type ActivityPage,
 } from "@/features/boards/lib/card-activity";
@@ -35,12 +35,16 @@ async function fetchActivityPage(
   url: string,
   before: string | null,
 ): Promise<ActivityPage | null> {
-  const query = before === null ? "" : `?before=${before}`;
+  const query =
+    before === null ? "" : `?${new URLSearchParams({ before }).toString()}`;
   try {
     const response = await fetch(`${url}${query}`, {
       cache: "no-store",
       redirect: "error",
     });
+    if (!response.ok) {
+      return null;
+    }
     const result = pageResponseSchema.parse(await response.json());
     return result.status === "success" ? result.data : null;
   } catch (caught) {
@@ -139,19 +143,17 @@ export function useCardActivity({
       setStatus("loading");
     },
     loadOlder: async () => {
-      if (list.nextCursor === null || older === "loading") {
+      const cursor = list.nextCursor;
+      if (cursor === null || older === "loading") {
         return;
       }
       setOlder("loading");
-      const page = await fetchActivityPage(url, list.nextCursor);
+      const page = await fetchActivityPage(url, cursor);
       if (page === null) {
         setOlder("failed");
         return;
       }
-      setList((current) => ({
-        activities: mergeActivities(current.activities, page.activities),
-        nextCursor: page.nextCursor,
-      }));
+      setList((current) => appendOlderActivities(current, cursor, page));
       setOlder("idle");
     },
   };
