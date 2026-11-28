@@ -68,13 +68,17 @@ export async function lockCard(
   ref: { boardId: string; cardId: string },
 ) {
   const locked = await tx.$queryRaw<{ id: string }[]>`
-    SELECT card.id FROM cards card
-    JOIN columns board_column ON board_column.id = card."columnId"
-    JOIN boards board ON board.id = board_column."boardId"
-    WHERE card.id = ${ref.cardId}::uuid
-      AND board_column."boardId" = ${ref.boardId}::uuid
-      AND board."workspaceId" = ${workspaceId}::uuid
-    FOR NO KEY UPDATE OF card
+    SELECT id FROM cards WHERE id = ${ref.cardId}::uuid FOR NO KEY UPDATE
   `;
-  return locked.length > 0;
+  if (locked.length === 0) {
+    return false;
+  }
+  const card = await tx.card.findUnique({
+    where: {
+      id: ref.cardId,
+      column: { boardId: ref.boardId, board: { workspaceId } },
+    },
+    select: { id: true },
+  });
+  return card !== null;
 }
