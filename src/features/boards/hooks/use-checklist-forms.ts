@@ -69,8 +69,11 @@ export function useChecklistForms({
     failure: CREATE_FAILED,
     onSuccess: ({ id }, values) => {
       checklist.added({ id, text: values.text, completed: false });
-      add.form.reset({ text: "" });
+      if (checklist.items.length + 1 >= MAX_CHECKLIST_ITEMS) {
+        refocusTextOf.current = id;
+      }
       add.form.setFocus("text");
+      add.form.reset({ text: "" });
     },
     onError: (error) => {
       if (error.gone === true) {
@@ -180,6 +183,7 @@ export function useChecklistForms({
         }
       },
       open: () => {
+        add.form.reset({ text: "" });
         setIsAdding(true);
       },
       close: closeAdd,
