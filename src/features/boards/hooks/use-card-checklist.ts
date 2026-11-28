@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
-import * as z from "zod";
 import {
+  checklistResponseSchema,
   moveToIndex,
   placeAfter,
   previousIdOf,
@@ -14,6 +14,7 @@ import {
   markChanged,
   receiveList,
   startWrite,
+  type ChecklistSync,
 } from "@/features/boards/lib/checklist-sync";
 import {
   deleteChecklistItemAction,
@@ -27,17 +28,6 @@ const SAVE_FAILED = "Não foi possível salvar. Tente de novo.";
 const RELOAD_FAILED =
   "Não foi possível atualizar o checklist. Feche e abra o card de novo.";
 
-const itemSchema = z.object({
-  id: z.string(),
-  text: z.string(),
-  completed: z.boolean(),
-});
-
-const responseSchema = z.discriminatedUnion("status", [
-  z.object({ status: z.literal("success"), data: z.array(itemSchema) }),
-  z.object({ status: z.literal("error"), message: z.string() }),
-]);
-
 type ListStatus = "loading" | "reloading" | "failed" | "ready";
 
 export type ChecklistNotice = { tone: "error" | "info"; message: string };
@@ -50,7 +40,7 @@ async function fetchChecklist(
     if (response.status === 404) {
       return "gone";
     }
-    const result = responseSchema.parse(await response.json());
+    const result = checklistResponseSchema.parse(await response.json());
     if (result.status === "error") {
       return "failed";
     }
@@ -63,6 +53,10 @@ async function fetchChecklist(
     console.error(caught);
     return "failed";
   }
+}
+
+function syncOf(syncs: Map<string, ChecklistSync>, url: string) {
+  return syncs.get(url) ?? IDLE_SYNC;
 }
 
 type CardChecklistOptions = {
@@ -88,9 +82,8 @@ export function useCardChecklist({
   const [loadedUrl, setLoadedUrl] = useState(url);
   const [request, setRequest] = useState(0);
   const currentUrl = useRef(url);
-  const syncUrl = useRef(url);
   const cardGone = useEffectEvent(onCardGone);
-  const sync = useRef(IDLE_SYNC);
+  const syncs = useRef(new Map<string, ChecklistSync>());
   const loaded = useRef(false);
 
   if (loadedUrl !== url) {
@@ -101,10 +94,6 @@ export function useCardChecklist({
   }
 
   useEffect(() => {
-    if (url !== null && syncUrl.current !== url) {
-      sync.current = IDLE_SYNC;
-      syncUrl.current = url;
-    }
     if (currentUrl.current !== url) {
       loaded.current = false;
     }
@@ -114,7 +103,7 @@ export function useCardChecklist({
   useEffect(() => {
     let ignore = false;
     const load = async (listUrl: string) => {
-      const startedWhenSent = sync.current.started;
+      const startedWhenSent = syncOf(syncs.current, listUrl).started;
       const result = await fetchChecklist(listUrl);
       if (ignore) {
         return;
@@ -132,8 +121,11 @@ export function useCardChecklist({
         }
         return;
       }
-      const received = receiveList(sync.current, startedWhenSent);
-      sync.current = received.sync;
+      const received = receiveList(
+        syncOf(syncs.current, listUrl),
+        startedWhenSent,
+      );
+      syncs.current.set(listUrl, received.sync);
       if (received.reload) {
         setRequest(request + 1);
         return;
@@ -154,6 +146,12 @@ export function useCardChecklist({
     };
   }, [url, request]);
 
+  const markListChanged = () => {
+    if (url !== null) {
+      syncs.current.set(url, markChanged(syncOf(syncs.current, url)));
+    }
+  };
+
   const requestList = () => {
     setStatus((current) => (current === "ready" ? "reloading" : current));
     setRequest((count) => count + 1);
@@ -164,14 +162,17 @@ export function useCardChecklist({
     revert: () => void,
   ) => {
     const requestUrl = url;
-    sync.current = startWrite(sync.current);
-    const result = await runAction(write, SAVE_FAILED);
-    if (requestUrl === null || syncUrl.current !== requestUrl) {
+    if (requestUrl === null) {
       return;
     }
+    syncs.current.set(
+      requestUrl,
+      startWrite(syncOf(syncs.current, requestUrl)),
+    );
+    const result = await runAction(write, SAVE_FAILED);
     const saved = result.status === "success";
-    const finished = finishWrite(sync.current, saved);
-    sync.current = finished.sync;
+    const finished = finishWrite(syncOf(syncs.current, requestUrl), saved);
+    syncs.current.set(requestUrl, finished.sync);
     if (currentUrl.current !== requestUrl) {
       return;
     }
@@ -197,14 +198,14 @@ export function useCardChecklist({
       setRequest((count) => count + 1);
     },
     added: (item: ChecklistEntry) => {
-      sync.current = markChanged(sync.current);
+      markListChanged();
       setNotice(null);
       setItems((current) =>
         current.some(({ id }) => id === item.id) ? current : [...current, item],
       );
     },
     renamed: (itemId: string, text: string) => {
-      sync.current = markChanged(sync.current);
+      markListChanged();
       setNotice(null);
       setItems((current) =>
         current.map((item) => (item.id === itemId ? { ...item, text } : item)),
