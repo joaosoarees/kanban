@@ -18,6 +18,7 @@ type CardPropertiesProps = {
   card: BoardCard;
   columns: BoardColumn[];
   onUpdateCard: (update: CardUpdate) => void;
+  onLabelDeleted: () => void;
 };
 
 export function CardProperties({
@@ -26,6 +27,7 @@ export function CardProperties({
   card,
   columns,
   onUpdateCard,
+  onLabelDeleted,
 }: CardPropertiesProps) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-y-1 sm:grid-cols-[96px_minmax(0,1fr)] sm:gap-x-2 sm:gap-y-1.5">
@@ -59,6 +61,7 @@ export function CardProperties({
         card={card}
         columns={columns}
         onUpdateCard={onUpdateCard}
+        onLabelDeleted={onLabelDeleted}
       />
     </div>
   );

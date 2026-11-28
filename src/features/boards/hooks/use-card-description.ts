@@ -39,6 +39,7 @@ export function useCardDescription({
   onLoadFailed,
 }: UseCardDescriptionOptions) {
   const [saved, setSaved] = useState<string | null>();
+  const [saves, setSaves] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [loadedCardId, setLoadedCardId] = useState(cardId);
   if (loadedCardId !== cardId) {
@@ -66,6 +67,7 @@ export function useCardDescription({
     failure: SAVE_FAILED,
     onSuccess: (_, values) => {
       setSaved(values.description);
+      setSaves((count) => count + 1);
       setIsEditing(false);
     },
     onError: (failure) => {
@@ -118,6 +120,7 @@ export function useCardDescription({
 
   return {
     saved,
+    saves,
     draft,
     error,
     isLoading,

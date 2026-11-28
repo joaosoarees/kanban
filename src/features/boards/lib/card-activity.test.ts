@@ -48,6 +48,15 @@ describe("refreshActivities", () => {
     expect(result).toEqual(pageOf(["04", "03", "02", "01"], null));
   });
 
+  it("should keep the order the server gave when a fresh event has a lower id than a loaded one", () => {
+    const current = pageOf(["05", "03"], null);
+    const fresh = pageOf(["06", "02", "05"], "05");
+
+    const result = refreshActivities(current, fresh);
+
+    expect(result).toEqual(pageOf(["06", "02", "05", "03"], null));
+  });
+
   it("should take the fresh page when nothing was loaded before", () => {
     const current = pageOf([], null);
     const fresh = pageOf(["03", "02"], "02");
@@ -66,6 +75,24 @@ describe("appendOlderActivities", () => {
     const result = appendOlderActivities(current, "04", older);
 
     expect(result).toEqual(pageOf(["05", "04", "03", "02"], "02"));
+  });
+
+  it("should keep the order the server gave when an older event has a higher id than a loaded one", () => {
+    const current = pageOf(["05", "04"], "04");
+    const older = pageOf(["06", "03"], null);
+
+    const result = appendOlderActivities(current, "04", older);
+
+    expect(result).toEqual(pageOf(["05", "04", "06", "03"], null));
+  });
+
+  it("should not repeat an older event that is already in the list", () => {
+    const current = pageOf(["05", "04"], "04");
+    const older = pageOf(["04", "03"], "03");
+
+    const result = appendOlderActivities(current, "04", older);
+
+    expect(result).toEqual(pageOf(["05", "04", "03"], "03"));
   });
 
   it("should keep the list when a refresh replaced it while the older page loaded", () => {
