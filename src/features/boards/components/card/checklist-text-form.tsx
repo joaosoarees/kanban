@@ -1,7 +1,7 @@
 "use client";
 
 import { CircleAlert, Info } from "lucide-react";
-import { useEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { primaryButton } from "@/components/button-styles";
 import { PendingButton } from "@/components/pending-button";
 import { Button } from "@/components/ui/button";
@@ -33,13 +33,13 @@ export function ChecklistTextForm({
 }: TextFormProps) {
   const { errors } = form.formState;
   const error = errors.text?.message ?? errors.root?.message;
-  const { setFocus } = form;
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    setFocus("text");
-  }, [setFocus]);
+  useLayoutEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
-  const field = form.register("text", {
+  const { ref: fieldRef, ...field } = form.register("text", {
     onChange: () => {
       form.clearErrors("root");
     },
@@ -53,6 +53,10 @@ export function ChecklistTextForm({
     >
       <input
         {...field}
+        ref={(node) => {
+          fieldRef(node);
+          inputRef.current = node;
+        }}
         aria-label={label}
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby={messageId}
