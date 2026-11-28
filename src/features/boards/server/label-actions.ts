@@ -5,13 +5,9 @@ import {
   LABEL_GONE_MESSAGE,
   labelSchema,
   MAX_LABELS_PER_BOARD,
-  MAX_LABELS_PER_CARD,
 } from "@/features/boards/lib/label-schemas";
-import {
-  BOARD_GONE,
-  CARD_GONE,
-  lockBoard,
-} from "@/features/boards/server/access";
+import { BOARD_GONE, lockBoard } from "@/features/boards/server/access";
+import { recordActivities } from "@/features/boards/server/activity";
 import {
   loadActorAllowedTo,
   revalidateWorkspace,
@@ -41,11 +37,6 @@ const NAME_TAKEN: ActionError = {
 const BOARD_LABEL_LIMIT: ActionError = {
   status: "error",
   message: `Um quadro pode ter no máximo ${MAX_LABELS_PER_BOARD} etiquetas.`,
-};
-
-const CARD_LABEL_LIMIT: ActionError = {
-  status: "error",
-  message: `Um card pode ter no máximo ${MAX_LABELS_PER_CARD} etiquetas.`,
 };
 
 const SUCCESS = { status: "success", data: undefined } as const;
@@ -165,119 +156,22 @@ export async function deleteLabelAction(
 
   await db.$transaction(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
-    if (lockedBoardId !== null) {
-      await tx.label.deleteMany({
-        where: { id: labelRef, boardId: lockedBoardId },
-      });
-    }
-  });
-
-  revalidateWorkspace(actor.slug);
-  return SUCCESS;
-}
-
-export async function addCardLabelAction(
-  workspaceId: unknown,
-  boardId: unknown,
-  cardId: unknown,
-  labelId: unknown,
-): Promise<ActionResult> {
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-
-  const cardRef = parseId(cardId);
-  const labelRef = parseId(labelId);
-  if (cardRef === null) {
-    return CARD_GONE;
-  }
-  if (labelRef === null) {
-    return LABEL_GONE;
-  }
-
-  const failure = await db.$transaction(async (tx) => {
-    const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
     if (lockedBoardId === null) {
-      return BOARD_GONE;
+      return;
     }
-
-    const inserted = await tx.$executeRaw`
-      INSERT INTO card_labels ("cardId", "labelId")
-      SELECT card.id, label.id
-      FROM cards card
-      JOIN columns board_column ON board_column.id = card."columnId"
-      JOIN labels label ON label."boardId" = board_column."boardId"
-      WHERE card.id = ${cardRef}::uuid
-        AND label.id = ${labelRef}::uuid
-        AND board_column."boardId" = ${lockedBoardId}::uuid
-        AND (
-          SELECT count(*) FROM card_labels applied
-          WHERE applied."cardId" = card.id
-        ) < ${MAX_LABELS_PER_CARD}
-      ON CONFLICT DO NOTHING
-    `;
-    if (inserted > 0) {
-      return null;
-    }
-
-    const card = await tx.card.findUnique({
-      where: { id: cardRef, column: { boardId: lockedBoardId } },
-      select: {
-        labels: { where: { labelId: labelRef }, select: { labelId: true } },
-      },
-    });
-    if (!card) {
-      return CARD_GONE;
-    }
-    if (card.labels.length > 0) {
-      return null;
-    }
-
     const label = await tx.label.findUnique({
       where: { id: labelRef, boardId: lockedBoardId },
-      select: { id: true },
+      select: { name: true, color: true, cards: { select: { cardId: true } } },
     });
-    return label ? CARD_LABEL_LIMIT : LABEL_GONE;
-  });
-
-  revalidateWorkspace(actor.slug);
-  return failure ?? SUCCESS;
-}
-
-export async function removeCardLabelAction(
-  workspaceId: unknown,
-  boardId: unknown,
-  cardId: unknown,
-  labelId: unknown,
-): Promise<ActionResult> {
-  const actor = await loadActorAllowedTo(workspaceId, "manageCards");
-  if (!actor) {
-    return FORBIDDEN;
-  }
-
-  const boardRef = parseId(boardId);
-  const cardRef = parseId(cardId);
-  const labelRef = parseId(labelId);
-  if (boardRef === null) {
-    return BOARD_GONE;
-  }
-  if (cardRef === null) {
-    return CARD_GONE;
-  }
-  if (labelRef === null) {
-    return LABEL_GONE;
-  }
-
-  await db.cardLabel.deleteMany({
-    where: {
-      cardId: cardRef,
-      labelId: labelRef,
-      label: {
-        boardId: boardRef,
-        board: { workspaceId: actor.workspaceId },
-      },
-    },
+    if (!label) {
+      return;
+    }
+    await tx.label.delete({ where: { id: labelRef }, select: { id: true } });
+    await recordActivities(
+      tx,
+      label.cards.map(({ cardId }) => cardId),
+      { type: "LABEL_REMOVED", name: label.name, color: label.color },
+    );
   });
 
   revalidateWorkspace(actor.slug);

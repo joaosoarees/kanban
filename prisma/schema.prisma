@@ -24,6 +24,7 @@ model User {
   sentInvites   Invite[]
   inviteSends   InviteSend[]
   comments      Comment[]
+  activities    CardActivity[]
 
   @@map("users")
 }
@@ -155,6 +156,7 @@ model Card {
   labels         CardLabel[]
   comments       Comment[]
   checklistItems ChecklistItem[]
+  activities     CardActivity[]
 
   @@unique([columnId, position])
   @@index([assigneeId])
@@ -225,4 +227,33 @@ model CardLabel {
   @@id([cardId, labelId])
   @@index([labelId])
   @@map("card_labels")
+}
+
+enum CardActivityType {
+  CARD_CREATED
+  CARD_MOVED
+  TITLE_CHANGED
+  DESCRIPTION_CHANGED
+  DUE_CHANGED
+  COMPLETION_CHANGED
+  ASSIGNEE_CHANGED
+  LABEL_ADDED
+  LABEL_REMOVED
+  CHECKLIST_ITEM_COMPLETION_CHANGED
+}
+
+model CardActivity {
+  id        String           @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  cardId    String           @db.Uuid
+  actorId   String?          @db.Uuid
+  type      CardActivityType
+  data      Json
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+
+  card  Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([cardId, id])
+  @@index([actorId])
+  @@map("card_activities")
 }

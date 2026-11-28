@@ -24,9 +24,9 @@ import type {
 import { MAX_LABELS_PER_CARD } from "@/features/boards/lib/label-schemas";
 import {
   addCardLabelAction,
-  deleteLabelAction,
   removeCardLabelAction,
-} from "@/features/boards/server/label-actions";
+} from "@/features/boards/server/card-label-actions";
+import { deleteLabelAction } from "@/features/boards/server/label-actions";
 import { cardsLabel } from "@/lib/card-count";
 
 const TOGGLE_FAILED = "Não foi possível salvar a etiqueta. Tente de novo.";
