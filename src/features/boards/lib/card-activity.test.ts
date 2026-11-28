@@ -39,13 +39,13 @@ describe("refreshActivities", () => {
     expect(result).toEqual(fresh);
   });
 
-  it("should merge when the fresh page has no older events", () => {
+  it("should keep the loaded events when the fresh page ends after them but has no older page", () => {
     const current = pageOf(["02", "01"], null);
-    const fresh = pageOf(["04", "03", "02", "01"], null);
+    const fresh = pageOf(["04", "03"], null);
 
     const result = refreshActivities(current, fresh);
 
-    expect(result).toEqual(fresh);
+    expect(result).toEqual(pageOf(["04", "03", "02", "01"], null));
   });
 
   it("should take the fresh page when nothing was loaded before", () => {
