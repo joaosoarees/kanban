@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   finishWrite,
   IDLE_SYNC,
+  markChanged,
   receiveList,
   startWrite,
 } from "./checklist-sync";
@@ -78,5 +79,18 @@ describe("receiveList", () => {
     const result = receiveList(sync, sentAt);
 
     expect(result).toEqual({ sync, apply: false, reload: true });
+  });
+
+  it("should reload now when the list changed locally while it was fetched", () => {
+    const sentAt = IDLE_SYNC.started;
+    const sync = markChanged(IDLE_SYNC);
+
+    const result = receiveList(sync, sentAt);
+
+    expect(result).toEqual({
+      sync: { pending: 0, started: 1, stale: false },
+      apply: false,
+      reload: true,
+    });
   });
 });

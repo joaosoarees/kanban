@@ -1,3 +1,5 @@
+import * as z from "zod";
+
 export type ChecklistEntry = {
   id: string;
   text: string;
@@ -53,3 +55,14 @@ export function moveToIndex(
 export function countDone(items: ChecklistEntry[]) {
   return items.filter(({ completed }) => completed).length;
 }
+
+const entrySchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  completed: z.boolean(),
+});
+
+export const checklistResponseSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("success"), data: z.array(entrySchema) }),
+  z.object({ status: z.literal("error"), message: z.string() }),
+]);
