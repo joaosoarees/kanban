@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  appendOlderActivities,
   refreshActivities,
   type ActivityPage,
   type CardActivity,
@@ -54,5 +55,25 @@ describe("refreshActivities", () => {
     const result = refreshActivities(current, fresh);
 
     expect(result).toEqual(fresh);
+  });
+});
+
+describe("appendOlderActivities", () => {
+  it("should add the older events below and take their cursor when the list still ends at the cursor", () => {
+    const current = pageOf(["05", "04"], "04");
+    const older = pageOf(["03", "02"], "02");
+
+    const result = appendOlderActivities(current, "04", older);
+
+    expect(result).toEqual(pageOf(["05", "04", "03", "02"], "02"));
+  });
+
+  it("should keep the list when a refresh replaced it while the older page loaded", () => {
+    const current = pageOf(["09", "08"], "08");
+    const older = pageOf(["03", "02"], "02");
+
+    const result = appendOlderActivities(current, "04", older);
+
+    expect(result).toEqual(current);
   });
 });
