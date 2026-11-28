@@ -41,6 +41,26 @@ describe("finishWrite", () => {
     });
   });
 
+  it("should not reload when a write is saved while others are pending and none failed", () => {
+    const sync = startWrite(startWrite(IDLE_SYNC));
+
+    const result = finishWrite(sync, true);
+
+    expect(result).toEqual({
+      sync: { pending: 1, changes: 3, stale: false },
+      reload: false,
+    });
+  });
+
+  it("should keep the pending count at zero when no write was pending", () => {
+    const result = finishWrite(IDLE_SYNC, true);
+
+    expect(result).toEqual({
+      sync: { pending: 0, changes: 1, stale: false },
+      reload: false,
+    });
+  });
+
   it("should reload when the last write is saved after an earlier one failed", () => {
     const sync = { pending: 1, changes: 2, stale: true };
 
@@ -64,6 +84,19 @@ describe("receiveList", () => {
     const sync = startWrite(IDLE_SYNC);
 
     const result = receiveList(sync, sync.changes);
+
+    expect(result).toEqual({
+      sync: { pending: 1, changes: 1, stale: true },
+      apply: false,
+      reload: false,
+    });
+  });
+
+  it("should hold a fetched list when a write started while it was fetched and is still pending", () => {
+    const sentAt = IDLE_SYNC.changes;
+    const sync = startWrite(IDLE_SYNC);
+
+    const result = receiveList(sync, sentAt);
 
     expect(result).toEqual({
       sync: { pending: 1, changes: 1, stale: true },

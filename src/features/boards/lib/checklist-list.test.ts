@@ -84,6 +84,15 @@ describe("moveToIndex", () => {
     });
   });
 
+  it("should clamp an index before the start", () => {
+    const result = moveToIndex(LIST, "c", -1);
+
+    expect(result).toEqual({
+      items: [LIST[2], LIST[0], LIST[1]],
+      previousId: null,
+    });
+  });
+
   it("should clamp an index past the end", () => {
     const result = moveToIndex(LIST, "a", 9);
 
