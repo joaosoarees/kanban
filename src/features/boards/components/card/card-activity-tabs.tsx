@@ -22,6 +22,7 @@ type CardActivityTabsProps = {
   commentCount: number;
   version: string;
   isSaving: boolean;
+  onCardGone: () => void;
   comments: ReactNode;
 };
 
@@ -32,6 +33,7 @@ export function CardActivityTabs({
   commentCount,
   version,
   isSaving,
+  onCardGone,
   comments,
 }: CardActivityTabsProps) {
   const [tab, setTab] = useState<ActivityTab>("comments");
@@ -42,6 +44,7 @@ export function CardActivityTabs({
     isOpen: tab === "history",
     version,
     isSaving,
+    onCardGone,
   });
 
   return (

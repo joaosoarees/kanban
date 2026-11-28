@@ -63,6 +63,10 @@ export function CardDialog({
     pushCardUrl(null);
   };
 
+  const refreshBoard = () => {
+    router.refresh();
+  };
+
   const description = useCardDescription({
     workspaceId,
     boardId,
@@ -79,9 +83,7 @@ export function CardDialog({
     workspaceId,
     boardId,
     cardId,
-    onCardGone: () => {
-      router.refresh();
-    },
+    onCardGone: refreshBoard,
   });
   const checklistForms = useChecklistForms({
     workspaceId,
@@ -169,6 +171,7 @@ export function CardDialog({
           checklistForms={checklistForms}
           comments={comments}
           commentForms={commentForms}
+          onCardGone={refreshBoard}
           onDeleted={() => {
             description.cancel();
             checklistForms.discard();
