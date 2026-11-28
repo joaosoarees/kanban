@@ -47,6 +47,7 @@ export function BoardColumns({
 }: BoardColumnsProps) {
   const {
     columns: confirmedColumns,
+    isSaving,
     move,
     moveCard,
     commitCardMove,
@@ -143,6 +144,7 @@ export function BoardColumns({
         workspaceId={workspaceId}
         boardId={boardId}
         columns={confirmedColumns}
+        isSaving={isSaving}
         onMoveCard={moveCard}
         onUpdateCard={updateCard}
       />

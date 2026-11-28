@@ -36,6 +36,7 @@ type CardDialogBodyProps = {
   column: BoardColumn;
   index: number;
   columns: BoardColumn[];
+  isSaving: boolean;
   canReorder: boolean;
   description: CardDescriptionState;
   checklist: CardChecklistState;
@@ -54,6 +55,7 @@ export function CardDialogBody({
   column,
   index,
   columns,
+  isSaving,
   canReorder,
   description,
   checklist,
@@ -165,6 +167,7 @@ export function CardDialogBody({
             cardId={card.id}
             commentCount={card.commentCount}
             version={historyVersion}
+            isSaving={isSaving}
             comments={
               <CardComments
                 workspaceId={workspaceId}
