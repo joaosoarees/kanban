@@ -61,11 +61,14 @@ export async function setChecklistItemCompletionAction(
       return null;
     }
 
-    await tx.$executeRaw`
+    const updated = await tx.$executeRaw`
       UPDATE checklist_items
       SET "completedAt" = CASE WHEN ${completed}::boolean THEN now() END
       WHERE id = ${itemRef.data}::uuid
     `;
+    if (updated === 0) {
+      return CHECKLIST_ITEM_GONE;
+    }
     await recordActivity(tx, ref.cardId, {
       type: "CHECKLIST_ITEM_COMPLETION_CHANGED",
       text: item.text,
