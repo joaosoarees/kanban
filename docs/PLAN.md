@@ -288,21 +288,23 @@ Comment (id, cardId, authorId, body, createdAt, editedAt?)
 - Skills: `modeling-entity-relationships` (1:N com cascata, limite entre linhas sob lock), `precomputed-counters` (por que não ter contador), `prisma-schema-and-migrations`, `react-query-optimistic-updates`, `motion-reorder`, `craft`.
 
 ```
-ChecklistItem (id, cardId, text, position, completedAt?)
+ChecklistItem (id, cardId, text, position, completedAt?, createdAt)
   @@unique([cardId, position]), card onDelete: Cascade
-  CHECK (char_length(text) BETWEEN 1 AND 200)
+  CHECK do texto: com algo visível, sem espaço nas pontas, uma linha, até 200 caracteres
+  CHECK (completedAt >= createdAt)
 ```
 
 ## Histórico do card (fatia 21)
 
-- O histórico é gravado pelas actions, não por trigger: o banco não sabe quem fez a mudança sem passar o usuário por `set_config` em toda transação, e as escritas do card já passam pelas actions de `boards/server`. Um `recordActivity(tx, …)` grava o evento na mesma transação da escrita.
+- O histórico é gravado pelas actions, não por trigger: o banco não sabe quem fez a mudança sem passar o usuário por `set_config` em toda transação, e as escritas do card já passam pelas actions de `boards/server`. Um `recordActivity(tx, actorId, …)` grava o evento na mesma transação da escrita e lê o nome de quem fez a mudança pelo `tx`: o `cache()` do React não vale dentro de uma Server Action, então um `requireUser()` ali faria a consulta em outra conexão, com a transação segurando as travas.
 - Entram: card criado, movido de coluna, título alterado, descrição editada (sem o texto), prazo definido ou removido, concluído ou reaberto, responsável trocado, etiqueta adicionada ou removida e item do checklist concluído ou reaberto.
 - Ficam de fora: reordenar dentro da mesma coluna e os comentários, que já têm a lista deles.
 - Uma action idempotente que não muda nada, como reaplicar uma etiqueta que o card já tem, não grava evento.
 - Tirar uma etiqueta do card trava o quadro, como pôr a etiqueta e excluí-la do quadro: sem essa trava, tirar e excluir ao mesmo tempo gravavam o evento de remoção duas vezes. O evento só é gravado quando a linha foi de fato apagada.
 - O evento guarda um retrato do que mudou (nomes de colunas, etiquetas e pessoas na hora), para o histórico não mudar quando algo é renomeado ou excluído depois. O formato de `data` é uma união discriminada por `type`, validada com Zod em `lib/`.
 - O retrato guarda também o nome de quem fez a mudança, então o evento continua com o nome mesmo se a conta deixar de existir e o `actorId` virar nulo. Quem sai do workspace deixa os eventos. Os eventos caem com o card.
-- O histórico carrega quando o diálogo abre, fora da consulta do quadro: os 30 mais recentes, e "Ver anteriores" busca mais com cursor pelo id (uuid v7), como os comentários. Se ele aparece junto com os comentários ou numa seção à parte, o `craft` decide nas telas.
+- O histórico carrega na primeira vez que a aba "Histórico" abre, fora da consulta do quadro: os 30 mais recentes, e "Ver anteriores" busca mais com cursor pelo id (uuid v7), como os comentários. Ele fica numa aba ao lado dos comentários (decisão das telas, no `DESIGN.md`).
+- A aba recarrega depois de cada escrita feita no diálogo. As escritas do quadro avisam pelo fim da transição; as do checklist, que não passam por ela, por um contador de escritas concluídas, porque dois toggles seguidos gravam dois eventos e deixam a contagem de concluídos igual. Um 404 da rota fecha o diálogo como card excluído.
 - Skills: `postgres-triggers` (por que não trigger), `modeling-entity-relationships`, `sql-cursor-pagination`, `prisma-schema-and-migrations`, `craft`.
 
 ```
