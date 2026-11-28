@@ -103,7 +103,7 @@ export function useCardChecklist({
   useEffect(() => {
     let ignore = false;
     const load = async (listUrl: string) => {
-      const startedWhenSent = syncOf(syncs.current, listUrl).started;
+      const changesWhenSent = syncOf(syncs.current, listUrl).changes;
       const result = await fetchChecklist(listUrl);
       if (ignore) {
         return;
@@ -123,7 +123,7 @@ export function useCardChecklist({
       }
       const received = receiveList(
         syncOf(syncs.current, listUrl),
-        startedWhenSent,
+        changesWhenSent,
       );
       syncs.current.set(listUrl, received.sync);
       if (received.reload) {
