@@ -19,81 +19,91 @@ function idsOf(items: ChecklistEntry[]) {
 
 describe("previousIdOf", () => {
   it("should return null for the first item", () => {
-    expect(previousIdOf(LIST, "a")).toBe(null);
+    const result = previousIdOf(LIST, "a");
+
+    expect(result).toBe(null);
   });
 
   it("should return the id of the item before it", () => {
-    expect(previousIdOf(LIST, "c")).toBe("b");
+    const result = previousIdOf(LIST, "c");
+
+    expect(result).toBe("b");
   });
 
   it("should return undefined when the item is not in the list", () => {
-    expect(previousIdOf(LIST, "z")).toBe(undefined);
+    const result = previousIdOf(LIST, "z");
+
+    expect(result).toBe(undefined);
   });
 });
 
 describe("placeAfter", () => {
   it("should put the item first when there is no previous id", () => {
-    const sut = placeAfter(LIST, entry("c"), null);
+    const result = placeAfter(LIST, entry("c"), null);
 
-    expect(idsOf(sut)).toEqual(["c", "a", "b"]);
+    expect(idsOf(result)).toEqual(["c", "a", "b"]);
   });
 
   it("should put the item right after the previous one", () => {
-    const sut = placeAfter(LIST, entry("a"), "b");
+    const result = placeAfter(LIST, entry("a"), "b");
 
-    expect(idsOf(sut)).toEqual(["b", "a", "c"]);
+    expect(idsOf(result)).toEqual(["b", "a", "c"]);
   });
 
   it("should put a missing item back after its previous one", () => {
     const withoutB = LIST.filter(({ id }) => id !== "b");
 
-    const sut = placeAfter(withoutB, entry("b", true), "a");
+    const result = placeAfter(withoutB, entry("b", true), "a");
 
-    expect(sut).toEqual(LIST);
+    expect(result).toEqual(LIST);
   });
 
   it("should put the item last when the previous id is gone", () => {
-    const sut = placeAfter(LIST, entry("a"), "z");
+    const result = placeAfter(LIST, entry("a"), "z");
 
-    expect(idsOf(sut)).toEqual(["b", "c", "a"]);
+    expect(idsOf(result)).toEqual(["b", "c", "a"]);
   });
 });
 
 describe("moveToIndex", () => {
   it("should move an item down and report its new previous id", () => {
-    const sut = moveToIndex(LIST, "a", 2);
+    const result = moveToIndex(LIST, "a", 2);
 
-    expect(sut).toEqual({
+    expect(result).toEqual({
       items: [LIST[1], LIST[2], LIST[0]],
       previousId: "c",
     });
   });
 
   it("should move an item to the top with no previous id", () => {
-    const sut = moveToIndex(LIST, "c", 0);
+    const result = moveToIndex(LIST, "c", 0);
 
-    expect(sut).toEqual({
+    expect(result).toEqual({
       items: [LIST[2], LIST[0], LIST[1]],
       previousId: null,
     });
   });
 
   it("should clamp an index past the end", () => {
-    const sut = moveToIndex(LIST, "a", 9);
+    const result = moveToIndex(LIST, "a", 9);
 
-    expect(sut).toEqual({
+    expect(result).toEqual({
       items: [LIST[1], LIST[2], LIST[0]],
       previousId: "c",
     });
   });
 
   it("should return null when the item is not in the list", () => {
-    expect(moveToIndex(LIST, "z", 0)).toBe(null);
+    const result = moveToIndex(LIST, "z", 0);
+
+    expect(result).toBe(null);
   });
 });
 
 describe("countDone", () => {
   it("should count the completed items", () => {
-    expect(countDone(LIST)).toBe(1);
+    const result = countDone(LIST);
+
+    expect(result).toBe(1);
   });
 });
