@@ -43,6 +43,7 @@ type CardDialogBodyProps = {
   checklistForms: ChecklistFormsState;
   comments: CardCommentsState;
   commentForms: CommentFormsState;
+  onCardGone: () => void;
   onDeleted: () => void;
   onMoveCard: (cardId: string, columnId: string, index: number) => void;
   onUpdateCard: (update: CardUpdate) => void;
@@ -62,6 +63,7 @@ export function CardDialogBody({
   checklistForms,
   comments,
   commentForms,
+  onCardGone,
   onDeleted,
   onMoveCard,
   onUpdateCard,
@@ -168,6 +170,7 @@ export function CardDialogBody({
             commentCount={card.commentCount}
             version={historyVersion}
             isSaving={isSaving}
+            onCardGone={onCardGone}
             comments={
               <CardComments
                 workspaceId={workspaceId}

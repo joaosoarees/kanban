@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import * as z from "zod";
 import {
   appendOlderActivities,
@@ -34,7 +34,7 @@ type OlderStatus = "idle" | "loading" | "failed";
 async function fetchActivityPage(
   url: string,
   before: string | null,
-): Promise<ActivityPage | null> {
+): Promise<ActivityPage | "gone" | null> {
   const query =
     before === null ? "" : `?${new URLSearchParams({ before }).toString()}`;
   try {
@@ -42,6 +42,9 @@ async function fetchActivityPage(
       cache: "no-store",
       redirect: "error",
     });
+    if (response.status === 404) {
+      return "gone";
+    }
     if (!response.ok) {
       return null;
     }
@@ -60,6 +63,7 @@ type UseCardActivityOptions = {
   isOpen: boolean;
   version: string;
   isSaving: boolean;
+  onCardGone: () => void;
 };
 
 export function useCardActivity({
@@ -69,6 +73,7 @@ export function useCardActivity({
   isOpen,
   version,
   isSaving,
+  onCardGone,
 }: UseCardActivityOptions) {
   const url = `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/activity`;
   const [status, setStatus] = useState<ListStatus>("idle");
@@ -78,6 +83,7 @@ export function useCardActivity({
   const [wasSaving, setWasSaving] = useState(isSaving);
   const [changes, setChanges] = useState(0);
   const [loadedChanges, setLoadedChanges] = useState(0);
+  const cardGone = useEffectEvent(onCardGone);
 
   if (version !== seenVersion) {
     setSeenVersion(version);
@@ -105,7 +111,10 @@ export function useCardActivity({
       if (ignore) {
         return;
       }
-      if (page === null) {
+      if (page === "gone") {
+        cardGone();
+      }
+      if (page === null || page === "gone") {
         setStatus("failed");
         return;
       }
@@ -128,7 +137,10 @@ export function useCardActivity({
       if (ignore) {
         return;
       }
-      if (page === null) {
+      if (page === "gone") {
+        cardGone();
+      }
+      if (page === null || page === "gone") {
         return;
       }
       setList((current) => refreshActivities(current, page));
@@ -159,7 +171,10 @@ export function useCardActivity({
       }
       setOlder("loading");
       const page = await fetchActivityPage(url, cursor);
-      if (page === null) {
+      if (page === "gone") {
+        onCardGone();
+      }
+      if (page === null || page === "gone") {
         setOlder("failed");
         return;
       }
