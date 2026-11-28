@@ -1,7 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
-import { useWatch } from "react-hook-form";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CardChecklistState } from "@/features/boards/hooks/use-card-checklist";
 import { checklistItemSchema } from "@/features/boards/lib/checklist-schemas";
 import type { ChecklistEntry } from "@/features/boards/lib/checklist-list";
@@ -40,6 +39,7 @@ export function useChecklistForms({
     ? requestedEditId
     : null;
   const [nextEdit, setNextEdit] = useState<ChecklistEntry | null>(null);
+  const [hasAddText, setHasAddText] = useState(false);
   const [formsCardId, setFormsCardId] = useState(cardId);
   const refocusAddButton = useRef(false);
   const refocusTextOf = useRef<string | null>(null);
@@ -114,10 +114,21 @@ export function useChecklistForms({
     }
   }, [cardId, addForm, editForm]);
 
-  const addText = useWatch({ control: add.form.control, name: "text" });
+  useEffect(
+    () =>
+      addForm.subscribe({
+        name: "text",
+        exact: true,
+        formState: { values: true },
+        callback: ({ values }) => {
+          setHasAddText(hasVisibleText(values.text));
+        },
+      }),
+    [addForm],
+  );
+
   const { isDirty: isEditChanged } = edit.form.formState;
-  const hasDraft =
-    isAdding && checklist.status !== "failed" && hasVisibleText(addText);
+  const hasDraft = isAdding && checklist.status !== "failed" && hasAddText;
   const hasEdit = editingId !== null && isEditChanged;
   const isDirty = hasDraft || hasEdit;
   const isBusy = add.isPending || edit.isPending;
