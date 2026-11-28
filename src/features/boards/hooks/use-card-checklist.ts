@@ -111,6 +111,7 @@ export function useCardChecklist({
   useEffect(() => {
     let ignore = false;
     const load = async (listUrl: string) => {
+      const startedWhenSent = sync.current.started;
       const result = await fetchChecklist(listUrl);
       if (ignore) {
         return;
@@ -128,12 +129,16 @@ export function useCardChecklist({
         }
         return;
       }
-      const received = receiveList(sync.current);
+      const received = receiveList(sync.current, startedWhenSent);
       sync.current = received.sync;
       if (received.apply) {
         setItems(result);
       }
       loaded.current = true;
+      if (received.reload) {
+        void load(listUrl);
+        return;
+      }
       setStatus("ready");
     };
     if (isFetching && url !== null) {

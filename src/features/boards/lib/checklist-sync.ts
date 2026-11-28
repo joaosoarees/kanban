@@ -1,9 +1,17 @@
-export type ChecklistSync = { pending: number; stale: boolean };
+export type ChecklistSync = {
+  pending: number;
+  started: number;
+  stale: boolean;
+};
 
-export const IDLE_SYNC: ChecklistSync = { pending: 0, stale: false };
+export const IDLE_SYNC: ChecklistSync = {
+  pending: 0,
+  started: 0,
+  stale: false,
+};
 
 export function startWrite(sync: ChecklistSync): ChecklistSync {
-  return { ...sync, pending: sync.pending + 1 };
+  return { ...sync, pending: sync.pending + 1, started: sync.started + 1 };
 }
 
 export function finishWrite(
@@ -13,17 +21,20 @@ export function finishWrite(
   const pending = Math.max(0, sync.pending - 1);
   const stale = sync.stale || !saved;
   if (pending === 0 && stale) {
-    return { sync: IDLE_SYNC, reload: true };
+    return { sync: { ...sync, pending, stale: false }, reload: true };
   }
-  return { sync: { pending, stale }, reload: false };
+  return { sync: { ...sync, pending, stale }, reload: false };
 }
 
-export function receiveList(sync: ChecklistSync): {
-  sync: ChecklistSync;
-  apply: boolean;
-} {
-  if (sync.pending === 0) {
-    return { sync, apply: true };
+export function receiveList(
+  sync: ChecklistSync,
+  startedWhenSent: number,
+): { sync: ChecklistSync; apply: boolean; reload: boolean } {
+  if (sync.pending > 0) {
+    return { sync: { ...sync, stale: true }, apply: false, reload: false };
   }
-  return { sync: { ...sync, stale: true }, apply: false };
+  if (sync.started !== startedWhenSent) {
+    return { sync, apply: false, reload: true };
+  }
+  return { sync, apply: true, reload: false };
 }
