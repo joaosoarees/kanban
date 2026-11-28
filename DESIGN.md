@@ -160,6 +160,7 @@ Nunca parecer: painel SaaS genérico, corporativo pesado (Jira/ERP), infantil (n
 - 2026-11-27 — O histórico carrega na primeira vez que a aba abre e recarrega sem esqueleto depois de uma mudança feita no próprio diálogo. Falha ao carregar mostra "Não foi possível carregar o histórico." com "Tentar de novo" dentro da aba; falha em "Ver anteriores" mostra a mensagem ao lado do botão.
 - 2026-11-27 — Cada evento é um ícone de 28px numa linha do tempo, a frase com os nomes em destaque e a data no formato dos comentários; concluir usa `success-bg`/`success-fg`. Sem avatar: o ícone diz o que mudou e o nome já está na frase. Quem fez a mudança aparece como "Você" quando é a própria pessoa.
 - 2026-11-27 — Renomear mostra o título antigo riscado e o novo, até 2 linhas cada; editar a descrição não mostra o texto. Card sem eventos (de antes da fatia 21) mostra "Nenhuma alteração registrada ainda." As frases usam `text-wrap: pretty`.
+- 2026-11-27 — "assumiu o card" aparece quando o nome do responsável é igual ao de quem atribuiu: os eventos guardam só nomes, então dois membros com o mesmo nome podem fazer uma atribuição parecer que a pessoa assumiu o card. Aceito como limitação conhecida.
 
 ## Perguntas abertas
 
