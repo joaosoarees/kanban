@@ -52,7 +52,7 @@ export async function setChecklistItemCompletionAction(
     }
     const item = await tx.checklistItem.findUnique({
       where: { id: itemRef.data, cardId: ref.cardId },
-      select: { text: true, completedAt: true },
+      select: { completedAt: true },
     });
     if (!item) {
       return CHECKLIST_ITEM_GONE;
@@ -61,17 +61,19 @@ export async function setChecklistItemCompletionAction(
       return null;
     }
 
-    const updated = await tx.$executeRaw`
+    const updated = await tx.$queryRaw<{ text: string }[]>`
       UPDATE checklist_items
       SET "completedAt" = CASE WHEN ${completed}::boolean THEN now() END
       WHERE id = ${itemRef.data}::uuid
+      RETURNING text
     `;
-    if (updated === 0) {
+    const saved = updated.at(0);
+    if (saved === undefined) {
       return CHECKLIST_ITEM_GONE;
     }
     await recordActivity(tx, actor.userId, ref.cardId, {
       type: "CHECKLIST_ITEM_COMPLETION_CHANGED",
-      text: item.text,
+      text: saved.text,
       completed,
     });
     return null;
