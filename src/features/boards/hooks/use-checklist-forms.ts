@@ -180,6 +180,7 @@ export function useChecklistForms({
         }
       },
       open: () => {
+        add.form.reset({ text: "" });
         setIsAdding(true);
       },
       close: closeAdd,
