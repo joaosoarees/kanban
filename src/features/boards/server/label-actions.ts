@@ -19,6 +19,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 import { isUniqueViolation } from "@/server/prisma-errors";
 
 const LABEL_GONE: ActionError = {
@@ -75,7 +76,7 @@ export async function createLabelAction(
   }
 
   const result = await refusingTakenName(async () =>
-    db.$transaction(async (tx) => {
+    transact(async (tx) => {
       const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
       if (lockedBoardId === null) {
         return BOARD_GONE;
@@ -154,7 +155,7 @@ export async function deleteLabelAction(
     return LABEL_GONE;
   }
 
-  await db.$transaction(async (tx) => {
+  await transact(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
     if (lockedBoardId === null) {
       return;

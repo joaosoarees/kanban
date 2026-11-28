@@ -20,7 +20,7 @@ import {
   type ActionError,
   type ActionResult,
 } from "@/lib/action-result";
-import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 
 const LABEL_GONE: ActionError = {
   status: "error",
@@ -59,7 +59,7 @@ export async function addCardLabelAction(
     return LABEL_GONE;
   }
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
     if (lockedBoardId === null) {
       return BOARD_GONE;
@@ -136,7 +136,7 @@ export async function removeCardLabelAction(
     return LABEL_GONE;
   }
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     const lockedBoardId = await lockBoard(tx, actor.workspaceId, boardId);
     if (lockedBoardId === null) {
       return BOARD_GONE;

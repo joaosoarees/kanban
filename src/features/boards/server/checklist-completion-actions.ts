@@ -14,7 +14,7 @@ import {
   revalidateWorkspace,
 } from "@/features/workspaces/server/access";
 import { FORBIDDEN, INVALID, type ActionResult } from "@/lib/action-result";
-import { db } from "@/server/db";
+import { transact } from "@/server/transaction";
 
 const SUCCESS = { status: "success", data: undefined } as const;
 
@@ -46,7 +46,7 @@ export async function setChecklistItemCompletionAction(
 
   const { completed } = parsed.data;
 
-  const failure = await db.$transaction(async (tx) => {
+  const failure = await transact(async (tx) => {
     if (!(await lockCard(tx, actor.workspaceId, ref))) {
       return CARD_GONE;
     }
