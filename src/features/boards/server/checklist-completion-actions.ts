@@ -69,7 +69,7 @@ export async function setChecklistItemCompletionAction(
     if (updated === 0) {
       return CHECKLIST_ITEM_GONE;
     }
-    await recordActivity(tx, ref.cardId, {
+    await recordActivity(tx, actor.userId, ref.cardId, {
       type: "CHECKLIST_ITEM_COMPLETION_CHANGED",
       text: item.text,
       completed,

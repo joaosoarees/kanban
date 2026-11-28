@@ -85,7 +85,10 @@ export async function addCardLabelAction(
         where: { id: labelRef },
         select: { name: true, color: true },
       });
-      await recordActivity(tx, cardRef, { type: "LABEL_ADDED", ...added });
+      await recordActivity(tx, actor.userId, cardRef, {
+        type: "LABEL_ADDED",
+        ...added,
+      });
       return null;
     }
 
@@ -158,7 +161,7 @@ export async function removeCardLabelAction(
       where: { cardId: cardRef, labelId: labelRef },
     });
     if (count > 0) {
-      await recordActivity(tx, cardRef, {
+      await recordActivity(tx, actor.userId, cardRef, {
         type: "LABEL_REMOVED",
         ...applied.label,
       });

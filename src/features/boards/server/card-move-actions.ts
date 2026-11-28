@@ -81,7 +81,7 @@ export async function moveCardAction(
       data: { columnId: column.id, position },
     });
     if (card.columnId !== column.id) {
-      await recordActivity(tx, cardId, {
+      await recordActivity(tx, actor.userId, cardId, {
         type: "CARD_MOVED",
         from: card.column.name,
         to: column.name,

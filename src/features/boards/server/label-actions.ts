@@ -169,6 +169,7 @@ export async function deleteLabelAction(
     await tx.label.delete({ where: { id: labelRef }, select: { id: true } });
     await recordActivities(
       tx,
+      actor.userId,
       label.cards.map(({ cardId }) => cardId),
       { type: "LABEL_REMOVED", name: label.name, color: label.color },
     );

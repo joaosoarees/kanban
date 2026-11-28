@@ -6,6 +6,7 @@ import {
 
 const ITEM_ID = "01a21e59-e2f6-7657-b816-ce9f42cd41d0";
 const OTHER_ID = "01a21e59-e2f8-70a9-8d18-85355a81bff8";
+const NUL = String.fromCodePoint(0);
 
 describe("checklistItemSchema", () => {
   it("should trim a valid item", () => {
@@ -19,6 +20,14 @@ describe("checklistItemSchema", () => {
     ["201 characters", "x".repeat(201)],
   ])("should refuse %s", (_case, text) => {
     expect(checklistItemSchema.safeParse({ text }).success).toBe(false);
+  });
+
+  it("should refuse a NUL character", () => {
+    const parsed = checklistItemSchema.safeParse({ text: `a${NUL}b` });
+
+    expect(parsed.error?.issues.map(({ message }) => message)).toEqual([
+      "Remova os caracteres inválidos.",
+    ]);
   });
 
   it("should accept 200 characters", () => {
