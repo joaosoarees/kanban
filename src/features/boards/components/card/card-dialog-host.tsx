@@ -19,6 +19,7 @@ type CardDialogHostProps = {
   workspaceId: string;
   boardId: string;
   columns: BoardColumn[];
+  isSaving: boolean;
   onMoveCard: (cardId: string, columnId: string, index: number) => void;
   onUpdateCard: (update: CardUpdate) => void;
 };
@@ -31,6 +32,7 @@ export function CardDialogHost({
   workspaceId,
   boardId,
   columns,
+  isSaving,
   onMoveCard,
   onUpdateCard,
 }: CardDialogHostProps) {
@@ -62,6 +64,7 @@ export function CardDialogHost({
       boardId={boardId}
       requestedId={requestedId}
       columns={columns}
+      isSaving={isSaving}
       canReorder={canReorder}
       onDeleted={(card) => {
         deletedCard.current = card;

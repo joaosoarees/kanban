@@ -59,6 +59,7 @@ type UseCardActivityOptions = {
   cardId: string;
   isOpen: boolean;
   version: string;
+  isSaving: boolean;
 };
 
 export function useCardActivity({
@@ -67,18 +68,27 @@ export function useCardActivity({
   cardId,
   isOpen,
   version,
+  isSaving,
 }: UseCardActivityOptions) {
   const url = `/api/workspaces/${workspaceId}/boards/${boardId}/cards/${cardId}/activity`;
   const [status, setStatus] = useState<ListStatus>("idle");
   const [list, setList] = useState(EMPTY_PAGE);
   const [older, setOlder] = useState<OlderStatus>("idle");
   const [seenVersion, setSeenVersion] = useState(version);
+  const [wasSaving, setWasSaving] = useState(isSaving);
   const [changes, setChanges] = useState(0);
   const [loadedChanges, setLoadedChanges] = useState(0);
 
   if (version !== seenVersion) {
     setSeenVersion(version);
     setChanges((count) => count + 1);
+  }
+
+  if (isSaving !== wasSaving) {
+    setWasSaving(isSaving);
+    if (!isSaving) {
+      setChanges((count) => count + 1);
+    }
   }
 
   if (isOpen && status === "idle") {
@@ -125,14 +135,14 @@ export function useCardActivity({
       setLoadedChanges(changes);
     };
     const timer =
-      isOpen && isStale
+      isOpen && isStale && !isSaving
         ? setTimeout(() => void refresh(), REFRESH_DELAY_MS)
         : undefined;
     return () => {
       ignore = true;
       clearTimeout(timer);
     };
-  }, [url, isOpen, isStale, changes]);
+  }, [url, isOpen, isStale, isSaving, changes]);
 
   return {
     status,

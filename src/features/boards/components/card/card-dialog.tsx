@@ -31,6 +31,7 @@ type CardDialogProps = {
   boardId: string;
   requestedId: string | null;
   columns: BoardColumn[];
+  isSaving: boolean;
   canReorder: boolean;
   onDeleted: (card: DeletedCard) => void;
   onMoveCard: (cardId: string, columnId: string, index: number) => void;
@@ -42,6 +43,7 @@ export function CardDialog({
   boardId,
   requestedId,
   columns,
+  isSaving,
   canReorder,
   onDeleted,
   onMoveCard,
@@ -160,6 +162,7 @@ export function CardDialog({
           column={column}
           index={index}
           columns={columns}
+          isSaving={isSaving}
           canReorder={canReorder}
           description={description}
           checklist={checklist}

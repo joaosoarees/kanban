@@ -52,7 +52,7 @@ export function useBoardColumns(
     (current, update: ColumnsUpdate) =>
       typeof update === "function" ? update(current) : update,
   );
-  const [, startTransition] = useTransition();
+  const [isSaving, startTransition] = useTransition();
 
   const updateCard = ({ cardId, change, write, failure }: CardUpdate) => {
     startTransition(async () => {
@@ -134,5 +134,5 @@ export function useBoardColumns(
     }
   };
 
-  return { columns, move, moveCard, commitCardMove, updateCard };
+  return { columns, isSaving, move, moveCard, commitCardMove, updateCard };
 }
