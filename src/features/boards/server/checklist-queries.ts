@@ -4,7 +4,6 @@ import { db } from "@/server/db";
 export type ChecklistItem = {
   id: string;
   text: string;
-  position: string;
   completed: boolean;
 };
 
@@ -20,7 +19,7 @@ export async function getCardChecklist(
     select: {
       checklistItems: {
         orderBy: { position: "asc" },
-        select: { id: true, text: true, position: true, completedAt: true },
+        select: { id: true, text: true, completedAt: true },
       },
     },
   });
@@ -31,7 +30,6 @@ export async function getCardChecklist(
   return card.checklistItems.map((item) => ({
     id: item.id,
     text: item.text,
-    position: item.position,
     completed: item.completedAt !== null,
   }));
 }
