@@ -46,6 +46,7 @@ type LabelPickerProps = {
   card: BoardCard;
   columns: BoardColumn[];
   onUpdateCard: (update: CardUpdate) => void;
+  onLabelDeleted: () => void;
 };
 
 export function LabelPicker({
@@ -54,6 +55,7 @@ export function LabelPicker({
   card,
   columns,
   onUpdateCard,
+  onLabelDeleted,
 }: LabelPickerProps) {
   const { labels } = useBoardMeta();
   const [isOpen, setIsOpen] = useState(false);
@@ -174,6 +176,7 @@ export function LabelPicker({
                   deleteTarget.id,
                 );
                 if (result.status === "success") {
+                  onLabelDeleted();
                   startTransition(() => {
                     setIsDeleteOpen(false);
                     setDraft(null);

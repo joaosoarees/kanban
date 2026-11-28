@@ -37,7 +37,7 @@ async function fetchChecklist(
 ): Promise<ChecklistEntry[] | "gone" | "failed"> {
   try {
     const response = await fetch(url, { cache: "no-store", redirect: "error" });
-    if (response.status === 404) {
+    if (response.status === 401 || response.status === 404) {
       return "gone";
     }
     const result = checklistResponseSchema.parse(await response.json());
@@ -81,7 +81,7 @@ export function useCardChecklist({
   const [notice, setNotice] = useState<ChecklistNotice | null>(null);
   const [loadedUrl, setLoadedUrl] = useState(url);
   const [request, setRequest] = useState(0);
-  const [settledWrites, setSettledWrites] = useState(0);
+  const [settledToggles, setSettledToggles] = useState(0);
   const currentUrl = useRef(url);
   const cardGone = useEffectEvent(onCardGone);
   const syncs = useRef(new Map<string, ChecklistSync>());
@@ -177,7 +177,6 @@ export function useCardChecklist({
     if (currentUrl.current !== requestUrl) {
       return;
     }
-    setSettledWrites((count) => count + 1);
     if (result.status === "error" && result.gone === true) {
       setNotice({ tone: "info", message: result.message });
     } else if (result.status === "error") {
@@ -189,13 +188,11 @@ export function useCardChecklist({
     }
   };
 
-  const ref = { workspaceId, boardId, cardId };
-
   return {
     status,
     items,
     notice,
-    settledWrites,
+    settledToggles,
     retry: () => {
       setStatus("loading");
       setRequest((count) => count + 1);
@@ -229,14 +226,17 @@ export function useCardChecklist({
       };
       setCompleted(completed);
       void settle(
-        async () =>
-          setChecklistItemCompletionAction(
-            ref.workspaceId,
-            ref.boardId,
-            ref.cardId,
+        async () => {
+          const result = await setChecklistItemCompletionAction(
+            workspaceId,
+            boardId,
+            cardId,
             itemId,
             { completed },
-          ),
+          );
+          setSettledToggles((count) => count + 1);
+          return result;
+        },
         () => {
           setCompleted(!completed);
         },
@@ -258,7 +258,7 @@ export function useCardChecklist({
       );
       void settle(
         async () =>
-          moveChecklistItemAction(ref.workspaceId, ref.boardId, ref.cardId, {
+          moveChecklistItemAction(workspaceId, boardId, cardId, {
             itemId,
             previousItemId: moved.previousId,
           }),
@@ -282,12 +282,7 @@ export function useCardChecklist({
       setItems((current) => current.filter(({ id }) => id !== itemId));
       void settle(
         async () =>
-          deleteChecklistItemAction(
-            ref.workspaceId,
-            ref.boardId,
-            ref.cardId,
-            itemId,
-          ),
+          deleteChecklistItemAction(workspaceId, boardId, cardId, itemId),
         () => {
           setItems((current) => placeAfter(current, item, oldPreviousId));
         },

@@ -69,6 +69,7 @@ export function CardDialogBody({
   onUpdateCard,
 }: CardDialogBodyProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [labelDeletes, setLabelDeletes] = useState(0);
   const historyVersion = JSON.stringify([
     column.id,
     card.title,
@@ -77,8 +78,9 @@ export function CardDialogBody({
     card.dueOn,
     card.completed,
     card.checklistDone,
-    checklist.settledWrites,
-    description.saved,
+    checklist.settledToggles,
+    description.saves,
+    labelDeletes,
   ]);
   const footerOf = (visibility: string) => (
     <div className={cn("flex-col gap-4", visibility)}>
@@ -148,6 +150,9 @@ export function CardDialogBody({
             card={card}
             columns={columns}
             onUpdateCard={onUpdateCard}
+            onLabelDeleted={() => {
+              setLabelDeletes((count) => count + 1);
+            }}
           />
 
           <CardDescription cardId={card.id} state={description} />

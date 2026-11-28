@@ -42,7 +42,7 @@ async function fetchActivityPage(
       cache: "no-store",
       redirect: "error",
     });
-    if (response.status === 404) {
+    if (response.status === 401 || response.status === 404) {
       return "gone";
     }
     if (!response.ok) {
