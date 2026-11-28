@@ -11,6 +11,7 @@ import {
 import {
   finishWrite,
   IDLE_SYNC,
+  markChanged,
   receiveList,
   startWrite,
 } from "@/features/boards/lib/checklist-sync";
@@ -85,7 +86,9 @@ export function useCardChecklist({
   const [items, setItems] = useState<ChecklistEntry[]>([]);
   const [notice, setNotice] = useState<ChecklistNotice | null>(null);
   const [loadedUrl, setLoadedUrl] = useState(url);
+  const [request, setRequest] = useState(0);
   const currentUrl = useRef(url);
+  const syncUrl = useRef(url);
   const cardGone = useEffectEvent(onCardGone);
   const sync = useRef(IDLE_SYNC);
   const loaded = useRef(false);
@@ -98,14 +101,15 @@ export function useCardChecklist({
   }
 
   useEffect(() => {
-    if (currentUrl.current !== url) {
+    if (url !== null && syncUrl.current !== url) {
       sync.current = IDLE_SYNC;
+      syncUrl.current = url;
+    }
+    if (currentUrl.current !== url) {
       loaded.current = false;
     }
     currentUrl.current = url;
   }, [url]);
-
-  const isFetching = status === "loading" || status === "reloading";
 
   useEffect(() => {
     let ignore = false;
@@ -130,26 +134,30 @@ export function useCardChecklist({
       }
       const received = receiveList(sync.current, startedWhenSent);
       sync.current = received.sync;
-      if (received.apply) {
-        setItems(result);
-      }
-      loaded.current = true;
       if (received.reload) {
-        void load(listUrl);
+        setRequest(request + 1);
         return;
       }
-      setStatus("ready");
+      if (received.apply) {
+        setItems(result);
+        loaded.current = true;
+      }
+      if (loaded.current) {
+        setStatus("ready");
+      }
     };
-    if (isFetching && url !== null) {
+    if (url !== null) {
       void load(url);
     }
     return () => {
       ignore = true;
     };
-  }, [url, isFetching]);
+  }, [url, request]);
 
-  const isCurrent = (requestUrl: string | null) =>
-    requestUrl !== null && currentUrl.current === requestUrl;
+  const requestList = () => {
+    setStatus((current) => (current === "ready" ? "reloading" : current));
+    setRequest((count) => count + 1);
+  };
 
   const settle = async (
     write: () => Promise<ActionResult>,
@@ -158,20 +166,23 @@ export function useCardChecklist({
     const requestUrl = url;
     sync.current = startWrite(sync.current);
     const result = await runAction(write, SAVE_FAILED);
-    if (!isCurrent(requestUrl)) {
+    if (requestUrl === null || syncUrl.current !== requestUrl) {
       return;
     }
     const saved = result.status === "success";
-    if (result.status === "error" && result.gone === true) {
-      setNotice({ tone: "info", message: result.message });
-    } else if (!saved) {
-      revert();
-      setNotice({ tone: "error", message: SAVE_FAILED });
-    }
     const finished = finishWrite(sync.current, saved);
     sync.current = finished.sync;
+    if (currentUrl.current !== requestUrl) {
+      return;
+    }
+    if (result.status === "error" && result.gone === true) {
+      setNotice({ tone: "info", message: result.message });
+    } else if (result.status === "error") {
+      revert();
+      setNotice({ tone: "error", message: result.message });
+    }
     if (finished.reload) {
-      setStatus("reloading");
+      requestList();
     }
   };
 
@@ -183,12 +194,17 @@ export function useCardChecklist({
     notice,
     retry: () => {
       setStatus("loading");
+      setRequest((count) => count + 1);
     },
     added: (item: ChecklistEntry) => {
+      sync.current = markChanged(sync.current);
       setNotice(null);
-      setItems((current) => [...current, item]);
+      setItems((current) =>
+        current.some(({ id }) => id === item.id) ? current : [...current, item],
+      );
     },
     renamed: (itemId: string, text: string) => {
+      sync.current = markChanged(sync.current);
       setNotice(null);
       setItems((current) =>
         current.map((item) => (item.id === itemId ? { ...item, text } : item)),
@@ -196,7 +212,7 @@ export function useCardChecklist({
     },
     reload: (message: string) => {
       setNotice({ tone: "info", message });
-      setStatus("reloading");
+      requestList();
     },
     toggle: (itemId: string, completed: boolean) => {
       setNotice(null);
@@ -233,7 +249,9 @@ export function useCardChecklist({
         return;
       }
       setNotice(null);
-      setItems(moved.items);
+      setItems(
+        (current) => moveToIndex(current, itemId, index)?.items ?? current,
+      );
       void settle(
         async () =>
           moveChecklistItemAction(ref.workspaceId, ref.boardId, ref.cardId, {
