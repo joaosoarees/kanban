@@ -2,7 +2,10 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CardChecklistState } from "@/features/boards/hooks/use-card-checklist";
-import { checklistItemSchema } from "@/features/boards/lib/checklist-schemas";
+import {
+  checklistItemSchema,
+  MAX_CHECKLIST_ITEMS,
+} from "@/features/boards/lib/checklist-schemas";
 import type { ChecklistEntry } from "@/features/boards/lib/checklist-list";
 import {
   createChecklistItemAction,
@@ -49,6 +52,11 @@ export function useChecklistForms({
     setIsAdding(false);
     setEditingId(null);
     setNextEdit(null);
+  }
+
+  const isFull = checklist.items.length >= MAX_CHECKLIST_ITEMS;
+  if (isAdding && isFull && !hasAddText) {
+    setIsAdding(false);
   }
 
   const add = useActionForm({
