@@ -69,8 +69,8 @@ export function useChecklistForms({
     failure: CREATE_FAILED,
     onSuccess: ({ id }, values) => {
       checklist.added({ id, text: values.text, completed: false });
-      add.form.reset({ text: "" });
       add.form.setFocus("text");
+      add.form.reset({ text: "" });
     },
     onError: (error) => {
       if (error.gone === true) {
