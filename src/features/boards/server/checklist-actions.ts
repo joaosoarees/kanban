@@ -198,11 +198,11 @@ export async function moveChecklistItemAction(
       return CHECKLIST_CHANGED;
     }
 
-    await tx.checklistItem.update({
+    const { count } = await tx.checklistItem.updateMany({
       where: { id: itemId },
       data: { position },
     });
-    return null;
+    return count === 0 ? CHECKLIST_ITEM_GONE : null;
   });
 
   revalidateWorkspace(actor.slug);
